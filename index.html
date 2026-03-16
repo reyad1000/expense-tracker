@@ -482,7 +482,7 @@ html[dir="rtl"] .bar-label{text-align:start}
 const L={
 en:{
 appTitle:'UNDP Expense Tracker',totalUSD:'Total (USD)',entries:'Entries',payees:'Payees',
-navExpenses:'EXPENSES',navAdd:'ADD',navSummary:'SUMMARY',navRates:'RATES',navSave:'LOGIN',
+navExpenses:'EXPENSES',navAdd:'ADD',navSummary:'SUMMARY',navRates:'RATES',navSave:'LOGIN/LOGOUT',
 searchPH:'Search expenses...',
 fAll:'All',fGoods:'Goods',fServices:'Services',fTransport:'Transport',
 btnReport:'PDF Report',
@@ -535,7 +535,7 @@ passOk:'✓ Password verified',
 },
 ar:{
 appTitle:'متتبع مصروفات المشروع',totalUSD:'الإجمالي (دولار)',entries:'القيود',payees:'الموردين',
-navExpenses:'المصروفات',navAdd:'إضافة',navSummary:'ملخص',navRates:'الأسعار',navSave:'تسجيل',
+navExpenses:'المصروفات',navAdd:'إضافة',navSummary:'ملخص',navRates:'الأسعار',navSave:'دخول/خروج',
 searchPH:'بحث في المصروفات...',
 fAll:'الكل',fGoods:'بضائع',fServices:'خدمات',fTransport:'نقل',
 btnReport:'تقرير PDF',
@@ -1175,9 +1175,12 @@ saveExpense=async function(){
   clearForm();renderAll();switchPage('expenses');
 };
 
-// ===== PATCHED: deleteExpense with password gate =====
+// ===== PATCHED: deleteExpense with role + password gate =====
 const _origDeleteExpense=deleteExpense;
 deleteExpense=function(){
+  if(currentUser&&!currentUser.isAdmin){
+    toast('passWrong',true);return;
+  }
   if(isBusy())return;
   if(!confirm(T('cDel')))return;
   if(isCloudConnected){
@@ -1194,30 +1197,37 @@ deleteExpense=function(){
   }
 };
 
-// ===== PATCHED: openDetail — show lock on edit/delete for non-verified users =====
+// ===== PATCHED: openDetail — hide edit/delete for members =====
 const _origOpenDetail=openDetail;
 openDetail=function(id){
   _origOpenDetail(id);
-  // Always show edit/delete buttons, but they'll trigger password prompt
-  document.querySelectorAll('.modal-actions .btn').forEach(b=>{
-    b.style.opacity='1';b.style.pointerEvents='auto';
-  });
+  const isAdmin=currentUser&&currentUser.isAdmin;
   const note=document.getElementById('adminOnlyNote');
   if(note)note.remove();
-  // Show hint if not yet verified
-  if(isCloudConnected&&!adminVerified){
+  if(isAdmin){
+    // Admin: show edit/delete buttons
+    document.querySelectorAll('.modal-actions .btn').forEach(b=>{
+      b.style.display='inline-flex';
+    });
+  }else{
+    // Member: HIDE edit/delete buttons completely
+    document.querySelectorAll('.modal-actions .btn').forEach(b=>{
+      b.style.display='none';
+    });
     const info=document.createElement('div');
-    info.style.cssText='text-align:center;padding:8px;font-size:.72rem;color:var(--accent-amber);margin-top:8px';
-    info.textContent='🔐 '+(lang==='ar'?'التعديل والحذف يتطلب كلمة مرور المسؤول':'Edit & Delete require admin password');
+    info.style.cssText='text-align:center;padding:10px;font-size:.78rem;color:var(--text-muted);margin-top:8px';
+    info.textContent=lang==='ar'?'👁 عرض فقط — التعديل والحذف متاح للمسؤول فقط':'👁 View only — Edit & Delete available to Admin only';
     info.id='adminOnlyNote';
-    if(!document.getElementById('adminOnlyNote'))
-      document.querySelector('.modal-actions').after(info);
+    document.querySelector('.modal-actions').after(info);
   }
 };
 
-// ===== PATCHED: editExpense with password gate =====
+// ===== PATCHED: editExpense with role + password gate =====
 const _origEditExpense=editExpense;
 editExpense=function(){
+  if(currentUser&&!currentUser.isAdmin){
+    toast('passWrong',true);return;
+  }
   if(isCloudConnected&&!adminVerified){
     requirePassword(()=>{_origEditExpense()});
     return;
@@ -1500,12 +1510,6 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 // ===================== LOGIN SYSTEM =====================
 let currentUser=null; // {username, role, isAdmin}
 
-function setLoginLogo(){
-  const mainLogo=document.querySelector('header .akakos-logo');
-  const loginLogo=document.getElementById('loginLogo');
-  if(mainLogo&&loginLogo)loginLogo.src=mainLogo.src;
-}
-
 async function doLogin(){
   const url=document.getElementById('loginUrl').value.trim();
   const user=document.getElementById('loginUser').value;
@@ -1700,7 +1704,6 @@ async function deleteUser(username){
 
 
 init();
-setLoginLogo();
 if(!tryAutoLogin()){
   // Show login screen
   document.getElementById('loginScreen').style.display='flex';
@@ -1748,7 +1751,10 @@ function dismissInstall(){
   <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
     <!-- Logo & Project Info -->
     <div style="text-align:center;margin-bottom:20px">
-      <img class="akakos-logo" id="loginLogo" style="height:56px;margin-bottom:10px;border-radius:8px" alt="AKAKOS">
+      <div style="display:inline-block;background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:12px 20px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(59,130,246,.3)">
+        <div style="font-size:1.3rem;font-weight:800;color:#10b981;letter-spacing:1.5px">☘ AKAKOS</div>
+        <div style="font-size:.55rem;color:#94a3b8;letter-spacing:2px;margin-top:2px">FOR RENEWABLE ENERGIES</div>
+      </div>
       <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:2px">UNDP Expense Tracker</h2>
       <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
       <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
