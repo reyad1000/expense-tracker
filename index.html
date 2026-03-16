@@ -388,14 +388,35 @@ html[dir="rtl"] .bar-label{text-align:start}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
         <span data-t="cloudConnect"></span>
       </button>
-      <button class="btn btn-secondary" onclick="cloudRefresh()" style="flex:1" id="btnCloudRefresh" disabled>
+      <button class="btn btn-secondary" onclick="cloudRefresh()" style="flex:1" id="btnCloudRefresh">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <span data-t="cloudRefresh"></span>
       </button>
     </div>
     <div id="cloudInfo" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px;font-size:.75rem;color:var(--accent-green)"></div>
+    <button onclick="logout()" class="btn btn-danger btn-sm" style="margin-top:12px;width:100%">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Logout / تسجيل خروج
+    </button>
   </div>
-  <div class="form-section" id="dangerZone">
+    <!-- USER MANAGEMENT (Admin only) -->
+  <div class="form-section" id="userMgmtSection" style="display:none;border-color:rgba(139,92,246,.3)">
+    <h2 style="color:var(--accent-purple)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>User Management / إدارة المستخدمين</span>
+    </h2>
+    <div id="userList" style="margin-bottom:12px"></div>
+    <div id="addUserForm" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:10px">
+      <div style="font-size:.75rem;font-weight:600;color:var(--accent-purple);margin-bottom:8px">➕ Add New User / إضافة مستخدم جديد</div>
+      <div style="display:grid;gap:8px;grid-template-columns:1fr 1fr">
+        <input type="text" id="newUserName" placeholder="Username" style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-family:var(--font);font-size:.85rem;outline:none">
+        <input type="text" id="newUserPass" placeholder="Password" style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-family:var(--mono);font-size:.85rem;outline:none">
+      </div>
+      <button onclick="addNewUser()" class="btn btn-primary" style="margin-top:8px;padding:10px;font-size:.82rem">Add Member / إضافة عضو</button>
+    </div>
+  </div>
+
+<div class="form-section" id="dangerZone">
     <h2 style="font-size:.85rem;font-weight:600;color:var(--accent-red);margin-bottom:8px" data-t="danger"></h2>
     <p style="font-size:.72rem;color:var(--text-muted);margin-bottom:12px;line-height:1.4" data-t="dangerWarn"></p>
     <button class="btn btn-danger btn-sm" onclick="clearAllData()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span data-t="bClear"></span></button>
@@ -750,7 +771,7 @@ function renderExpenses(){
         <div class="ec-amounts"><div class="usd">${fUSD(u)}</div>${e.currency!=='USD'?`<div class="local">${fLocal(e.amount,e.currency)}</div>`:''}</div>
       </div>
       <div class="ec-bottom">
-        <span class="ec-payee">${esc(e.payee||'—')}</span>
+        <span class="ec-payee">${esc(e.payee||'—')}${e.addedBy?' · <span style="opacity:.6;font-size:.6rem">by '+esc(e.addedBy)+'</span>':''}</span>
         ${e.currency!=='USD'?`<span class="ec-rate${isManual?' ec-rate-manual':''}">${rl}</span>`:''}
       </div>
     </div>`}).join('');
@@ -845,6 +866,7 @@ function openDetail(id){
     [T('dPay'),e.payee||'—'],
     [T('dInv'),e.invoice||'—'],
     [T('dNotes'),e.notes||'—'],
+    ['Added by / أضيف بواسطة',e.addedBy||'—'],
   ];
   document.getElementById('modalBody').innerHTML=rows.map(([l,v])=>`<div class="detail-row"><span class="dlabel">${esc(l)}</span><span class="dvalue">${esc(v)}</span></div>`).join('');
   document.getElementById('detailModal').classList.add('open');
@@ -1038,7 +1060,7 @@ function closePassModal(ev){
 async function cloudAddExpense(entry){
   if(!isCloudConnected)return false;
   try{
-    const resp=await fetch(cloudUrl+'?action=addExpense',{method:'POST',body:JSON.stringify({...entry,addedBy:cloudUser})});
+    const resp=await fetch(cloudUrl+'?action=addExpense',{method:'POST',body:JSON.stringify({...entry,addedBy:currentUser?currentUser.username:cloudUser})});
     const data=await resp.json();
     if(data.success){await cloudSync(true);return true}
   }catch(err){console.error('Cloud add error:',err)}
@@ -1463,8 +1485,189 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
  }catch(err){alert('Excel Error: '+err.message);console.error(err)}
 }
 
+// ===================== LOGIN SYSTEM =====================
+let currentUser=null; // {username, role, isAdmin}
+
+function setLoginLogo(){
+  const mainLogo=document.querySelector('header .akakos-logo');
+  const loginLogo=document.getElementById('loginLogo');
+  if(mainLogo&&loginLogo)loginLogo.src=mainLogo.src;
+}
+
+async function doLogin(){
+  const url=document.getElementById('loginUrl').value.trim();
+  const user=document.getElementById('loginUser').value;
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginError');
+  const loadEl=document.getElementById('loginLoading');
+  const btn=document.getElementById('loginBtn');
+  
+  errEl.style.display='none';
+  if(!url){errEl.textContent='Please enter the Apps Script URL';errEl.style.display='block';return}
+  if(!user){errEl.textContent='Please select a username';errEl.style.display='block';return}
+  if(!pass){errEl.textContent='Please enter your password';errEl.style.display='block';return}
+  
+  btn.disabled=true;btn.style.opacity='.5';loadEl.style.display='block';
+  
+  try{
+    const resp=await fetch(url+'?action=login&username='+encodeURIComponent(user)+'&password='+encodeURIComponent(pass));
+    const data=await resp.json();
+    if(data.success){
+      currentUser=data;
+      // Save credentials for auto-login
+      localStorage.setItem('undp_login_url',url);
+      localStorage.setItem('undp_login_user',user);
+      localStorage.setItem('undp_login_role',data.role);
+      localStorage.setItem('undp_login_admin',data.isAdmin?'1':'0');
+      // Set cloud URL and user
+      cloudUrl=url;cloudUser=data.username;
+      localStorage.setItem('undp_cloud_url',url);
+      localStorage.setItem('undp_cloud_user',data.username);
+      document.getElementById('gSheetUrl').value=url;
+      document.getElementById('gUserName').value=data.username;
+      // If admin, auto-verify
+      if(data.isAdmin){adminVerified=true;sessionPassword=pass}
+      // Hide login, show app
+      document.getElementById('loginScreen').style.display='none';
+      // Sync with cloud
+      isCloudConnected=true;
+      await cloudSync(true);
+      applyUserPermissions();
+      toast('passOk',false);
+    }else{
+      errEl.textContent=data.error||'Login failed';
+      errEl.style.display='block';
+    }
+  }catch(err){
+    errEl.textContent='Connection error: '+err.message;
+    errEl.style.display='block';
+  }
+  btn.disabled=false;btn.style.opacity='1';loadEl.style.display='none';
+}
+
+function doLoginCancel(){
+  // Allow offline mode
+  document.getElementById('loginScreen').style.display='none';
+  currentUser={username:'offline',role:'member',isAdmin:false};
+  applyUserPermissions();
+}
+
+function applyUserPermissions(){
+  const isAdmin=currentUser&&currentUser.isAdmin;
+  // Show/hide danger zone
+  const dz=document.getElementById('dangerZone');
+  if(dz)dz.style.display=isAdmin?'block':'none';
+  // Show/hide user management
+  const um=document.getElementById('userMgmtSection');
+  if(um)um.style.display=isAdmin?'block':'none';
+  // Show/hide edit/delete buttons based on role
+  // (edit/delete already have password gate, but we also hide them for members)
+  // Update cloudInfo
+  const ci=document.getElementById('cloudInfo');
+  if(ci&&currentUser){
+    ci.style.display='block';
+    ci.textContent=isAdmin?
+      (lang==='ar'?'مسجل كـ: '+currentUser.username+' (مسؤول)':'Logged in as: '+currentUser.username+' (Admin)'):
+      (lang==='ar'?'مسجل كـ: '+currentUser.username+' (عضو)':'Logged in as: '+currentUser.username+' (Member)');
+  }
+  if(isAdmin)loadUserList();
+}
+
+function logout(){
+  localStorage.removeItem('undp_login_url');
+  localStorage.removeItem('undp_login_user');
+  localStorage.removeItem('undp_login_role');
+  localStorage.removeItem('undp_login_admin');
+  currentUser=null;adminVerified=false;sessionPassword='';isCloudConnected=false;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginError').style.display='none';
+}
+
+// Auto-login from saved credentials
+function tryAutoLogin(){
+  const url=localStorage.getItem('undp_login_url');
+  const user=localStorage.getItem('undp_login_user');
+  const role=localStorage.getItem('undp_login_role');
+  const isAdmin=localStorage.getItem('undp_login_admin')==='1';
+  if(url&&user){
+    document.getElementById('loginUrl').value=url;
+    document.getElementById('loginUser').value=user;
+    // Auto-connect without password (use saved session)
+    currentUser={username:user,role:role||'member',isAdmin:isAdmin};
+    cloudUrl=url;cloudUser=user;
+    localStorage.setItem('undp_cloud_url',url);
+    localStorage.setItem('undp_cloud_user',user);
+    document.getElementById('gSheetUrl').value=url;
+    document.getElementById('gUserName').value=user;
+    if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
+    document.getElementById('loginScreen').style.display='none';
+    isCloudConnected=true;
+    cloudSync(true);
+    applyUserPermissions();
+    return true;
+  }
+  return false;
+}
+
+// ===== USER MANAGEMENT =====
+async function loadUserList(){
+  if(!currentUser||!currentUser.isAdmin)return;
+  try{
+    const resp=await fetch(cloudUrl+'?action=getUsers&password='+encodeURIComponent(sessionPassword));
+    const data=await resp.json();
+    if(!data.success||!data.users)return;
+    const el=document.getElementById('userList');
+    el.innerHTML=data.users.map(u=>{
+      const badge=u.role==='admin'?'<span style="font-size:.6rem;background:var(--accent-blue);color:#fff;padding:2px 6px;border-radius:10px;font-weight:600">ADMIN</span>':'<span style="font-size:.6rem;background:rgba(255,255,255,.08);color:var(--text-muted);padding:2px 6px;border-radius:10px">MEMBER</span>';
+      const status=u.active?'<span style="color:var(--accent-green);font-size:.7rem">● Active</span>':'<span style="color:var(--accent-red);font-size:.7rem">● Disabled</span>';
+      const canDelete=u.role!=='admin';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">'+
+        '<div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">'+esc(u.username)+' '+badge+'</div>'+
+        '<div style="font-size:.7rem;color:var(--text-muted);margin-top:2px">'+status+' · Pass: '+esc(u.password)+'</div></div>'+
+        (canDelete?'<button onclick="deleteUser(\''+esc(u.username).replace(/'/g,"\\'")+'\')" style="background:var(--accent-red-dim);color:var(--accent-red);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:6px 10px;font-size:.7rem;cursor:pointer;font-family:var(--font)">Delete</button>':'')+
+        '</div>';
+    }).join('');
+  }catch(err){console.error('Load users error:',err)}
+}
+
+async function addNewUser(){
+  const name=document.getElementById('newUserName').value.trim();
+  const pass=document.getElementById('newUserPass').value.trim();
+  if(!name||!pass){alert(lang==='ar'?'أدخل اسم المستخدم وكلمة المرور':'Enter username and password');return}
+  try{
+    const resp=await fetch(cloudUrl+'?action=addUser&password='+encodeURIComponent(sessionPassword),{method:'POST',body:JSON.stringify({username:name,password:pass,role:'member'})});
+    const data=await resp.json();
+    if(data.success){
+      document.getElementById('newUserName').value='';
+      document.getElementById('newUserPass').value='';
+      toast('tAdd',false);
+      loadUserList();
+      // Add to login dropdown
+      const sel=document.getElementById('loginUser');
+      const opt=document.createElement('option');opt.value=name;opt.textContent=name;
+      sel.appendChild(opt);
+    }else{alert(data.error||'Error adding user')}
+  }catch(err){alert('Error: '+err.message)}
+}
+
+async function deleteUser(username){
+  if(!confirm((lang==='ar'?'حذف المستخدم: ':'Delete user: ')+username+'?'))return;
+  try{
+    const resp=await fetch(cloudUrl+'?action=deleteUser&username='+encodeURIComponent(username)+'&password='+encodeURIComponent(sessionPassword));
+    const data=await resp.json();
+    if(data.success){toast('tDel',false);loadUserList()}
+    else alert(data.error||'Error');
+  }catch(err){alert('Error: '+err.message)}
+}
+
+
 init();
-initCloud();
+setLoginLogo();
+if(!tryAutoLogin()){
+  // Show login screen
+  document.getElementById('loginScreen').style.display='flex';
+}
 
 // ===== INSTALL APP BANNER =====
 (function(){
@@ -1503,4 +1706,51 @@ function dismissInstall(){
 
 </script>
 </body>
-</html>
+</html><!-- LOGIN SCREEN — blocks access until authenticated -->
+<div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <!-- Logo & Project Info -->
+    <div style="text-align:center;margin-bottom:20px">
+      <img class="akakos-logo" id="loginLogo" style="height:56px;margin-bottom:10px;border-radius:8px" alt="AKAKOS">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:2px">UNDP Expense Tracker</h2>
+      <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
+      <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
+    </div>
+    <!-- URL Field -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL</label>
+      <input type="text" id="loginUrl" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.8rem;outline:none" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec">
+    </div>
+    <!-- Username Select -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username</label>
+      <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
+        <option value="">— Select user —</option>
+        <option value="reyad100@gmail.com">reyad100@gmail.com (Admin)</option>
+        <option value="AKAKOS">AKAKOS</option>
+        <option value="KIARI">KIARI</option>
+        <option value="FERRETTI">FERRETTI</option>
+      </select>
+    </div>
+    <!-- Password -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Password</label>
+      <input type="password" id="loginPass" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--mono);font-size:1.1rem;outline:none;letter-spacing:4px" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <!-- Error -->
+    <div id="loginError" style="display:none;color:var(--accent-red);font-size:.8rem;margin-bottom:12px;text-align:center;padding:8px;background:var(--accent-red-dim);border-radius:var(--radius-sm)"></div>
+    <!-- Buttons -->
+    <div style="display:flex;gap:8px">
+      <button onclick="doLogin()" style="flex:1;background:var(--accent-blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;min-height:var(--touch-min)" id="loginBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:6px;vertical-align:middle"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Login
+      </button>
+      <button onclick="doLoginCancel()" style="background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--font);font-size:.9rem;cursor:pointer;min-height:var(--touch-min)">Cancel</button>
+    </div>
+    <!-- Loading -->
+    <div id="loginLoading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:.8rem">
+      <span style="animation:pulse 1s infinite">⏳</span> Connecting...
+    </div>
+  </div>
+</div>
+
+
