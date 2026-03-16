@@ -996,13 +996,10 @@ function requirePassword(callback){
 }
 
 async function submitPassword(){
-  if(isBusy())return;
   const pw=document.getElementById('adminPassInput').value;
   if(!pw)return;
-  setBusy(true);
   if(!isCloudConnected){
     adminVerified=true;sessionPassword=pw;
-    setBusy(false);
     closePassModal({target:document.getElementById('passModal')});
     if(pendingAdminAction){pendingAdminAction();pendingAdminAction=null}
     return;
@@ -1013,7 +1010,6 @@ async function submitPassword(){
     if(data.verified){
       adminVerified=true;
       sessionPassword=pw;
-      setBusy(false);
       closePassModal({target:document.getElementById('passModal')});
       toast('passOk',false);
       document.getElementById('cloudInfo').style.display='block';
@@ -1021,14 +1017,12 @@ async function submitPassword(){
       document.getElementById('dangerZone').style.display='block';
       if(pendingAdminAction){pendingAdminAction();pendingAdminAction=null}
     }else{
-      setBusy(false);
       document.getElementById('passError').textContent=T('passWrong');
       document.getElementById('passError').style.display='block';
       document.getElementById('adminPassInput').value='';
       document.getElementById('adminPassInput').focus();
     }
   }catch(err){
-    setBusy(false);
     document.getElementById('passError').textContent=err.message;
     document.getElementById('passError').style.display='block';
   }
@@ -1107,12 +1101,12 @@ saveExpense=async function(){
   }else{
     if(!confirm(T('cEdit')))return;
   }
-  setBusy(true);
   if(pay&&!S.payeesList.includes(pay))S.payeesList.push(pay);
   
   if(isCloudConnected){
     if(editingId){
       requirePassword(async()=>{
+        setBusy(true);
         entry.id=editingId;entry.addedBy=cloudUser;
         const ok=await cloudEditExpense(entry);
         setBusy(false);
@@ -1125,6 +1119,7 @@ saveExpense=async function(){
       });
       return;
     }else{
+      setBusy(true);
       const ok=await cloudAddExpense(entry);
       setBusy(false);
       if(!ok){toast('eRead',true);return}
@@ -1146,14 +1141,14 @@ saveExpense=async function(){
   clearForm();renderAll();switchPage('expenses');
 };
 
-// ===== PATCHED: deleteExpense with password gate + busy lock =====
+// ===== PATCHED: deleteExpense with password gate =====
 const _origDeleteExpense=deleteExpense;
 deleteExpense=function(){
   if(isBusy())return;
   if(!confirm(T('cDel')))return;
-  setBusy(true);
   if(isCloudConnected){
     requirePassword(async()=>{
+      setBusy(true);
       const ok=await cloudDeleteExpense(viewingId);
       setBusy(false);
       if(!ok)return;
@@ -1161,7 +1156,6 @@ deleteExpense=function(){
     });
   }else{
     S.expenses=S.expenses.filter(e=>e.id!==viewingId);save();
-    setBusy(false);
     renderAll();closeModal({target:document.getElementById('detailModal')});toast('tDel');
   }
 };
