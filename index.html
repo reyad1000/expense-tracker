@@ -286,6 +286,8 @@ html[dir="rtl"] .bar-label{text-align:start}
     <button class="filter-chip" data-filter="Goods" onclick="setFilter('Goods')" data-t="fGoods"></button>
     <button class="filter-chip" data-filter="Services" onclick="setFilter('Services')" data-t="fServices"></button>
     <button class="filter-chip" data-filter="Transport" onclick="setFilter('Transport')" data-t="fTransport"></button>
+    <button class="filter-chip" data-filter="Accommodation" onclick="setFilter('Accommodation')" data-t="fAccom"></button>
+    <button class="filter-chip" data-filter="Other" onclick="setFilter('Other')" data-t="fOther"></button>
     <button class="filter-chip" style="margin-inline-start:auto;background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.3);color:var(--accent-purple)" onclick="generatePDFReport()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
       <span data-t="btnReport"></span>
@@ -480,7 +482,7 @@ en:{
 appTitle:'UNDP Expense Tracker',totalUSD:'Total (USD)',entries:'Entries',payees:'Payees',
 navExpenses:'EXPENSES',navAdd:'ADD',navSummary:'REPORTS',navRates:'RATES',navSave:'LOGIN/LOGOUT',
 searchPH:'Search expenses...',
-fAll:'All',fGoods:'Goods',fServices:'Services',fTransport:'Transport',
+fAll:'All',fGoods:'Goods',fServices:'Services',fTransport:'Transport',fAccom:'Accom.',fOther:'Other',
 btnReport:'PDF Report',
 btnExcel:'Excel Report',
 formNew:'New Expense Entry',formEdit:'Edit Expense',
@@ -533,7 +535,7 @@ ar:{
 appTitle:'متتبع مصروفات المشروع',totalUSD:'الإجمالي (دولار)',entries:'القيود',payees:'الموردين',
 navExpenses:'المصروفات',navAdd:'إضافة',navSummary:'تقارير',navRates:'الأسعار',navSave:'دخول/خروج',
 searchPH:'بحث في المصروفات...',
-fAll:'الكل',fGoods:'بضائع',fServices:'خدمات',fTransport:'نقل',
+fAll:'الكل',fGoods:'بضائع',fServices:'خدمات',fTransport:'نقل',fAccom:'إقامة',fOther:'أخرى',
 btnReport:'تقرير PDF',
 btnExcel:'تقرير Excel',
 formNew:'إدخال مصروف جديد',formEdit:'تعديل المصروف',
@@ -926,14 +928,21 @@ function renderRates(){
   document.getElementById('rYearTabs').innerHTML=years.map(y=>`<button class="${y===ratesYear?'active':''}" onclick="ratesYear=${y};renderRates()">${y}</button>`).join('');
   const yr=S.exchangeRates[ratesYear];if(!yr)return;
   let h='<thead><tr><th></th>';Mo.forEach((m,i)=>h+=`<th>${lang==='ar'?MA[i]:m}</th>`);h+='</tr></thead><tbody>';
-  h+=`<tr><td>${T('rLU')}</td>`;yr.LYD_USD.forEach((v,i)=>h+=`<td><input type="number" step="0.01" value="${v}" onchange="updRate('LYD_USD',${i},this.value)"></td>`);h+='</tr>';
-  h+=`<tr><td>${T('rLE')}</td>`;yr.LYD_EUR.forEach((v,i)=>h+=`<td><input type="number" step="0.01" value="${v}" onchange="updRate('LYD_EUR',${i},this.value)"></td>`);h+='</tr>';
+  const rOnly=currentUser&&!currentUser.isAdmin?' readonly style="opacity:.6;cursor:not-allowed"':'';
+  h+=`<tr><td>${T('rLU')}</td>`;yr.LYD_USD.forEach((v,i)=>h+=`<td><input type="number" step="0.01" value="${v}" onchange="updRate('LYD_USD',${i},this.value)"${rOnly}></td>`);h+='</tr>';
+  h+=`<tr><td>${T('rLE')}</td>`;yr.LYD_EUR.forEach((v,i)=>h+=`<td><input type="number" step="0.01" value="${v}" onchange="updRate('LYD_EUR',${i},this.value)"${rOnly}></td>`);h+='</tr>';
   h+=`<tr><td>${T('rLU2')}</td>`;yr.LYD_USD.forEach(v=>h+=`<td class="auto-cell">${(1/v).toFixed(4)}</td>`);h+='</tr>';
   h+=`<tr><td>${T('rEU')}</td>`;yr.LYD_EUR.forEach((v,i)=>h+=`<td class="auto-cell">${(v/yr.LYD_USD[i]).toFixed(4)}</td>`);h+='</tr>';
   h+=`<tr><td>${T('rUF')}</td>`;Mo.forEach(()=>h+='<td>1.0000</td>');h+='</tr></tbody>';
   document.getElementById('rTable').innerHTML=h;
 }
-function updRate(t,i,v){const n=parseFloat(v);if(isNaN(n)||n<=0)return;S.exchangeRates[ratesYear][t][i]=n;save();renderRates();renderAll()}
+function updRate(t,i,v){
+  if(currentUser&&!currentUser.isAdmin){
+    alert(lang==='ar'?'تعديل أسعار الصرف متاح للمسؤول فقط':'Exchange rate editing is Admin only');
+    renderRates();return;
+  }
+  const n=parseFloat(v);if(isNaN(n)||n<=0)return;S.exchangeRates[ratesYear][t][i]=n;save();renderRates();renderAll()
+}
 
 // ===== EXPORT/IMPORT =====
 function exportJSON(){const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});dl(b,`UNDP_Expenses_${new Date().toISOString().slice(0,10)}.json`);toast('tExp')}
@@ -1238,6 +1247,7 @@ editExpense=function(){
 // Pure browser print-to-PDF — NO external library needed, works 100% offline
 
 function generatePDFReport(){
+ try{
   const expenses=[...S.expenses].sort((a,b)=>new Date(a.year,Mo.indexOf(a.month),a.day)-new Date(b.year,Mo.indexOf(b.month),b.day));
   const totalUSD=expenses.reduce((s,e)=>s+toUSD(e),0);
   const now=new Date();
@@ -1272,6 +1282,8 @@ function generatePDFReport(){
       <td>${esc(e.payee||'')}</td>
       <td class="sm" style="text-align:center">${rateType}</td>
       <td class="sm">${esc(e.invoice||'')}</td>
+      <td class="sm">${esc(e.addedBy||'')}</td>
+      <td class="sm">${e.receiptUrl?'<a href="'+esc(e.receiptUrl)+'" style="color:#3b82f6;font-size:6pt">📎 Link</a>':'—'}</td>
       <td class="sm">${notes}</td>
     </tr>`;
   });
@@ -1336,21 +1348,23 @@ tr:nth-child(even){background:#f8fafc}
 </div>
 <div class="st">Detailed Expenses / المصروفات التفصيلية</div>
 <table><thead><tr>
-<th style="width:3%">#<span class="a">رقم</span></th>
-<th style="width:7%">Date<span class="a">التاريخ</span></th>
-<th style="width:8%">Category<span class="a">الفئة</span></th>
-<th style="width:30%">Description<span class="a">الوصف</span></th>
-<th style="width:4%">Cur.<span class="a">العملة</span></th>
-<th style="text-align:right;width:7%">Amount<span class="a">المبلغ</span></th>
-<th style="text-align:right;width:6%">Rate<span class="a">سعر الصرف</span></th>
-<th style="text-align:right;width:7%">USD<span class="a">دولار</span></th>
-<th style="width:7%">Payee<span class="a">المورد</span></th>
-<th style="width:5%">Type<span class="a">نوع السعر</span></th>
-<th style="width:6%">Invoice<span class="a">الفاتورة</span></th>
-<th style="width:10%">Notes<span class="a">ملاحظات</span></th>
+<th style="width:2%">#<span class="a">رقم</span></th>
+<th style="width:6%">Date<span class="a">التاريخ</span></th>
+<th style="width:7%">Category<span class="a">الفئة</span></th>
+<th style="width:22%">Description<span class="a">الوصف</span></th>
+<th style="width:3%">Cur.<span class="a">العملة</span></th>
+<th style="text-align:right;width:6%">Amount<span class="a">المبلغ</span></th>
+<th style="text-align:right;width:5%">Rate<span class="a">سعر الصرف</span></th>
+<th style="text-align:right;width:6%">USD<span class="a">دولار</span></th>
+<th style="width:6%">Payee<span class="a">المورد</span></th>
+<th style="width:4%">Type<span class="a">نوع</span></th>
+<th style="width:5%">Invoice<span class="a">الفاتورة</span></th>
+<th style="width:6%">By<span class="a">بواسطة</span></th>
+<th style="width:4%">📎<span class="a">إيصال</span></th>
+<th style="width:8%">Notes<span class="a">ملاحظات</span></th>
 </tr></thead><tbody>
 ${rows}
-<tr class="tr"><td colspan="8" style="text-align:left">TOTAL / الإجمالي</td><td class="n" style="color:#fff" colspan="4">${fUSD(totalUSD)}</td></tr>
+<tr class="tr"><td colspan="9" style="text-align:left">TOTAL / الإجمالي</td><td class="n" style="color:#fff" colspan="5">${fUSD(totalUSD)}</td></tr>
 </tbody></table>
 <div class="tc">
 <div><div class="st">By Category / حسب الفئة</div><table class="st2"><tbody>${catRows}</tbody></table></div>
@@ -1367,6 +1381,7 @@ ${rows}
   win.document.write(html);
   win.document.close();
   setTimeout(()=>{win.focus();win.print()},600);
+ }catch(err){alert('PDF Error: '+err.message);console.error(err)}
 }
 
 // ===================== EXCEL REPORT GENERATOR =====================
@@ -1400,9 +1415,9 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 </style>
 </head><body>
 <table border="0" cellpadding="4" cellspacing="0" width="100%">
-<col width="30"><col width="65"><col width="80"><col width="280">
-<col width="35"><col width="70"><col width="65"><col width="70">
-<col width="70"><col width="55"><col width="60"><col width="120">`;
+<col width="25"><col width="60"><col width="70"><col width="220">
+<col width="30"><col width="65"><col width="55"><col width="65">
+<col width="65"><col width="45"><col width="55"><col width="55"><col width="55"><col width="100">`;
 
   // Row 1: AKAKOS text logo + Title (merged)
   html+=`<tr style="height:35px;background:#1E3A5F">
@@ -1411,14 +1426,14 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
   </tr>`;
   // Row 2: English subtitle
   html+=`<tr style="height:20px;background:#1E3A5F">
-    <td colspan="12" style="font-size:9pt;color:#B0C4DE;text-align:center">UNDP Contract No. 10495188 — AKAKOS for Renewable Energies</td>
+    <td colspan="14" style="font-size:9pt;color:#B0C4DE;text-align:center">UNDP Contract No. 10495188 — AKAKOS for Renewable Energies</td>
   </tr>`;
   // Row 3: Arabic subtitle
   html+=`<tr style="height:20px;background:#1E3A5F">
-    <td colspan="12" style="font-size:9pt;color:#B0C4DE;text-align:center;direction:rtl">تقرير مصروفات المشروع — عقد برنامج الأمم المتحدة الإنمائي رقم 10495188 — أكاكوس للطاقات المتجددة</td>
+    <td colspan="14" style="font-size:9pt;color:#B0C4DE;text-align:center;direction:rtl">تقرير مصروفات المشروع — عقد برنامج الأمم المتحدة الإنمائي رقم 10495188 — أكاكوس للطاقات المتجددة</td>
   </tr>`;
   // Row 4: spacer
-  html+=`<tr style="height:6px"><td colspan="12"></td></tr>`;
+  html+=`<tr style="height:6px"><td colspan="14"></td></tr>`;
   // Row 5: Summary labels
   html+=`<tr style="height:20px">
     <td colspan="3" style="background:#F1F5F9;text-align:center;font-size:8pt;color:#64748B;border:1px solid #E2E8F0">Total Expenses / إجمالي المصروفات</td>
@@ -1434,12 +1449,12 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
     <td colspan="3" style="background:#F1F5F9;text-align:center;font-size:14pt;font-weight:bold;color:#1E3A5F;border:1px solid #E2E8F0">${payeeSet.size}</td>
   </tr>`;
   // Row 7: spacer
-  html+=`<tr style="height:6px"><td colspan="12"></td></tr>`;
+  html+=`<tr style="height:6px"><td colspan="14"></td></tr>`;
   // Row 8: Section title
-  html+=`<tr style="height:22px"><td colspan="12" style="font-size:11pt;font-weight:bold;color:#1E3A5F;border-bottom:2px solid #1E3A5F">Detailed Expenses / المصروفات التفصيلية</td></tr>`;
+  html+=`<tr style="height:22px"><td colspan="14" style="font-size:11pt;font-weight:bold;color:#1E3A5F;border-bottom:2px solid #1E3A5F">Detailed Expenses / المصروفات التفصيلية</td></tr>`;
 
   // Row 9: Table headers
-  const hdrs=[['#','رقم'],['Date','التاريخ'],['Category','الفئة'],['Description','الوصف'],['Cur.','العملة'],['Amount','المبلغ'],['Rate','سعر الصرف'],['USD','دولار'],['Payee','المورد'],['Type','نوع السعر'],['Invoice','الفاتورة'],['Notes','ملاحظات']];
+  const hdrs=[['#','رقم'],['Date','التاريخ'],['Category','الفئة'],['Description','الوصف'],['Cur.','العملة'],['Amount','المبلغ'],['Rate','سعر الصرف'],['USD','دولار'],['Payee','المورد'],['Type','نوع السعر'],['Invoice','الفاتورة'],['By','بواسطة'],['Receipt','إيصال'],['Notes','ملاحظات']];
   html+=`<tr style="height:28px">`;
   hdrs.forEach(([en,ar])=>{html+=`<th style="background:#1E3A5F;color:#fff;font-weight:bold;font-size:8pt;text-align:center;border:1px solid #334155">${en}<br><span style="font-weight:normal;font-size:7pt;opacity:0.75">${ar}</span></th>`});
   html+=`</tr>`;
@@ -1464,16 +1479,18 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
       <td style="border-bottom:1px solid #E8ECF0">${String(e.payee||'').replace(/</g,'&lt;')}</td>
       <td style="border-bottom:1px solid #E8ECF0;text-align:center;font-size:8pt">${rateType}</td>
       <td style="border-bottom:1px solid #E8ECF0;font-size:8pt">${String(e.invoice||'').replace(/</g,'&lt;')}</td>
+      <td style="border-bottom:1px solid #E8ECF0;font-size:7pt">${String(e.addedBy||'').replace(/</g,'&lt;')}</td>
+      <td style="border-bottom:1px solid #E8ECF0;font-size:7pt">${e.receiptUrl?'<a href="'+String(e.receiptUrl).replace(/</g,'&lt;')+'">📎 Link</a>':'—'}</td>
       <td style="border-bottom:1px solid #E8ECF0;font-size:8pt">${notes}</td>
     </tr>`;
   });
 
   // Total row
   html+=`<tr style="height:28px;background:#1E3A5F">
-    <td colspan="7" style="color:#fff;font-weight:bold;font-size:11pt">TOTAL / الإجمالي</td>
+    <td colspan="9" style="color:#fff;font-weight:bold;font-size:11pt">TOTAL / الإجمالي</td>
     <td colspan="5" class="n" style="color:#fff;font-weight:bold;font-size:11pt">${fUSD(totalUSD)}</td>
   </tr>`;
-  html+=`<tr style="height:8px"><td colspan="12"></td></tr>`;
+  html+=`<tr style="height:8px"><td colspan="14"></td></tr>`;
 
   // Category summary
   html+=`<tr style="height:22px"><td colspan="4" style="font-size:11pt;font-weight:bold;color:#1E3A5F;border-bottom:2px solid #1E3A5F">By Category / حسب الفئة</td><td colspan="8"></td></tr>`;
@@ -1481,7 +1498,7 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
     const bg=i%2===0?'#F1F5F9':'#fff';
     html+=`<tr style="height:18px"><td colspan="3" style="background:${bg};border-bottom:1px solid #E8ECF0">${String(c).replace(/</g,'&lt;')}</td><td class="n" style="background:${bg};font-weight:bold;color:#10B981;border-bottom:1px solid #E8ECF0">${fUSD(v)}</td><td colspan="8"></td></tr>`;
   });
-  html+=`<tr style="height:8px"><td colspan="12"></td></tr>`;
+  html+=`<tr style="height:8px"><td colspan="14"></td></tr>`;
 
   // Payee summary
   html+=`<tr style="height:22px"><td colspan="4" style="font-size:11pt;font-weight:bold;color:#1E3A5F;border-bottom:2px solid #1E3A5F">By Payee / حسب المورد</td><td colspan="8"></td></tr>`;
@@ -1489,10 +1506,10 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
     const bg=i%2===0?'#F1F5F9':'#fff';
     html+=`<tr style="height:18px"><td colspan="3" style="background:${bg};border-bottom:1px solid #E8ECF0">${String(p).replace(/</g,'&lt;')}</td><td class="n" style="background:${bg};font-weight:bold;color:#10B981;border-bottom:1px solid #E8ECF0">${fUSD(v)}</td><td colspan="8"></td></tr>`;
   });
-  html+=`<tr style="height:8px"><td colspan="12"></td></tr>`;
+  html+=`<tr style="height:8px"><td colspan="14"></td></tr>`;
 
   // Footer
-  html+=`<tr style="height:14px"><td colspan="12" style="font-size:7pt;color:#94A3B8">UNDP Contract No. 10495188 — AKAKOS for Renewable Energies — Confidential — Generated: ${now.toLocaleString()}</td></tr>`;
+  html+=`<tr style="height:14px"><td colspan="14" style="font-size:7pt;color:#94A3B8">UNDP Contract No. 10495188 — AKAKOS for Renewable Energies — Confidential — Generated: ${now.toLocaleString()}</td></tr>`;
 
   html+=`</table></body></html>`;
 
