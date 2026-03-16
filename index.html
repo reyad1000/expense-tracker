@@ -374,6 +374,7 @@ html[dir="rtl"] .bar-label{text-align:start}
       <span data-t="cloudTitle"></span>
     </h2>
     <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.45" data-t="cloudDesc"></p>
+    <div id="cloudFormFields">
     <div class="form-group" style="margin-bottom:10px">
       <label data-t="cloudUrl"></label>
       <input type="text" id="gSheetUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.82rem">
@@ -391,6 +392,17 @@ html[dir="rtl"] .bar-label{text-align:start}
       <button class="btn btn-secondary" onclick="cloudRefresh()" style="flex:1" id="btnCloudRefresh">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <span data-t="cloudRefresh"></span>
+      </button>
+    </div>
+    </div>
+    <div id="cloudConnectedInfo" style="display:none">
+      <div style="padding:14px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px;margin-bottom:12px">
+        <div style="font-size:.85rem;color:var(--accent-green);font-weight:600;margin-bottom:4px">✅ Connected to Google Sheets</div>
+        <div id="cloudUserInfo" style="font-size:.78rem;color:var(--text-secondary);line-height:1.4"></div>
+      </div>
+      <button onclick="cloudRefresh()" class="btn btn-secondary" style="width:100%;margin-bottom:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh Data / تحديث البيانات
       </button>
     </div>
     <div id="cloudInfo" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px;font-size:.75rem;color:var(--accent-green)"></div>
@@ -1526,7 +1538,9 @@ async function doLogin(){
       document.getElementById('gSheetUrl').value=url;
       document.getElementById('gUserName').value=data.username;
       // If admin, auto-verify
-      if(data.isAdmin){adminVerified=true;sessionPassword=pass}
+      if(data.isAdmin){adminVerified=true;sessionPassword=pass;localStorage.setItem('undp_admin_pw',pass)}
+      // Save session timestamp (30 min timeout)
+      localStorage.setItem('undp_session_time',Date.now().toString());
       // Hide login, show app
       document.getElementById('loginScreen').style.display='none';
       // Sync with cloud
@@ -1560,15 +1574,24 @@ function applyUserPermissions(){
   // Show/hide user management
   const um=document.getElementById('userMgmtSection');
   if(um)um.style.display=isAdmin?'block':'none';
-  // Show/hide edit/delete buttons based on role
-  // (edit/delete already have password gate, but we also hide them for members)
+  // Hide cloud form fields, show connected info when logged in
+  const ff=document.getElementById('cloudFormFields');
+  const ci2=document.getElementById('cloudConnectedInfo');
+  if(ff)ff.style.display=isCloudConnected?'none':'block';
+  if(ci2&&currentUser&&currentUser.username!=='offline'){
+    ci2.style.display='block';
+    const roleLabel=isAdmin?(lang==='ar'?'مسؤول':'Admin'):(lang==='ar'?'عضو':'Member');
+    document.getElementById('cloudUserInfo').innerHTML=
+      (lang==='ar'?'المستخدم: ':'User: ')+'<strong>'+esc(currentUser.username)+'</strong> ('+roleLabel+')<br>'+
+      (lang==='ar'?'الجلسة تنتهي بعد 30 دقيقة من آخر تسجيل دخول':'Session expires 30 min after last login');
+  }
   // Update cloudInfo
   const ci=document.getElementById('cloudInfo');
   if(ci&&currentUser){
     ci.style.display='block';
     ci.textContent=isAdmin?
       (lang==='ar'?'مسجل كـ: '+currentUser.username+' (مسؤول)':'Logged in as: '+currentUser.username+' (Admin)'):
-      (lang==='ar'?'مسجل كـ: '+currentUser.username+' (عضو)':'Logged in as: '+currentUser.username+' (Member)');
+      (lang==='ar'?'مسجل كـ: '+currentUser.username+' (عضو) — يمكنك إضافة مصروفات فقط. التعديل والحذف للمسؤول فقط.':'Logged in as: '+currentUser.username+' (Member) — you can add expenses. Only Admin can edit/delete.');
   }
   if(isAdmin)loadUserList();
 }
@@ -1578,36 +1601,50 @@ function logout(){
   localStorage.removeItem('undp_login_user');
   localStorage.removeItem('undp_login_role');
   localStorage.removeItem('undp_login_admin');
+  localStorage.removeItem('undp_session_time');
+  localStorage.removeItem('undp_admin_pw');
   currentUser=null;adminVerified=false;sessionPassword='';isCloudConnected=false;
+  // Reset UI
+  const ff=document.getElementById('cloudFormFields');if(ff)ff.style.display='block';
+  const ci2=document.getElementById('cloudConnectedInfo');if(ci2)ci2.style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('loginPass').value='';
   document.getElementById('loginError').style.display='none';
 }
 
-// Auto-login from saved credentials
+// Auto-login from saved credentials (30 min session)
 function tryAutoLogin(){
   const url=localStorage.getItem('undp_login_url');
   const user=localStorage.getItem('undp_login_user');
   const role=localStorage.getItem('undp_login_role');
   const isAdmin=localStorage.getItem('undp_login_admin')==='1';
-  if(url&&user){
-    document.getElementById('loginUrl').value=url;
-    document.getElementById('loginUser').value=user;
-    // Auto-connect without password (use saved session)
-    currentUser={username:user,role:role||'member',isAdmin:isAdmin};
-    cloudUrl=url;cloudUser=user;
-    localStorage.setItem('undp_cloud_url',url);
-    localStorage.setItem('undp_cloud_user',user);
-    document.getElementById('gSheetUrl').value=url;
-    document.getElementById('gUserName').value=user;
-    if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
-    document.getElementById('loginScreen').style.display='none';
-    isCloudConnected=true;
-    cloudSync(true);
-    applyUserPermissions();
-    return true;
+  const sessionTime=parseInt(localStorage.getItem('undp_session_time')||'0');
+  const SESSION_TIMEOUT=30*60*1000; // 30 minutes
+  
+  if(!url||!user)return false;
+  
+  // Check if session expired
+  if(Date.now()-sessionTime>SESSION_TIMEOUT){
+    // Session expired — clear and show login
+    logout();
+    return false;
   }
-  return false;
+  
+  // Session still valid — auto-login
+  currentUser={username:user,role:role||'member',isAdmin:isAdmin};
+  cloudUrl=url;cloudUser=user;
+  localStorage.setItem('undp_cloud_url',url);
+  localStorage.setItem('undp_cloud_user',user);
+  document.getElementById('gSheetUrl').value=url;
+  document.getElementById('gUserName').value=user;
+  if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
+  document.getElementById('loginScreen').style.display='none';
+  isCloudConnected=true;
+  // Refresh session timestamp on each page load
+  localStorage.setItem('undp_session_time',Date.now().toString());
+  cloudSync(true);
+  applyUserPermissions();
+  return true;
 }
 
 // ===== USER MANAGEMENT =====
@@ -1726,7 +1763,7 @@ function dismissInstall(){
       <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username</label>
       <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
         <option value="">— Select user —</option>
-        <option value="reyad100@gmail.com">reyad100@gmail.com (Admin)</option>
+        <option value="reyad100@gmail.com"><template class="__cf_email__" data-cfemail="f98b9c80989dc8c9c9b99e94989095d79a9694">[email&#160;protected]</template> (Admin)</option>
         <option value="AKAKOS">AKAKOS</option>
         <option value="KIARI">KIARI</option>
         <option value="FERRETTI">FERRETTI</option>
@@ -1748,9 +1785,4 @@ function dismissInstall(){
     </div>
     <!-- Loading -->
     <div id="loginLoading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:.8rem">
-      <span style="animation:pulse 1s infinite">⏳</span> Connecting...
-    </div>
-  </div>
-</div>
-
-
+  
