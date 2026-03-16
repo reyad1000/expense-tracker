@@ -878,7 +878,7 @@ function openDetail(id){
     [T('dNotes'),e.notes||'—'],
     ['Added by / أضيف بواسطة',e.addedBy||'—'],
   ];
-  document.getElementById('modalBody').innerHTML=rows.map(([l,v])=>`<div class="detail-row"><span class="dlabel">${esc(l)}</span><span class="dvalue">${esc(v)}</span></div>`).join('');
+  document.getElementById('modalBody').innerHTML=rows.map(([l,v])=>`<div class="detail-row"><span class="dlabel">${esc(l)}</span><span class="dvalue">${v&&v.startsWith('<a ')?v:esc(v)}</span></div>`).join('');
   document.getElementById('detailModal').classList.add('open');
 }
 function closeModal(ev){if(ev&&ev.target!==document.getElementById('detailModal'))return;document.getElementById('detailModal').classList.remove('open')}
@@ -1760,12 +1760,14 @@ function dismissInstall(){
     </div>
     <!-- URL Field -->
     <div style="margin-bottom:12px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL</label>
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL / رابط التطبيق</label>
       <input type="text" id="loginUrl" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.8rem;outline:none" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec">
+      <div style="font-size:.6rem;color:var(--text-muted);margin-top:3px;line-height:1.3">Please write the URL provided by the admin / يرجى كتابة الرابط المقدم من المسؤول</div>
     </div>
     <!-- Username Select -->
     <div style="margin-bottom:12px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username</label>
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username / اسم المستخدم</label>
+      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Select your username / اختر اسم المستخدم</div>
       <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
         <option value="">— Select user —</option>
         <option value="reyad100@gmail.com"><template class="__cf_email__" data-cfemail="f98b9c80989dc8c9c9b99e94989095d79a9694">[email&#160;protected]</template> (Admin)</option>
@@ -1776,18 +1778,20 @@ function dismissInstall(){
     </div>
     <!-- Password -->
     <div style="margin-bottom:16px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Password</label>
-      <input type="password" id="loginPass" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--mono);font-size:1.1rem;outline:none;letter-spacing:4px" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Password / كلمة المرور</label>
+      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Enter your password / أدخل كلمة المرور</div>
+      <input type="password" id="loginPass" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--mono);font-size:1.1rem;outline:none;letter-spacing:4px" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <!-- Error -->
     <div id="loginError" style="display:none;color:var(--accent-red);font-size:.8rem;margin-bottom:12px;text-align:center;padding:8px;background:var(--accent-red-dim);border-radius:var(--radius-sm)"></div>
     <!-- Buttons -->
     <div style="display:flex;gap:8px">
       <button onclick="doLogin()" style="flex:1;background:var(--accent-blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;min-height:var(--touch-min)" id="loginBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:6px;vertical-align:middle"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Login
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:6px;vertical-align:middle"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Login / دخول
       </button>
-      <button onclick="doLoginCancel()" style="background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--font);font-size:.9rem;cursor:pointer;min-height:var(--touch-min)">Cancel</button>
+      <button onclick="doLoginCancel()" style="background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--font);font-size:.9rem;cursor:pointer;min-height:var(--touch-min)">Cancel / إلغاء</button>
     </div>
     <!-- Loading -->
     <div id="loginLoading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:.8rem">
-  
+      <span style="animation:pulse 1s infinite">⏳</span> Connecting... / جاري الاتصال...
+    </div>
