@@ -319,6 +319,7 @@ html[dir="rtl"] .bar-label{text-align:start}
         </div>
       </div>
       <div class="form-group"><label data-t="lInv"></label><input type="text" id="fInvoice" data-tp="phOpt"></div>
+      <div class="form-group full"><label data-t="lReceipt"></label><input type="url" id="fReceiptUrl" placeholder="https://drive.google.com/..." style="font-size:.85rem"></div>
       <div class="form-group full"><label data-t="lNotes"></label><textarea id="fNotes" data-tp="phNotes" style="min-height:50px"></textarea></div>
     </div>
     <!-- Manual rate override -->
@@ -358,13 +359,8 @@ html[dir="rtl"] .bar-label{text-align:start}
 <!-- SAVE/LOAD -->
 <div class="page" id="page-settings">
   <div class="form-section">
-    <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><span data-t="sTitle"></span></h2>
+    <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg><span data-t="sTitle"></span></h2>
     <p style="font-size:.82rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5" data-t="sDesc"></p>
-    <div class="file-ops">
-      <button class="btn btn-primary" onclick="exportJSON()" style="flex:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span data-t="bExpJSON"></span></button>
-      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" style="flex:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg><span data-t="bImpJSON"></span></button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    </div>
     <div class="file-ops"><button class="btn btn-secondary" onclick="exportCSV()" style="flex:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg><span data-t="bExpCSV"></span></button></div>
   </div>
   <!-- CLOUD SYNC SECTION -->
@@ -482,14 +478,14 @@ html[dir="rtl"] .bar-label{text-align:start}
 const L={
 en:{
 appTitle:'UNDP Expense Tracker',totalUSD:'Total (USD)',entries:'Entries',payees:'Payees',
-navExpenses:'EXPENSES',navAdd:'ADD',navSummary:'SUMMARY',navRates:'RATES',navSave:'LOGIN/LOGOUT',
+navExpenses:'EXPENSES',navAdd:'ADD',navSummary:'REPORTS',navRates:'RATES',navSave:'LOGIN/LOGOUT',
 searchPH:'Search expenses...',
 fAll:'All',fGoods:'Goods',fServices:'Services',fTransport:'Transport',
 btnReport:'PDF Report',
 btnExcel:'Excel Report',
 formNew:'New Expense Entry',formEdit:'Edit Expense',
 lDay:'Day',lMonth:'Month',lYear:'Year',lCat:'Category',lCur:'Currency',lAmt:'Amount (Local)',
-lDesc:'Description',lPayee:'Payee',lInv:'Invoice / Receipt No.',lNotes:'Notes',
+lDesc:'Description',lPayee:'Payee',lInv:'Invoice / Receipt No.',lReceipt:'Receipt Link (Google Drive, Dropbox, etc.)',lNotes:'Notes',
 phDesc:'Describe the expense...',phOpt:'Optional',phNotes:'Optional notes...',
 usdConv:'USD Conversion:',
 manualRate:'Use manual exchange rate for this entry',
@@ -499,8 +495,8 @@ chCat:'Expenses by Category',chPay:'Expenses by Payee',chMon:'Monthly Spending (
 sTotal:'Total (USD)',sEntries:'Entries',sAvg:'Avg / Entry',sTopCat:'Top Category',
 rTitle:'Exchange Rates (LYD per 1 USD / EUR)',
 rLU:'LYD per 1 USD ✏',rLE:'LYD per 1 EUR ✏',rLU2:'LYD → USD (auto)',rEU:'EUR → USD (auto)',rUF:'USD → USD (fixed)',
-sTitle:'Save & Load Data',
-sDesc:'Your data auto-saves to this browser. Use the buttons below to export a backup or import data on another device.',
+sTitle:'Export Data',
+sDesc:'Export your expense data as a CSV spreadsheet file.',
 bExpJSON:'Export Backup (JSON)',bImpJSON:'Import Backup',bExpCSV:'Export as CSV',
 danger:'Danger Zone',bClear:'Clear All Data',
 dangerWarn:'⚠ Admin password required. This will permanently delete ALL expenses, exchange rates, and payees.',
@@ -535,14 +531,14 @@ passOk:'✓ Password verified',
 },
 ar:{
 appTitle:'متتبع مصروفات المشروع',totalUSD:'الإجمالي (دولار)',entries:'القيود',payees:'الموردين',
-navExpenses:'المصروفات',navAdd:'إضافة',navSummary:'ملخص',navRates:'الأسعار',navSave:'دخول/خروج',
+navExpenses:'المصروفات',navAdd:'إضافة',navSummary:'تقارير',navRates:'الأسعار',navSave:'دخول/خروج',
 searchPH:'بحث في المصروفات...',
 fAll:'الكل',fGoods:'بضائع',fServices:'خدمات',fTransport:'نقل',
 btnReport:'تقرير PDF',
 btnExcel:'تقرير Excel',
 formNew:'إدخال مصروف جديد',formEdit:'تعديل المصروف',
 lDay:'اليوم',lMonth:'الشهر',lYear:'السنة',lCat:'الفئة',lCur:'العملة',lAmt:'المبلغ (محلي)',
-lDesc:'وصف المصروف',lPayee:'المورد',lInv:'رقم الفاتورة / الإيصال',lNotes:'ملاحظات',
+lDesc:'وصف المصروف',lPayee:'المورد',lInv:'رقم الفاتورة / الإيصال',lReceipt:'رابط الإيصال (جوجل درايف، دروبوكس، إلخ)',lNotes:'ملاحظات',
 phDesc:'وصف المصروف...',phOpt:'اختياري',phNotes:'ملاحظات اختيارية...',
 usdConv:'التحويل بالدولار:',
 manualRate:'استخدام سعر صرف يدوي لهذا القيد',
@@ -783,7 +779,7 @@ function renderExpenses(){
         <div class="ec-amounts"><div class="usd">${fUSD(u)}</div>${e.currency!=='USD'?`<div class="local">${fLocal(e.amount,e.currency)}</div>`:''}</div>
       </div>
       <div class="ec-bottom">
-        <span class="ec-payee">${esc(e.payee||'—')}${e.addedBy?' · <span style="opacity:.6;font-size:.6rem">by '+esc(e.addedBy)+'</span>':''}</span>
+        <span class="ec-payee">${esc(e.payee||'—')}${e.addedBy?' · <span style="opacity:.6;font-size:.6rem">by '+esc(e.addedBy)+'</span>':''}${e.receiptUrl?' · <a href="'+esc(e.receiptUrl)+'" target="_blank" onclick="event.stopPropagation()" style="font-size:.6rem;color:var(--accent-blue)">📎</a>':''}</span>
         ${e.currency!=='USD'?`<span class="ec-rate${isManual?' ec-rate-manual':''}">${rl}</span>`:''}
       </div>
     </div>`}).join('');
@@ -825,7 +821,8 @@ function saveExpense(){
   if(!amt&&amt!==0){toast('eAmt',true);return}
   if(!desc&&!pay){toast('eDesc',true);return}
   const fixedUSDVal=parseFloat(calcUSD(amt,cur,mo,yr,manualRate>0?manualRate:null).toFixed(2));
-  const entry={day:d,month:mo,year:yr,category:cat,currency:cur,amount:amt,desc,payee:pay,invoice:inv,notes,manualRate:manualRate>0?manualRate:null,
+  const rcpt=document.getElementById('fReceiptUrl').value.trim();
+  const entry={day:d,month:mo,year:yr,category:cat,currency:cur,amount:amt,desc,payee:pay,invoice:inv,receiptUrl:rcpt,notes,manualRate:manualRate>0?manualRate:null,
     fixedRate:calcRateForDisplay(cur,mo,yr,manualRate>0?manualRate:null),
     fixedUSD:fixedUSDVal
   };
@@ -851,7 +848,7 @@ function saveExpense(){
   setBusy(false);
 }
 function clearForm(){
-  ['fAmount','fDesc','fPayee','fInvoice','fNotes','fManualRate'].forEach(id=>document.getElementById(id).value='');
+  ['fAmount','fDesc','fPayee','fInvoice','fReceiptUrl','fNotes','fManualRate'].forEach(id=>document.getElementById(id).value='');
   setToday();document.getElementById('fCategory').selectedIndex=0;document.getElementById('fCurrency').selectedIndex=0;
   document.getElementById('usdPreview').textContent='—';document.getElementById('ratePreview').textContent='';
   document.getElementById('fManualRateCheck').checked=false;
@@ -877,6 +874,7 @@ function openDetail(id){
     [T('dRateType'),isManual?T('rateManual'):(isLocked?T('rateLocked'):T('rateAuto'))],
     [T('dPay'),e.payee||'—'],
     [T('dInv'),e.invoice||'—'],
+    [T('dReceipt')||'Receipt / إيصال',e.receiptUrl?'<a href="'+esc(e.receiptUrl)+'" target="_blank" style="color:var(--accent-blue)">📎 '+T('viewReceipt')+'</a>':'—'],
     [T('dNotes'),e.notes||'—'],
     ['Added by / أضيف بواسطة',e.addedBy||'—'],
   ];
@@ -888,7 +886,7 @@ function editExpense(){
   const e=S.expenses.find(x=>x.id===viewingId);if(!e)return;editingId=e.id;
   document.getElementById('fDay').value=e.day;document.getElementById('fMonth').value=e.month;document.getElementById('fYear').value=e.year;
   document.getElementById('fCategory').value=e.category;document.getElementById('fCurrency').value=e.currency;document.getElementById('fAmount').value=e.amount;
-  document.getElementById('fDesc').value=e.desc;document.getElementById('fPayee').value=e.payee;document.getElementById('fInvoice').value=e.invoice;document.getElementById('fNotes').value=e.notes||'';
+  document.getElementById('fDesc').value=e.desc;document.getElementById('fPayee').value=e.payee;document.getElementById('fInvoice').value=e.invoice;document.getElementById('fReceiptUrl').value=e.receiptUrl||'';document.getElementById('fNotes').value=e.notes||'';
   if(e.manualRate&&e.manualRate>0){
     document.getElementById('fManualRateCheck').checked=true;
     document.getElementById('manualRateBox').classList.add('show');
@@ -1123,7 +1121,8 @@ saveExpense=async function(){
   if(!amt&&amt!==0){toast('eAmt',true);return}
   if(!desc&&!pay){toast('eDesc',true);return}
   const fixedUSDVal=parseFloat(calcUSD(amt,cur,mo,yr,manualRate>0?manualRate:null).toFixed(2));
-  const entry={day:d,month:mo,year:yr,category:cat,currency:cur,amount:amt,desc,payee:pay,invoice:inv,notes,manualRate:manualRate>0?manualRate:null,
+  const rcpt=document.getElementById('fReceiptUrl').value.trim();
+  const entry={day:d,month:mo,year:yr,category:cat,currency:cur,amount:amt,desc,payee:pay,invoice:inv,receiptUrl:rcpt,notes,manualRate:manualRate>0?manualRate:null,
     fixedRate:calcRateForDisplay(cur,mo,yr,manualRate>0?manualRate:null),
     fixedUSD:fixedUSDVal
   };
