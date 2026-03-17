@@ -1775,11 +1775,11 @@ function dismissInstall(){
       <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
       <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
     </div>
-    <!-- URL Field -->
-    <div style="margin-bottom:12px">
+    <!-- URL Field — hidden by default, stored internally -->
+    <input type="hidden" id="loginUrl" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec">
+    <div id="loginUrlBox" style="display:none;margin-bottom:12px">
       <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL / رابط التطبيق</label>
-      <input type="text" id="loginUrl" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.8rem;outline:none" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec">
-      <div style="font-size:.6rem;color:var(--text-muted);margin-top:3px;line-height:1.3">Please write the URL provided by the admin / يرجى كتابة الرابط المقدم من المسؤول</div>
+      <input type="text" id="loginUrlVisible" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.8rem;outline:none" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec" oninput="document.getElementById('loginUrl').value=this.value">
     </div>
     <!-- Username Select -->
     <div style="margin-bottom:12px">
@@ -1801,6 +1801,10 @@ function dismissInstall(){
     </div>
     <!-- Error -->
     <div id="loginError" style="display:none;color:var(--accent-red);font-size:.8rem;margin-bottom:12px;text-align:center;padding:8px;background:var(--accent-red-dim);border-radius:var(--radius-sm)"></div>
+    <!-- Admin: change URL toggle -->
+    <div style="text-align:center;margin-bottom:10px">
+      <a href="#" onclick="event.preventDefault();const b=document.getElementById('loginUrlBox');b.style.display=b.style.display==='none'?'block':'none'" style="font-size:.6rem;color:var(--text-muted);text-decoration:none;opacity:.5">⚙️ Admin: Change server URL / تغيير رابط الخادم</a>
+    </div>
     <!-- Buttons -->
     <div style="display:flex;gap:8px">
       <button onclick="doLogin()" style="flex:1;background:var(--accent-blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;min-height:var(--touch-min)" id="loginBtn">
