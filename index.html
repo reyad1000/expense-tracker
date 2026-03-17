@@ -1530,6 +1530,17 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 let currentUser=null; // {username, role, isAdmin}
 const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwT2y2TguoBsjl7o6KN40DYAlITrpUGt6XJ6RgbvgSzcNluoO_EuiSDPhkDKax6nuxa5g/exec';
 
+// One-time migration: clear old cached URLs that don't match current DEFAULT_URL
+(function(){
+  const v=localStorage.getItem('undp_app_version')||'';
+  if(v!=='v3'){
+    localStorage.removeItem('undp_login_url');
+    localStorage.removeItem('undp_cloud_url');
+    localStorage.setItem('undp_login_url',DEFAULT_URL);
+    localStorage.setItem('undp_app_version','v3');
+  }
+})();
+
 // Load saved URL or use default
 function initLoginUrl(){
   const saved=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url')||'';
