@@ -404,6 +404,15 @@ html[dir="rtl"] .bar-label{text-align:start}
       </button>
     </div>
     <div id="cloudInfo" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px;font-size:.75rem;color:var(--accent-green)"></div>
+    <!-- Admin: Change Server URL -->
+    <div id="changeUrlSection" style="display:none;margin-top:10px">
+      <div onclick="const b=document.getElementById('changeUrlBox');b.style.display=b.style.display==='none'?'block':'none'" style="font-size:.7rem;color:var(--accent-amber);cursor:pointer;padding:6px 0">⚙️ Change Server URL / تغيير رابط الخادم ▾</div>
+      <div id="changeUrlBox" style="display:none;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-top:4px">
+        <label style="font-size:.6rem;color:var(--text-muted);display:block;margin-bottom:4px">Apps Script URL</label>
+        <input type="text" id="changeUrlInput" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-family:var(--font);font-size:.78rem;outline:none;margin-bottom:6px">
+        <button onclick="saveNewUrl()" class="btn btn-primary" style="padding:8px;font-size:.78rem;width:100%">Save URL & Reconnect / حفظ والاتصال</button>
+      </div>
+    </div>
     <button onclick="logout()" class="btn btn-danger btn-sm" style="margin-top:12px;width:100%">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Logout / تسجيل خروج
@@ -1525,6 +1534,17 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 
 // ===================== LOGIN SYSTEM =====================
 let currentUser=null; // {username, role, isAdmin}
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec';
+
+// Load saved URL or use default
+function initLoginUrl(){
+  const saved=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url');
+  const url=saved||DEFAULT_URL;
+  document.getElementById('loginUrl').value=url;
+  document.getElementById('loginUrlVisible').value=url;
+  // If no saved URL, show URL field so user can enter it
+  if(!saved){document.getElementById('loginUrlBox').style.display='block'}
+}
 
 async function doLogin(){
   const url=document.getElementById('loginUrl').value.trim();
@@ -1614,22 +1634,41 @@ function applyUserPermissions(){
       (lang==='ar'?'مسجل كـ: '+currentUser.username+' (عضو) — يمكنك إضافة مصروفات فقط. التعديل والحذف للمسؤول فقط.':'Logged in as: '+currentUser.username+' (Member) — you can add expenses. Only Admin can edit/delete.');
   }
   if(isAdmin)loadUserList();
+  // Show URL change section for admin
+  const cus=document.getElementById('changeUrlSection');
+  if(cus){cus.style.display=isAdmin?'block':'none';document.getElementById('changeUrlInput').value=cloudUrl||localStorage.getItem('undp_login_url')||''}
 }
 
 function logout(){
-  localStorage.removeItem('undp_login_url');
   localStorage.removeItem('undp_login_user');
   localStorage.removeItem('undp_login_role');
   localStorage.removeItem('undp_login_admin');
   localStorage.removeItem('undp_session_time');
   localStorage.removeItem('undp_admin_pw');
+  // Keep undp_login_url — don't clear it so users don't need to re-enter
   currentUser=null;adminVerified=false;sessionPassword='';isCloudConnected=false;
-  // Reset UI
   const ff=document.getElementById('cloudFormFields');if(ff)ff.style.display='block';
   const ci2=document.getElementById('cloudConnectedInfo');if(ci2)ci2.style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('loginPass').value='';
   document.getElementById('loginError').style.display='none';
+  // Hide URL field since it's already saved
+  document.getElementById('loginUrlBox').style.display='none';
+}
+
+function saveNewUrl(){
+  const newUrl=document.getElementById('changeUrlInput').value.trim();
+  if(!newUrl){alert('Please enter a URL / يرجى إدخال الرابط');return}
+  localStorage.setItem('undp_login_url',newUrl);
+  localStorage.setItem('undp_cloud_url',newUrl);
+  cloudUrl=newUrl;
+  document.getElementById('loginUrl').value=newUrl;
+  document.getElementById('loginUrlVisible').value=newUrl;
+  document.getElementById('gSheetUrl').value=newUrl;
+  document.getElementById('changeUrlBox').style.display='none';
+  // Reconnect with new URL
+  cloudSync(false);
+  toast('tUpd',false);
 }
 
 // Auto-login from saved credentials (30 min session)
@@ -1720,6 +1759,7 @@ async function deleteUser(username){
 
 
 init();
+initLoginUrl();
 if(!tryAutoLogin()){
   // Show login screen
   document.getElementById('loginScreen').style.display='flex';
@@ -1775,11 +1815,12 @@ function dismissInstall(){
       <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
       <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
     </div>
-    <!-- URL Field — hidden by default, stored internally -->
-    <input type="hidden" id="loginUrl" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec">
+    <!-- URL Field — hidden by default, uses saved URL or default -->
+    <input type="hidden" id="loginUrl" value="">
     <div id="loginUrlBox" style="display:none;margin-bottom:12px">
       <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL / رابط التطبيق</label>
-      <input type="text" id="loginUrlVisible" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.8rem;outline:none" value="https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-PqaayVTPiXCecy1IahK6TH5qd4n-KfGzVDgp8t1yDiFlbpnpVQ/exec" oninput="document.getElementById('loginUrl').value=this.value">
+      <input type="text" id="loginUrlVisible" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.75rem;outline:none" placeholder="https://script.google.com/macros/s/.../exec" oninput="document.getElementById('loginUrl').value=this.value">
+      <div style="font-size:.55rem;color:var(--text-muted);margin-top:3px">Paste the URL from admin, then login. It will be saved for next time.<br>الصق الرابط من المسؤول ثم سجل الدخول. سيتم حفظه للمرة القادمة.</div>
     </div>
     <!-- Username Select -->
     <div style="margin-bottom:12px">
