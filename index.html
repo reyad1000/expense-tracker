@@ -1945,6 +1945,14 @@ if(!tryAutoLogin()){
   // Show login screen
   showLogin();
 }
+// Safety: if nothing visible after 2s, force show login
+setTimeout(function(){
+  var ls=document.getElementById('loginScreen');
+  var ma=document.getElementById('mainApp');
+  if(ls&&ma&&getComputedStyle(ls).display==='none'&&getComputedStyle(ma).display==='none'){
+    showLogin();
+  }
+},2000);
 
 // ===== INSTALL APP BANNER =====
 (function(){
