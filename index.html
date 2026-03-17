@@ -233,7 +233,7 @@ html[dir="rtl"] .bar-label{text-align:start}
 </style>
 </head>
 <body>
-<div id="loginScreen" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
+<div id="loginScreen">
   <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
     <!-- Logo & Project Info -->
     <div style="text-align:center;margin-bottom:20px">
@@ -287,6 +287,7 @@ html[dir="rtl"] .bar-label{text-align:start}
 
 
 </div>
+<div id="mainApp">
 <div class="app-header">
   <div class="header-top">
     <div class="logo-area">
@@ -531,6 +532,7 @@ html[dir="rtl"] .bar-label{text-align:start}
   </div>
 </div>
 
+</div>
 <script>
 // ===================== I18N =====================
 const L={
@@ -1704,7 +1706,7 @@ async function doLogin(){
       // Save session timestamp (30 min timeout)
       localStorage.setItem('undp_session_time',Date.now().toString());
       // Hide login, show app
-      document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+      hideLogin();
       // Sync with cloud
       isCloudConnected=true;
       await cloudSync(true);
@@ -1723,7 +1725,7 @@ async function doLogin(){
 
 function doLoginCancel(){
   // Allow offline mode
-  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+  hideLogin();
   currentUser={username:'offline',role:'member',isAdmin:false};
   applyUserPermissions();
 }
@@ -1771,7 +1773,7 @@ function logout(){
   currentUser=null;adminVerified=false;sessionPassword='';isCloudConnected=false;
   const ff=document.getElementById('cloudFormFields');if(ff)ff.style.display='block';
   const ci2=document.getElementById('cloudConnectedInfo');if(ci2)ci2.style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
+  showLogin();
   document.getElementById('loginPass').value='';
   document.getElementById('loginError').style.display='none';
   // Hide URL field since it's already saved
@@ -1819,7 +1821,7 @@ function tryAutoLogin(){
   document.getElementById('gSheetUrl').value=url;
   document.getElementById('gUserName').value=user;
   if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
-  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+  hideLogin();
   isCloudConnected=true;
   // Refresh session timestamp on each page load
   localStorage.setItem('undp_session_time',Date.now().toString());
@@ -1925,11 +1927,22 @@ async function changeUserPassword(username,newPassword){
 }
 
 
+
+function showLogin(){
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('loginScreen').style.display='block';
+}
+function hideLogin(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='';
+  document.getElementById('searchInput').value='';
+}
+
 init();
 initLoginUrl();
 if(!tryAutoLogin()){
   // Show login screen
-  document.getElementById('loginScreen').style.display='flex';
+  showLogin();
 }
 
 // ===== INSTALL APP BANNER =====
@@ -1967,8 +1980,7 @@ function dismissInstall(){
   localStorage.setItem('undp_install_dismissed','1');
 }
 
-</script><!-- LOGIN SCREEN — blocks access until authenticated -->
+</script>
 
 </body>
 </html>
-
