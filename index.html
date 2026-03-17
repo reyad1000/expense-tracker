@@ -281,7 +281,7 @@ html[dir="rtl"] .bar-label{text-align:start}
 <!-- EXPENSES PAGE -->
 <div class="page active" id="page-expenses">
   <div class="search-bar">
-    <input type="text" id="searchInput" oninput="renderExpenses()" data-tp="searchPH">
+    <input type="text" id="searchInput" oninput="renderExpenses()" data-tp="searchPH" autocomplete="off">
     <button class="filter-chip active" data-filter="all" onclick="setFilter('all')" data-t="fAll"></button>
     <button class="filter-chip" data-filter="Goods" onclick="setFilter('Goods')" data-t="fGoods"></button>
     <button class="filter-chip" data-filter="Services" onclick="setFilter('Services')" data-t="fServices"></button>
@@ -373,14 +373,8 @@ html[dir="rtl"] .bar-label{text-align:start}
     </h2>
     <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.45" data-t="cloudDesc"></p>
     <div id="cloudFormFields" style="display:none">
-    <div class="form-group" style="margin-bottom:10px">
-      <label data-t="cloudUrl"></label>
-      <input type="text" id="gSheetUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.82rem">
-    </div>
-    <div class="form-group" style="margin-bottom:12px">
-      <label data-t="cloudName"></label>
-      <input type="text" id="gUserName" placeholder="e.g. Ahmed" style="font-size:.82rem">
-    </div>
+    <input type="hidden" id="gSheetUrl">
+    <input type="hidden" id="gUserName">
     <div id="cloudStatus" style="display:none;padding:10px 12px;border-radius:8px;font-size:.8rem;margin-bottom:12px"></div>
     <div class="file-ops">
       <button class="btn btn-primary" onclick="cloudSync()" style="flex:1">
