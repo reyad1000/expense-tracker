@@ -1537,9 +1537,8 @@ function initLoginUrl(){
   document.getElementById('loginUrl').value=url;
   const vis=document.getElementById('loginUrlVisible');
   if(vis)vis.value=url;
-  // Only show URL field if no saved URL at all
-  if(!saved){document.getElementById('loginUrlBox').style.display='block'}
-  else{document.getElementById('loginUrlBox').style.display='none'}
+  // Always hide URL field — admin can reveal it via the toggle link if needed
+  document.getElementById('loginUrlBox').style.display='none';
 }
 
 async function doLogin(){
@@ -1558,6 +1557,11 @@ async function doLogin(){
   const btn=document.getElementById('loginBtn');
   
   errEl.style.display='none';
+  if(!url){
+    // Try default URL
+    url=DEFAULT_URL;
+    document.getElementById('loginUrl').value=url;
+  }
   if(!url){
     errEl.textContent='Please enter the Apps Script URL / يرجى إدخال رابط التطبيق';
     errEl.style.display='block';
