@@ -1528,7 +1528,10 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 
 // ===================== LOGIN SYSTEM =====================
 let currentUser=null; // {username, role, isAdmin}
-const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwL-gv5dDJvOBNqS1KsSmddbNN5w6vWn2DJnb-flUptG7biMC50RczypPHwxrJaFCBllQ/exec';
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwRzDx8_M7XWHTKtcDXaWT0JCFqlm3gxttHFBPSy4xrljQlhIynGqmgtYUqMEhOxAwtUg/exec';
+
+// One-time: update cached URL to new deployment
+(function(){var v=localStorage.getItem('undp_v')||'';if(v!=='v4'){localStorage.setItem('undp_login_url',DEFAULT_URL);localStorage.setItem('undp_cloud_url',DEFAULT_URL);localStorage.setItem('undp_v','v4')}})();
 
 // Load saved URL or use default
 function initLoginUrl(){
