@@ -1528,7 +1528,7 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 
 // ===================== LOGIN SYSTEM =====================
 let currentUser=null; // {username, role, isAdmin}
-const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwL-gv5dDJvOBNqS1KsSmddbNN5w6vWn2DJnb-flUptG7biMC50RczypPHwxrJaFCBllQ/exec';
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwT2y2TguoBsjl7o6KN40DYAlITrpUGt6XJ6RgbvgSzcNluoO_EuiSDPhkDKax6nuxa5g/exec';
 
 // Load saved URL or use default
 function initLoginUrl(){
@@ -1539,6 +1539,41 @@ function initLoginUrl(){
   if(vis)vis.value=url;
   // Always hide URL field — admin can reveal it via the toggle link if needed
   document.getElementById('loginUrlBox').style.display='none';
+  // Load users from server into dropdown
+  loadLoginUsers(url);
+}
+
+async function loadLoginUsers(url){
+  const sel=document.getElementById('loginUser');
+  const info=document.getElementById('loginUserLoading');
+  try{
+    const resp=await fetch(url+'?action=getUsernames');
+    const data=await resp.json();
+    if(data.success&&data.users&&data.users.length>0){
+      sel.innerHTML='<option value="">— Select user / اختر المستخدم —</option>';
+      data.users.forEach(u=>{
+        const roleLabel=u.role==='admin'?' (Admin)':'';
+        sel.innerHTML+=`<option value="${u.username}">${u.username}${roleLabel}</option>`;
+      });
+      if(info)info.textContent='';
+    }else{
+      // Fallback to defaults if server fails
+      loadDefaultUsers(sel);
+      if(info)info.textContent='Using default users / تم استخدام المستخدمين الافتراضيين';
+    }
+  }catch(err){
+    // Offline or server error — use defaults
+    loadDefaultUsers(sel);
+    if(info)info.textContent='Offline — using saved users / غير متصل — المستخدمين المحفوظين';
+  }
+}
+
+function loadDefaultUsers(sel){
+  sel.innerHTML='<option value="">— Select user / اختر المستخدم —</option>'+
+    '<option value="reyad100@gmail.com">reyad100@gmail.com (Admin)</option>'+
+    '<option value="AKAKOS">AKAKOS</option>'+
+    '<option value="KIARI">KIARI</option>'+
+    '<option value="FERRETTI">FERRETTI</option>';
 }
 
 async function doLogin(){
@@ -1884,12 +1919,9 @@ function dismissInstall(){
       <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username / اسم المستخدم</label>
       <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Select your username / اختر اسم المستخدم</div>
       <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
-        <option value="">— Select user —</option>
-        <option value="reyad100@gmail.com"><template class="__cf_email__" data-cfemail="f98b9c80989dc8c9c9b99e94989095d79a9694">[email&#160;protected]</template> (Admin)</option>
-        <option value="AKAKOS">AKAKOS</option>
-        <option value="KIARI">KIARI</option>
-        <option value="FERRETTI">FERRETTI</option>
+        <option value="">— Loading users... / جاري تحميل المستخدمين... —</option>
       </select>
+      <div id="loginUserLoading" style="font-size:.6rem;color:var(--text-muted);margin-top:3px"></div>
     </div>
     <!-- Password -->
     <div style="margin-bottom:16px">
