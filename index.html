@@ -230,6 +230,8 @@ html[dir="rtl"] .bar-label{text-align:start}
   .akakos-logo{height:44px}
 }
 @media print{.bottom-nav,.app-header{display:none}.page{display:block!important}body{background:#fff;color:#000}}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+#loginScreen>div{width:100%;max-width:420px}
 </style>
 </head>
 <body>
@@ -1614,7 +1616,10 @@ async function loadLoginUsers(url){
   const sel=document.getElementById('loginUser');
   const info=document.getElementById('loginUserLoading');
   
-  // Try loading from server
+  // Show defaults immediately so users can login even while loading
+  loadDefaultUsers(sel);
+  
+  // Try loading from server in background
   async function tryLoadFrom(tryUrl){
     try{
       const resp=await fetch(tryUrl+'?action=getUsernames');
@@ -1627,21 +1632,17 @@ async function loadLoginUsers(url){
           sel.innerHTML+=`<option value="${u.username}">${u.username}${roleLabel}</option>`;
         });
         if(info)info.textContent='';
-        // Save the working URL
         localStorage.setItem('undp_login_url',tryUrl);
         document.getElementById('loginUrl').value=tryUrl;
         return true;
       }
-    }catch(e){}
+    }catch(e){console.log('loadLoginUsers error:',e)}
     return false;
   }
   
-  // Try saved URL first
+  // Try to load from server (replaces defaults if successful)
   if(await tryLoadFrom(url))return;
-  // Try DEFAULT_URL if different
   if(url!==DEFAULT_URL&&await tryLoadFrom(DEFAULT_URL))return;
-  // All failed — show defaults
-  loadDefaultUsers(sel);
   if(info)info.textContent='';
 }
 
@@ -1930,7 +1931,7 @@ async function changeUserPassword(username,newPassword){
 
 function showLogin(){
   document.getElementById('mainApp').style.display='none';
-  document.getElementById('loginScreen').style.display='block';
+  document.getElementById('loginScreen').style.display='flex';
 }
 function hideLogin(){
   document.getElementById('loginScreen').style.display='none';
