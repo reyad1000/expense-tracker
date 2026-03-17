@@ -372,7 +372,7 @@ html[dir="rtl"] .bar-label{text-align:start}
       <span data-t="cloudTitle"></span>
     </h2>
     <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.45" data-t="cloudDesc"></p>
-    <div id="cloudFormFields">
+    <div id="cloudFormFields" style="display:none">
     <div class="form-group" style="margin-bottom:10px">
       <label data-t="cloudUrl"></label>
       <input type="text" id="gSheetUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.82rem">
@@ -1538,16 +1538,25 @@ const DEFAULT_URL='https://script.google.com/macros/s/AKfycbxjhOHT6BqC9GzGHXx-Pq
 
 // Load saved URL or use default
 function initLoginUrl(){
-  const saved=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url');
+  const saved=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url')||'';
   const url=saved||DEFAULT_URL;
   document.getElementById('loginUrl').value=url;
-  document.getElementById('loginUrlVisible').value=url;
-  // If no saved URL, show URL field so user can enter it
+  const vis=document.getElementById('loginUrlVisible');
+  if(vis)vis.value=url;
+  // Only show URL field if no saved URL at all
   if(!saved){document.getElementById('loginUrlBox').style.display='block'}
+  else{document.getElementById('loginUrlBox').style.display='none'}
 }
 
 async function doLogin(){
-  const url=document.getElementById('loginUrl').value.trim();
+  // Get URL from hidden input, or visible input, or saved
+  let url=document.getElementById('loginUrl').value.trim();
+  const visUrl=document.getElementById('loginUrlVisible');
+  if(!url&&visUrl)url=visUrl.value.trim();
+  if(!url)url=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url')||'';
+  // Update hidden input
+  document.getElementById('loginUrl').value=url;
+  
   const user=document.getElementById('loginUser').value;
   const pass=document.getElementById('loginPass').value;
   const errEl=document.getElementById('loginError');
@@ -1555,7 +1564,12 @@ async function doLogin(){
   const btn=document.getElementById('loginBtn');
   
   errEl.style.display='none';
-  if(!url){errEl.textContent='Please enter the Apps Script URL';errEl.style.display='block';return}
+  if(!url){
+    errEl.textContent='Please enter the Apps Script URL / يرجى إدخال رابط التطبيق';
+    errEl.style.display='block';
+    document.getElementById('loginUrlBox').style.display='block';
+    return;
+  }
   if(!user){errEl.textContent='Please select a username';errEl.style.display='block';return}
   if(!pass){errEl.textContent='Please enter your password';errEl.style.display='block';return}
   
