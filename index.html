@@ -230,11 +230,14 @@ html[dir="rtl"] .bar-label{text-align:start}
   .akakos-logo{height:44px}
 }
 @media print{.bottom-nav,.app-header{display:none}.page{display:block!important}body{background:#fff;color:#000}}
+#loginScreen{position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;background:#0f172a!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;overflow:auto!important}
+#loginScreen[style*="display:none"]{display:none!important}
+body.login-active{overflow:hidden!important}
 </style>
 </head>
-<body>
+<body class="login-active">
 
-<div id="loginScreen" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto">
+<div id="loginScreen">
   <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
     <!-- Logo & Project Info -->
     <div style="text-align:center;margin-bottom:20px">
@@ -1387,7 +1390,7 @@ tr:nth-child(even){background:#f8fafc}
 .ft{position:fixed;bottom:0;left:0;right:0;font-size:6.5pt;color:#94a3b8;padding:3px 8mm;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0}
 .pb{position:fixed;top:10px;right:10px;z-index:999;background:#3b82f6;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .pb:hover{background:#2563eb}
-</style></head><body>
+</style></head><body class="login-active">
 <button class="pb np" onclick="window.print()">📄 ${lang==='ar'?'طباعة / حفظ كـ PDF':'Print / Save as PDF'}</button>
 <div class="hd">
 <img class="hd-logo" src="${document.querySelector('.akakos-logo')?.src||''}" alt="AKAKOS">
@@ -1470,7 +1473,7 @@ td,th{font-family:Arial;font-size:9pt;vertical-align:middle;mso-number-format:\@
 .n{mso-number-format:"\#\,\#\#0\.00";text-align:right;font-family:'Courier New'}
 .nr{mso-number-format:"0\.0000";text-align:right;font-family:'Courier New'}
 </style>
-</head><body>
+</head><body class="login-active">
 <table border="0" cellpadding="4" cellspacing="0" width="100%">
 <col width="25"><col width="60"><col width="70"><col width="220">
 <col width="30"><col width="65"><col width="55"><col width="65">
@@ -1705,7 +1708,7 @@ async function doLogin(){
       // Save session timestamp (30 min timeout)
       localStorage.setItem('undp_session_time',Date.now().toString());
       // Hide login, show app
-      document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+      document.getElementById('loginScreen').style.display='none';document.body.classList.remove('login-active');document.getElementById('searchInput').value='';
       // Sync with cloud
       isCloudConnected=true;
       await cloudSync(true);
@@ -1724,7 +1727,7 @@ async function doLogin(){
 
 function doLoginCancel(){
   // Allow offline mode
-  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+  document.getElementById('loginScreen').style.display='none';document.body.classList.remove('login-active');document.getElementById('searchInput').value='';
   currentUser={username:'offline',role:'member',isAdmin:false};
   applyUserPermissions();
 }
@@ -1772,7 +1775,7 @@ function logout(){
   currentUser=null;adminVerified=false;sessionPassword='';isCloudConnected=false;
   const ff=document.getElementById('cloudFormFields');if(ff)ff.style.display='block';
   const ci2=document.getElementById('cloudConnectedInfo');if(ci2)ci2.style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display='flex';document.body.classList.add('login-active');
   document.getElementById('loginPass').value='';
   document.getElementById('loginError').style.display='none';
   // Hide URL field since it's already saved
@@ -1820,7 +1823,7 @@ function tryAutoLogin(){
   document.getElementById('gSheetUrl').value=url;
   document.getElementById('gUserName').value=user;
   if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
-  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
+  document.getElementById('loginScreen').style.display='none';document.body.classList.remove('login-active');document.getElementById('searchInput').value='';
   isCloudConnected=true;
   // Refresh session timestamp on each page load
   localStorage.setItem('undp_session_time',Date.now().toString());
@@ -1930,7 +1933,7 @@ init();
 initLoginUrl();
 if(!tryAutoLogin()){
   // Show login screen
-  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display='flex';document.body.classList.add('login-active');
 }
 
 // ===== INSTALL APP BANNER =====
