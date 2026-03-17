@@ -1728,13 +1728,19 @@ async function loadUserList(){
     const el=document.getElementById('userList');
     el.innerHTML=data.users.map(u=>{
       const badge=u.role==='admin'?'<span style="font-size:.6rem;background:var(--accent-blue);color:#fff;padding:2px 6px;border-radius:10px;font-weight:600">ADMIN</span>':'<span style="font-size:.6rem;background:rgba(255,255,255,.08);color:var(--text-muted);padding:2px 6px;border-radius:10px">MEMBER</span>';
-      const status=u.active?'<span style="color:var(--accent-green);font-size:.7rem">● Active</span>':'<span style="color:var(--accent-red);font-size:.7rem">● Disabled</span>';
+      const status=u.active?'<span style="color:var(--accent-green);font-size:.65rem">● Active</span>':'<span style="color:var(--accent-red);font-size:.65rem">● Disabled</span>';
       const canDelete=u.role!=='admin';
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">'+
-        '<div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">'+esc(u.username)+' '+badge+'</div>'+
-        '<div style="font-size:.7rem;color:var(--text-muted);margin-top:2px">'+status+' · Pass: '+esc(u.password)+'</div></div>'+
-        (canDelete?'<button onclick="deleteUser(\''+esc(u.username).replace(/'/g,"\\'")+'\')" style="background:var(--accent-red-dim);color:var(--accent-red);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:6px 10px;font-size:.7rem;cursor:pointer;font-family:var(--font)">Delete</button>':'')+
-        '</div>';
+      const un=esc(u.username).replace(/'/g,"\\'");
+      return '<div style="padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+          '<div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">'+esc(u.username)+' '+badge+'</div>'+
+          '<div style="font-size:.65rem;color:var(--text-muted);margin-top:2px">'+status+' · '+(lang==='ar'?'كلمة المرور: ':'Pass: ')+'<code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:.65rem">'+esc(u.password)+'</code></div></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          '<button onclick="promptChangePassword(\''+un+'\')" style="background:rgba(245,158,11,.1);color:var(--accent-amber);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 10px;font-size:.65rem;cursor:pointer;font-family:var(--font)">🔑 '+(lang==='ar'?'تغيير كلمة المرور':'Change Password')+'</button>'+
+          (canDelete?'<button onclick="deleteUser(\''+un+'\')" style="background:var(--accent-red-dim);color:var(--accent-red);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:5px 10px;font-size:.65rem;cursor:pointer;font-family:var(--font)">🗑 '+(lang==='ar'?'حذف':'Delete')+'</button>':'')+
+        '</div>'+
+      '</div>';
     }).join('');
   }catch(err){console.error('Load users error:',err)}
 }
@@ -1766,6 +1772,45 @@ async function deleteUser(username){
     const data=await resp.json();
     if(data.success){toast('tDel',false);loadUserList()}
     else alert(data.error||'Error');
+  }catch(err){alert('Error: '+err.message)}
+}
+
+function promptChangePassword(username){
+  const newPass=prompt(
+    (lang==='ar'?'أدخل كلمة المرور الجديدة لـ ':'Enter new password for ')+username+':');
+  if(!newPass)return;
+  if(newPass.length<3){
+    alert(lang==='ar'?'كلمة المرور يجب أن تكون 3 أحرف على الأقل':'Password must be at least 3 characters');
+    return;
+  }
+  const confirmMsg=lang==='ar'
+    ?'تغيير كلمة مرور "'+username+'" إلى "'+newPass+'"؟'
+    :'Change password for "'+username+'" to "'+newPass+'"?';
+  if(!confirm(confirmMsg))return;
+  changeUserPassword(username,newPass);
+}
+
+async function changeUserPassword(username,newPassword){
+  try{
+    const resp=await fetch(cloudUrl+'?action=editUser&password='+encodeURIComponent(sessionPassword),{
+      method:'POST',
+      body:JSON.stringify({username:username,newPassword:newPassword})
+    });
+    const data=await resp.json();
+    if(data.success){
+      const msg=lang==='ar'
+        ?'✅ تم تغيير كلمة المرور بنجاح لـ '+username
+        :'✅ Password changed successfully for '+username;
+      alert(msg);
+      loadUserList();
+      // If admin changed their own password, update session
+      if(currentUser&&username.toLowerCase()===currentUser.username.toLowerCase()){
+        sessionPassword=newPassword;
+        localStorage.setItem('undp_admin_pw',newPassword);
+      }
+    }else{
+      alert(data.error||'Error changing password');
+    }
   }catch(err){alert('Error: '+err.message)}
 }
 
