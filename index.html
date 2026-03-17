@@ -234,6 +234,60 @@ html[dir="rtl"] .bar-label{text-align:start}
 </head>
 <body>
 
+<div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <!-- Logo & Project Info -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="display:inline-block;background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:12px 20px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(59,130,246,.3)">
+        <div style="font-size:1.3rem;font-weight:800;color:#10b981;letter-spacing:1.5px">☘ AKAKOS</div>
+        <div style="font-size:.55rem;color:#94a3b8;letter-spacing:2px;margin-top:2px">FOR RENEWABLE ENERGIES</div>
+      </div>
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:2px">UNDP Expense Tracker</h2>
+      <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
+      <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
+    </div>
+    <!-- URL Field — hidden by default, uses saved URL or default -->
+    <input type="hidden" id="loginUrl" value="">
+    <div id="loginUrlBox" style="display:none;margin-bottom:12px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL / رابط التطبيق</label>
+      <input type="text" id="loginUrlVisible" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.75rem;outline:none" placeholder="https://script.google.com/macros/s/.../exec" oninput="document.getElementById('loginUrl').value=this.value">
+      <div style="font-size:.55rem;color:var(--text-muted);margin-top:3px">Paste the URL from admin, then login. It will be saved for next time.<br>الصق الرابط من المسؤول ثم سجل الدخول. سيتم حفظه للمرة القادمة.</div>
+    </div>
+    <!-- Username Select -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username / اسم المستخدم</label>
+      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Select your username / اختر اسم المستخدم</div>
+      <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
+        <option value="">— Loading users... / جاري تحميل المستخدمين... —</option>
+      </select>
+      <div id="loginUserLoading" style="font-size:.6rem;color:var(--text-muted);margin-top:3px"></div>
+    </div>
+    <!-- Password -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Password / كلمة المرور</label>
+      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Enter your password / أدخل كلمة المرور</div>
+      <input type="password" id="loginPass" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--mono);font-size:1.1rem;outline:none;letter-spacing:4px" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <!-- Error -->
+    <div id="loginError" style="display:none;color:var(--accent-red);font-size:.8rem;margin-bottom:12px;text-align:center;padding:8px;background:var(--accent-red-dim);border-radius:var(--radius-sm)"></div>
+    <!-- Admin: change URL toggle -->
+    <div style="text-align:center;margin-bottom:10px">
+      <a href="#" onclick="event.preventDefault();const b=document.getElementById('loginUrlBox');b.style.display=b.style.display==='none'?'block':'none'" style="font-size:.6rem;color:var(--text-muted);text-decoration:none;opacity:.5">⚙️ Admin: Change server URL / تغيير رابط الخادم</a>
+    </div>
+    <!-- Buttons -->
+    <div style="display:flex;gap:8px">
+      <button onclick="doLogin()" style="flex:1;background:var(--accent-blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;min-height:var(--touch-min)" id="loginBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:6px;vertical-align:middle"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Login / دخول
+      </button>
+      <button onclick="doLoginCancel()" style="background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--font);font-size:.9rem;cursor:pointer;min-height:var(--touch-min)">Cancel / إلغاء</button>
+    </div>
+    <!-- Loading -->
+    <div id="loginLoading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:.8rem">
+      <span style="animation:pulse 1s infinite">⏳</span> Connecting... / جاري الاتصال...
+    </div>
+
+
+
 <div class="app-header">
   <div class="header-top">
     <div class="logo-area">
@@ -1545,11 +1599,12 @@ const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwT2y2TguoBsjl7o6KN40
 function initLoginUrl(){
   const saved=localStorage.getItem('undp_login_url')||localStorage.getItem('undp_cloud_url')||'';
   const url=saved||DEFAULT_URL;
-  document.getElementById('loginUrl').value=url;
+  const el=document.getElementById('loginUrl');
+  if(el)el.value=url;
   const vis=document.getElementById('loginUrlVisible');
   if(vis)vis.value=url;
-  // Always hide URL field — admin can reveal it via the toggle link if needed
-  document.getElementById('loginUrlBox').style.display='none';
+  const box=document.getElementById('loginUrlBox');
+  if(box)box.style.display='none';
   // Load users from server into dropdown
   loadLoginUsers(url);
 }
@@ -1913,57 +1968,6 @@ function dismissInstall(){
   localStorage.setItem('undp_install_dismissed','1');
 }
 
-</script>
+</script><!-- LOGIN SCREEN — blocks access until authenticated -->
 </body>
-</html><!-- LOGIN SCREEN — blocks access until authenticated -->
-<div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;padding:16px">
-  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
-    <!-- Logo & Project Info -->
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="display:inline-block;background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:12px 20px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(59,130,246,.3)">
-        <div style="font-size:1.3rem;font-weight:800;color:#10b981;letter-spacing:1.5px">☘ AKAKOS</div>
-        <div style="font-size:.55rem;color:#94a3b8;letter-spacing:2px;margin-top:2px">FOR RENEWABLE ENERGIES</div>
-      </div>
-      <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:2px">UNDP Expense Tracker</h2>
-      <div style="font-size:.72rem;color:var(--accent-blue);font-weight:600;margin-bottom:2px">ON-GRID SMART SOLAR PV SYSTEM</div>
-      <div style="font-size:.65rem;color:var(--text-muted)">Contract: UNDP - 10495188</div>
-    </div>
-    <!-- URL Field — hidden by default, uses saved URL or default -->
-    <input type="hidden" id="loginUrl" value="">
-    <div id="loginUrlBox" style="display:none;margin-bottom:12px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Google Apps Script URL / رابط التطبيق</label>
-      <input type="text" id="loginUrlVisible" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.75rem;outline:none" placeholder="https://script.google.com/macros/s/.../exec" oninput="document.getElementById('loginUrl').value=this.value">
-      <div style="font-size:.55rem;color:var(--text-muted);margin-top:3px">Paste the URL from admin, then login. It will be saved for next time.<br>الصق الرابط من المسؤول ثم سجل الدخول. سيتم حفظه للمرة القادمة.</div>
-    </div>
-    <!-- Username Select -->
-    <div style="margin-bottom:12px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Username / اسم المستخدم</label>
-      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Select your username / اختر اسم المستخدم</div>
-      <select id="loginUser" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--font);font-size:.95rem;outline:none;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8.5L1 3.5h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
-        <option value="">— Loading users... / جاري تحميل المستخدمين... —</option>
-      </select>
-      <div id="loginUserLoading" style="font-size:.6rem;color:var(--text-muted);margin-top:3px"></div>
-    </div>
-    <!-- Password -->
-    <div style="margin-bottom:16px">
-      <label style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Password / كلمة المرور</label>
-      <div style="font-size:.6rem;color:var(--text-muted);margin-bottom:4px">Enter your password / أدخل كلمة المرور</div>
-      <input type="password" id="loginPass" style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:var(--mono);font-size:1.1rem;outline:none;letter-spacing:4px" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <!-- Error -->
-    <div id="loginError" style="display:none;color:var(--accent-red);font-size:.8rem;margin-bottom:12px;text-align:center;padding:8px;background:var(--accent-red-dim);border-radius:var(--radius-sm)"></div>
-    <!-- Admin: change URL toggle -->
-    <div style="text-align:center;margin-bottom:10px">
-      <a href="#" onclick="event.preventDefault();const b=document.getElementById('loginUrlBox');b.style.display=b.style.display==='none'?'block':'none'" style="font-size:.6rem;color:var(--text-muted);text-decoration:none;opacity:.5">⚙️ Admin: Change server URL / تغيير رابط الخادم</a>
-    </div>
-    <!-- Buttons -->
-    <div style="display:flex;gap:8px">
-      <button onclick="doLogin()" style="flex:1;background:var(--accent-blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;min-height:var(--touch-min)" id="loginBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-inline-end:6px;vertical-align:middle"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Login / دخول
-      </button>
-      <button onclick="doLoginCancel()" style="background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--font);font-size:.9rem;cursor:pointer;min-height:var(--touch-min)">Cancel / إلغاء</button>
-    </div>
-    <!-- Loading -->
-    <div id="loginLoading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:.8rem">
-      <span style="animation:pulse 1s infinite">⏳</span> Connecting... / جاري الاتصال...
-    </div>
+</html>
