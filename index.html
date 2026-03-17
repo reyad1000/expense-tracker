@@ -281,7 +281,7 @@ html[dir="rtl"] .bar-label{text-align:start}
 <!-- EXPENSES PAGE -->
 <div class="page active" id="page-expenses">
   <div class="search-bar">
-    <input type="text" id="searchInput" oninput="renderExpenses()" data-tp="searchPH" autocomplete="off">
+    <input type="text" id="searchInput" oninput="renderExpenses()" data-tp="searchPH" autocomplete="off" name="expense_search_nofill" role="searchbox">
     <button class="filter-chip active" data-filter="all" onclick="setFilter('all')" data-t="fAll"></button>
     <button class="filter-chip" data-filter="Goods" onclick="setFilter('Goods')" data-t="fGoods"></button>
     <button class="filter-chip" data-filter="Services" onclick="setFilter('Services')" data-t="fServices"></button>
@@ -1594,7 +1594,7 @@ async function doLogin(){
       // Save session timestamp (30 min timeout)
       localStorage.setItem('undp_session_time',Date.now().toString());
       // Hide login, show app
-      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
       // Sync with cloud
       isCloudConnected=true;
       await cloudSync(true);
@@ -1613,7 +1613,7 @@ async function doLogin(){
 
 function doLoginCancel(){
   // Allow offline mode
-  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
   currentUser={username:'offline',role:'member',isAdmin:false};
   applyUserPermissions();
 }
@@ -1709,7 +1709,7 @@ function tryAutoLogin(){
   document.getElementById('gSheetUrl').value=url;
   document.getElementById('gUserName').value=user;
   if(isAdmin){adminVerified=true;sessionPassword=localStorage.getItem('undp_admin_pw')||''}
-  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='none';document.getElementById('searchInput').value='';
   isCloudConnected=true;
   // Refresh session timestamp on each page load
   localStorage.setItem('undp_session_time',Date.now().toString());
