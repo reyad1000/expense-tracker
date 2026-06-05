@@ -1883,6 +1883,41 @@ function dismissInstall(){
 }
 
 </script>
+
+<!-- ===== ELEVENLABS CONVERSATIONAL AI VOICE ASSISTANT ===== -->
+<!-- Hidden until the user is past the login screen (see sync logic below). -->
+<div id="voiceAssistant" style="display:none">
+  <elevenlabs-convai agent-id="agent_6401ktbyxzhaewyrktdchwyvxwra"></elevenlabs-convai>
+</div>
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+<style>
+/* Lift the floating widget above the fixed bottom nav on mobile */
+#voiceAssistant elevenlabs-convai{position:fixed;right:16px;bottom:calc(80px + var(--safe-bottom));z-index:250}
+@media(min-width:768px){#voiceAssistant elevenlabs-convai{bottom:24px}}
+</style>
+<script>
+(function(){
+  function syncVoiceAssistant(){
+    var ls=document.getElementById('loginScreen');
+    var va=document.getElementById('voiceAssistant');
+    if(!va)return;
+    var loggedIn=!ls||ls.style.display==='none';
+    va.style.display=loggedIn?'block':'none';
+  }
+  function start(){
+    var ls=document.getElementById('loginScreen');
+    if(ls){
+      new MutationObserver(syncVoiceAssistant).observe(ls,{attributes:true,attributeFilter:['style']});
+    }
+    syncVoiceAssistant();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',start);
+  }else{
+    start();
+  }
+})();
+</script>
 </body>
 </html><!-- LOGIN SCREEN — blocks access until authenticated -->
 <div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;padding:16px">
