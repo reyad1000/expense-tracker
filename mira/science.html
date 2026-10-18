@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mira's Science Safari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Jungle-safari look: one island map → one big activity card per round, big tappable tiles for a 6-year-old. */
+:root{
+  --bg:#f1fbe9;          /* pale leaf */
+  --bg2:#dff5cf;         /* grass */
+  --card:#ffffff;
+  --ink:#24402a;         /* forest ink */
+  --muted:#6f8a74;
+  --coral:#ff7a59;       /* main accent (sunset) */
+  --sun:#ffc93c;
+  --leaf:#4cbb5c;
+  --sky:#3fb0ff;
+  --grape:#9b6cff;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(36,64,42,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#fff6c4 0,transparent 32%),radial-gradient(circle at 92% 92%,#cfeeff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--leaf)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#dfe8d6}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#dff5cf)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.scene{font-size:clamp(2.6rem,9vw,4rem);text-align:center;line-height:1.2;margin:8px 0;letter-spacing:.08em}
+.scene.small{font-size:clamp(2rem,7vw,3rem)}
+.arrow{color:var(--muted);font-size:.6em;vertical-align:middle}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.tile .e{font-size:2.4rem;line-height:1}
+.tile .w{font-size:1.1rem}
+.tile .wa{font-size:.9rem;color:var(--grape);direction:rtl;display:none}
+body.ar .tile .wa{display:block}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+.tile.num{min-width:84px;font-size:2rem}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.cols .col{display:flex;flex-direction:column;gap:12px}
+.cols .tile{min-width:0}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.buckets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent}
+.bucket:hover{border-color:var(--sky)}
+.bucket .h{font-family:var(--display);font-size:1.15rem}
+.bucket .e{font-size:2rem}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:999px;padding:2px 8px;font-size:1rem}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:14px 0}
+.slot{width:78px;height:78px;border-radius:18px;background:var(--bg2);border-bottom:5px solid #c6e3b4;display:grid;place-items:center;font-size:2.4rem}
+.slot.fill{background:#e6f8ea;border-bottom-color:var(--ok);animation:pop .3s}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#dfe8d6}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+.report .tags{display:flex;flex-wrap:wrap;gap:6px}
+.report .tag{background:var(--card);border-radius:999px;padding:4px 10px;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #d9e6d0}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m" id="mascot-head">🦁</span> Mira's Science Safari</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🦁</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Science Mid-Term (Term 1) · Pearson iPrimary Science Workbook Y1, Topic 1 "Living things" ============
+// Revision sheet pages: p4 · p6 · p7(Q4a) · p8(Q1,Q2) · p9 · p10(Q1) · p12 · p15(Q3a). No spelling needed – tap only.
+
+const AR = { // Arabic labels for option words (shown only when عربي is on)
+  'Dog':'كلب','Car':'سيارة','Rock':'صخرة','Fish':'سمكة','Teddy':'دبدوب','Chair':'كرسي','Yes':'نعم','No':'لا',
+  'Move':'يتحرك','Eat':'يأكل','Grow':'ينمو','Breathe':'يتنفس','Have babies':'ينجب صغاراً','Drink water':'يشرب الماء','Needs batteries':'يحتاج بطاريات','Gets switched off':'يُطفأ بالزر',
+  'Eating':'يأكل','Growing':'ينمو','Moving':'يتحرك','Having babies':'ينجب صغاراً','Sleeping':'ينام',
+  'Tree':'شجرة','Flower':'زهرة','Cactus':'صبار','Grass':'عشب','Ball':'كرة','Bike':'دراجة','Cup':'كوب',
+  'Light':'ضوء','Water':'ماء','Air':'هواء','Pizza':'بيتزا','Batteries':'بطاريات','TV':'تلفاز','Sweets':'حلويات','Toys':'ألعاب',
+  'Make food':'يصنع غذاءه','Take in air':'يأخذ الهواء','Run':'يجري','Talk':'يتكلم','Watch TV':'يشاهد التلفاز',
+  'Seed':'بذرة','Little shoot':'نبتة صغيرة','Leaves':'أوراق','Flower plant':'نبتة بزهرة','It is growing':'إنها تنمو','It is sleeping':'إنها تنام','It is running':'إنها تجري',
+  'Taller stem':'ساق أطول','More leaves':'أوراق أكثر','Bigger leaves':'أوراق أكبر','A flower':'زهرة','Wheels':'عجلات','Eyes':'عيون',
+  'Inside the bean':'داخل حبة الفول','In the sky':'في السماء','In a shoe':'في حذاء',
+  'Living':'حي','Non-living':'غير حي','Cat':'قطة','Snail':'حلزون','Bird':'عصفور','Child':'طفل','Phone':'هاتف','Book':'كتاب','Cow':'بقرة','Bus':'حافلة','Pencil':'قلم',
+  'Beaker with air holes':'كوب زجاجي بفتحات هواء','A closed box':'صندوق مغلق','My pocket':'جيبي','To keep it alive':'لنحافظ على حياته','To make it fly':'ليطير','To make it big fast':'ليكبر بسرعة',
+  'Food':'طعام','Robot':'روبوت','Hen':'دجاجة','Sheep':'خروف','Butterfly':'فراشة','Frog':'ضفدع','Grown-up':'شخص كبير','Baby':'طفل رضيع','Chick':'صوص','Lamb':'حَمَل','Kitten':'قطة صغيرة','Puppy':'جرو','Caterpillar':'يرقة','Calf':'عجل',
+  'They get bigger':'تصبح أكبر','They get smaller':'تصبح أصغر','They stay the same':'تبقى كما هي','Walk and talk':'يمشي ويتكلم','Cry':'يبكي','Sleep':'ينام','Make noise':'يصدر صوتاً','Electricity':'كهرباء',
+  'Flying':'يطير','Jumping':'يقفز','Swimming':'يسبح','Child (big)':'طفل كبير'
+};
+
+const Q = (type, obj) => Object.assign({type}, obj);
+
+const LEVELS = [
+ { id:'animals', title:'Animals Are Alive', ar:'الحيوانات كائنات حية', emoji:'🐾', color:'#ff7a59', pages:'Workbook p.4', rounds:[
+   Q('pick',{ q:'Which one is a living thing?', ar:'أي واحد كائن حي؟', scene:'', opts:[['🐶','Dog',1],['🚗','Car',0],['🪨','Rock',0]], fact:'A dog is alive: it moves, eats, grows and breathes.', factAr:'الكلب حي: يتحرك ويأكل وينمو ويتنفس.' }),
+   Q('pick',{ q:'Which one is a living thing?', ar:'أي واحد كائن حي؟', opts:[['🐟','Fish',1],['🧸','Teddy',0],['🪑','Chair',0]], fact:'A fish is alive. A teddy and a chair are not – they never grow or eat.', factAr:'السمكة حية. الدبدوب والكرسي غير حيين – لا ينموان ولا يأكلان.' }),
+   Q('multi',{ q:'Tap ALL the things a living animal can do.', ar:'المس كل الأشياء التي يفعلها الحيوان الحي.', scene:'🐱', opts:[['🏃','Move',1],['🍎','Eat',1],['📏','Grow',1],['🌬️','Breathe',1],['🐣','Have babies',1],['🔋','Needs batteries',0],['🔌','Gets switched off',0]], fact:'Living things MOVE, EAT, GROW, BREATHE and HAVE BABIES. These are the life processes!', factAr:'الكائنات الحية تتحرك وتأكل وتنمو وتتنفس وتنجب صغاراً. هذه هي عمليات الحياة!' }),
+   Q('pick',{ q:'The rabbit eats a carrot. What is it doing?', ar:'الأرنب يأكل جزرة. ماذا يفعل؟', scene:'🐰🥕', opts:[['🍎','Eating',1],['📏','Growing',0],['🏃','Moving',0]] }),
+   Q('pick',{ q:'The kitten gets bigger and bigger. What is it doing?', ar:'القطة الصغيرة تصبح أكبر وأكبر. ماذا تفعل؟', scene:'🐱 <span class="arrow">➜</span> 🐈', opts:[['📏','Growing',1],['🍎','Eating',0],['😴','Sleeping',0]] }),
+   Q('pick',{ q:'The frog jumps into the pond. What is it doing?', ar:'الضفدع يقفز في البركة. ماذا يفعل؟', scene:'🐸💦', opts:[['🏃','Moving',1],['📏','Growing',0],['🐣','Having babies',0]] }),
+   Q('pick',{ q:'The hen has little chicks. What is it doing?', ar:'الدجاجة لديها صيصان صغيرة. ماذا تفعل؟', scene:'🐔🐣🐣', opts:[['🐣','Having babies',1],['🏃','Moving',0],['🍎','Eating',0]] }),
+ ]},
+ { id:'plants', title:'Plants Are Alive', ar:'النباتات كائنات حية', emoji:'🌻', color:'#4cbb5c', pages:'Workbook p.6', rounds:[
+   Q('multi',{ q:'Tap ALL the plants.', ar:'المس كل النباتات.', opts:[['🌳','Tree',1],['🌷','Flower',1],['🌵','Cactus',1],['🌾','Grass',1],['🪨','Rock',0],['⚽','Ball',0],['🚲','Bike',0]], fact:'Trees, flowers, grass and cactus are all plants – and plants are living things!', factAr:'الأشجار والزهور والعشب والصبار كلها نباتات – والنباتات كائنات حية!' }),
+   Q('pick',{ q:'Is a tree a living thing?', ar:'هل الشجرة كائن حي؟', scene:'🌳', opts:[['✅','Yes',1],['❌','No',0]], fact:'Yes! A tree grows, takes in air and makes its own food.', factAr:'نعم! الشجرة تنمو وتأخذ الهواء وتصنع غذاءها.' }),
+   Q('multi',{ q:'What does a plant need to grow? Tap them all.', ar:'ماذا يحتاج النبات لينمو؟ المس كلها.', scene:'🌱', opts:[['☀️','Light',1],['💧','Water',1],['🌬️','Air',1],['🍕','Pizza',0],['🔋','Batteries',0],['📺','TV',0]], fact:'Plants need LIGHT, WATER and AIR.', factAr:'النبات يحتاج إلى الضوء والماء والهواء.' }),
+   Q('multi',{ q:'Tap what a plant can do.', ar:'المس ما يستطيع النبات أن يفعله.', scene:'🌻', opts:[['📏','Grow',1],['🍃','Make food',1],['🌬️','Take in air',1],['🏃','Run',0],['🗣️','Talk',0],['📺','Watch TV',0]], fact:'Plants grow, take in air and make their own food with sunlight. They even move a tiny bit – they turn to the light!', factAr:'النباتات تنمو وتأخذ الهواء وتصنع غذاءها بضوء الشمس. وتتحرك قليلاً نحو الضوء!' }),
+   Q('pick',{ q:'Which one is NOT a plant?', ar:'أي واحد ليس نباتاً؟', opts:[['🪑','Chair',1],['🌷','Flower',0],['🌳','Tree',0]], fact:'A chair is made of wood, but it is not alive. It cannot grow.', factAr:'الكرسي مصنوع من الخشب لكنه ليس حياً. لا يستطيع أن ينمو.' }),
+ ]},
+ { id:'grow', title:'Watch Me Grow', ar:'شاهدني أنمو', emoji:'🌱', color:'#9b6cff', pages:'Workbook p.7 (Q4a) · p.15 (Q3a)', rounds:[
+   Q('order',{ q:'Put the bean plant in order, from first to last.', ar:'رتّب نبتة الفول من الأول إلى الأخير.', items:[['🫘','Seed'],['🌱','Little shoot'],['🌿','Leaves'],['🌻','Flower plant']], fact:'First the seed, then a little shoot, then more leaves, then a flower!', factAr:'أولاً البذرة، ثم نبتة صغيرة، ثم أوراق أكثر، ثم زهرة!' }),
+   Q('pick',{ q:'This is the plant today. Which picture shows it AFTER it has grown?', ar:'هذه النبتة اليوم. أي صورة تُظهرها بعد أن تنمو؟', scene:'🌱', opts:[['🌻','Flower plant',1],['🫘','Seed',0],['🌱','Little shoot',0]], fact:'After it grows it is TALLER, has MORE leaves and maybe a FLOWER.', factAr:'بعد أن تنمو تصبح أطول، لها أوراق أكثر وربما زهرة.' }),
+   Q('pick',{ q:'Look at the bean plant. What is it doing?', ar:'انظري إلى نبتة الفول. ماذا تفعل؟', scene:'🌱 <span class="arrow">➜</span> 🌿 <span class="arrow">➜</span> 🌻', small:true, opts:[['📏','It is growing',1],['😴','It is sleeping',0],['🏃','It is running',0]], fact:'It is GROWING! That is the answer on page 15.', factAr:'إنها تنمو! هذه إجابة صفحة 15.' }),
+   Q('multi',{ q:'Drawing check! When you draw the grown plant, what should it have? Tap them.', ar:'عند رسم النبتة الكبيرة، ماذا يجب أن يكون فيها؟', scene:'✏️🌻', opts:[['📏','Taller stem',1],['🍃','More leaves',1],['🌿','Bigger leaves',1],['🌸','A flower',1],['🛞','Wheels',0],['👀','Eyes',0]], fact:'In the test you DRAW the grown plant: make it taller, give it more and bigger leaves, and add a flower.', factAr:'في الاختبار سترسمين النبتة بعد نموها: أطول، أوراق أكثر وأكبر، وزهرة.' }),
+   Q('pick',{ q:'Where does the new plant start to grow?', ar:'من أين تبدأ النبتة الجديدة بالنمو؟', scene:'🫘', opts:[['🫘','Inside the bean',1],['☁️','In the sky',0],['👟','In a shoe',0]], fact:'The new plant starts inside the bean seed.', factAr:'النبتة الجديدة تبدأ من داخل حبة الفول.' }),
+   Q('multi',{ q:'The bean plant needs… tap them all.', ar:'نبتة الفول تحتاج إلى… المس كلها.', scene:'🌱', opts:[['☀️','Light',1],['💧','Water',1],['🌬️','Air',1],['🍬','Sweets',0],['🧸','Toys',0]] }),
+ ]},
+ { id:'living', title:'Living or Not?', ar:'حي أم غير حي؟', emoji:'🔍', color:'#3fb0ff', pages:'Workbook p.8 (Q1,Q2) · p.9', rounds:[
+   Q('sort',{ q:'Living or non-living? Tap the right box.', ar:'حي أم غير حي؟ المسي الصندوق الصحيح.', items:[['🐱','Cat',1],['🪨','Rock',0],['🌳','Tree',1],['🚗','Car',0],['🐌','Snail',1],['🧸','Teddy',0],['🌷','Flower',1],['📱','Phone',0],['🐦','Bird',1],['✏️','Pencil',0]] }),
+   Q('count',{ q:'How many LIVING things can you see?', ar:'كم كائناً حياً ترين؟', scene:'🐶 🪨 🌳 🚲 🐦 ⚽', answer:3, fact:'Dog, tree and bird are living – that is 3!', factAr:'الكلب والشجرة والعصفور كائنات حية – أي 3!' }),
+   Q('count',{ q:'How many LIVING things can you see?', ar:'كم كائناً حياً ترين؟', scene:'🐟 🪑 🌷 🧸 🐱 🌳', answer:4, fact:'Fish, flower, cat and tree are living – that is 4!', factAr:'السمكة والزهرة والقطة والشجرة كائنات حية – أي 4!' }),
+   Q('count',{ q:'How many NON-living things can you see?', ar:'كم شيئاً غير حي ترين؟', scene:'🚌 🐮 📚 🌾 🐸', answer:2, fact:'The bus and the books are not alive – that is 2!', factAr:'الحافلة والكتب غير حية – أي 2!' }),
+   Q('pick',{ q:'We found a snail! Where do we put it to keep it alive?', ar:'وجدنا حلزوناً! أين نضعه لنحافظ على حياته؟', scene:'🐌', opts:[['🥛','Beaker with air holes',1],['📦','A closed box',0],['👖','My pocket',0]], fact:'We put it in a beaker with air holes, some leaves and a little water – so it stays alive.', factAr:'نضعه في كوب زجاجي بفتحات هواء مع أوراق وقليل من الماء – ليبقى حياً.' }),
+   Q('pick',{ q:'Why do we give the snail air, food and water?', ar:'لماذا نعطي الحلزون هواءً وطعاماً وماءً؟', scene:'🐌🍃💧', opts:[['❤️','To keep it alive',1],['🪽','To make it fly',0],['🐘','To make it big fast',0]] }),
+   Q('multi',{ q:'What does a living thing need to stay alive?', ar:'ماذا يحتاج الكائن الحي ليبقى حياً؟', scene:'🐱🌱', opts:[['🌬️','Air',1],['💧','Water',1],['🍎','Food',1],['🔋','Batteries',0],['📺','TV',0]] }),
+   Q('pick',{ q:'Which one can NOT grow?', ar:'أي واحد لا يستطيع أن ينمو؟', opts:[['🪨','Rock',1],['🐱','Cat',0],['🌱','Little shoot',0]], fact:'A rock never grows, eats or breathes. It is non-living.', factAr:'الصخرة لا تنمو ولا تأكل ولا تتنفس. إنها غير حية.' }),
+ ]},
+ { id:'robots', title:'Are Robots Alive?', ar:'هل الروبوتات حية؟', emoji:'🤖', color:'#ffc93c', pages:'Workbook p.10 (Q1)', rounds:[
+   Q('pick',{ q:'What can a robot do?', ar:'ماذا يستطيع الروبوت أن يفعل؟', scene:'🤖', opts:[['🏃','Move',1],['📏','Grow',0],['🐣','Have babies',0]], fact:'A robot can MOVE – but that is all. It cannot grow, eat or have babies.', factAr:'الروبوت يستطيع أن يتحرك – فقط. لا ينمو ولا يأكل ولا ينجب.' }),
+   Q('pick',{ q:'Who is alive?', ar:'من هو الحي؟', scene:'🤖 ❓ 🐱', opts:[['🐱','Cat',1],['🤖','Robot',0]], fact:'The cat is alive. The robot only moves because of batteries.', factAr:'القطة حية. الروبوت يتحرك فقط بسبب البطاريات.' }),
+   Q('multi',{ q:'Tap the things a robot CANNOT do.', ar:'المس الأشياء التي لا يستطيع الروبوت فعلها.', scene:'🤖🚫', opts:[['📏','Grow',1],['🍎','Eat',1],['🐣','Have babies',1],['🌬️','Breathe',1],['🏃','Move',0],['🔊','Make noise',0]], fact:'Robots can move and make noise, but they do NOT grow, eat, breathe or have babies.', factAr:'الروبوت يتحرك ويصدر صوتاً، لكنه لا ينمو ولا يأكل ولا يتنفس ولا ينجب.' }),
+   Q('pick',{ q:'Is a robot a living thing?', ar:'هل الروبوت كائن حي؟', scene:'🤖', opts:[['❌','No',1],['✅','Yes',0]], fact:'No! Moving is not enough to be alive.', factAr:'لا! الحركة وحدها لا تكفي ليكون حياً.' }),
+   Q('pick',{ q:'What does a robot need to work?', ar:'ماذا يحتاج الروبوت ليعمل؟', scene:'🤖🔋', opts:[['🔋','Batteries',1],['🍎','Food',0],['💧','Water',0]] }),
+   Q('pick',{ q:'The toy dog moves when you press a button. Is it alive?', ar:'الكلب اللعبة يتحرك عند ضغط الزر. هل هو حي؟', scene:'🐕🔘', opts:[['❌','No',1],['✅','Yes',0]], fact:'A toy only moves with batteries. A real dog is alive – it eats, grows and breathes.', factAr:'اللعبة تتحرك بالبطاريات فقط. الكلب الحقيقي حي – يأكل وينمو ويتنفس.' }),
+ ]},
+ { id:'babies', title:'Growing Up', ar:'الصغار يكبرون', emoji:'🐣', color:'#ff8fb1', pages:'Workbook p.12', rounds:[
+   Q('match',{ q:'Match the baby animal to the grown-up animal.', ar:'صِلي الحيوان الصغير بالحيوان الكبير.', pairs:[['🐣','Chick','🐔','Hen'],['🐛','Caterpillar','🦋','Butterfly'],['🐶','Puppy','🐕','Dog'],['👶','Baby','🧑','Grown-up']] }),
+   Q('match',{ q:'Match the baby animal to the grown-up animal.', ar:'صِلي الحيوان الصغير بالحيوان الكبير.', pairs:[['🐱','Kitten','🐈','Cat'],['🐑','Lamb','🐏','Sheep'],['🐮','Calf','🐄','Cow']] }),
+   Q('pick',{ q:'A lamb grows into a…', ar:'الحَمَل يكبر ليصبح…', scene:'🐑 <span class="arrow">➜</span> ❓', opts:[['🐏','Sheep',1],['🐄','Cow',0],['🐕','Dog',0]] }),
+   Q('pick',{ q:'A chick grows into a…', ar:'الصوص يكبر ليصبح…', scene:'🐣 <span class="arrow">➜</span> ❓', opts:[['🐔','Hen',1],['🦋','Butterfly',0],['🐸','Frog',0]] }),
+   Q('pick',{ q:'What happens to animals as they grow?', ar:'ماذا يحدث للحيوانات عندما تنمو؟', scene:'🐶 <span class="arrow">➜</span> 🐕', opts:[['📏','They get bigger',1],['🤏','They get smaller',0],['🟰','They stay the same',0]], fact:'Animals grow and change. They get BIGGER. Adult cats are bigger than kittens!', factAr:'الحيوانات تنمو وتتغير. تصبح أكبر. القطة الكبيرة أكبر من القطة الصغيرة!' }),
+   Q('order',{ q:'Put the pictures in order: baby, child, grown-up.', ar:'رتّبي الصور: رضيع، طفل، كبير.', items:[['👶','Baby'],['🧒','Child (big)'],['🧑','Grown-up']], fact:'People grow and change too – from a baby to a child to a grown-up.', factAr:'الناس أيضاً ينمون ويتغيرون – من رضيع إلى طفل إلى كبير.' }),
+   Q('pick',{ q:'Which one is the BABY?', ar:'أي واحد هو الصغير؟', opts:[['🐣','Chick',1],['🐔','Hen',0]] }),
+   Q('pick',{ q:'What can a grown-up do that a baby cannot?', ar:'ماذا يستطيع الكبير أن يفعله ولا يستطيعه الرضيع؟', scene:'👶 ❓ 🧑', opts:[['🚶','Walk and talk',1],['😢','Cry',0],['😴','Sleep',0]] }),
+ ]},
+];
+const BIG_TEST_N = 12;
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_sci_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_sci_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});          // question text -> mistakes
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’-]/gu,''));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a real scientist!','Amazing!','Roar! Great job!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Look again.','Hmm, not that one.','Listen again and try.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='happy'?'🦁':mood==='think'?'🙈':'🦁'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+function arWord(w){ return AR[w]||''; }
+function tileHtml(e,w){ return `<span class="e">${e}</span><span class="w">${w}</span><span class="wa">${arWord(w)}</span>`; }
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🦁 Ready for the Science Safari?</h1><p>Tap an island, answer the questions and collect ⭐ stars. Finish every island, then try the Big Test!</p><span class="ar">مرحباً ميرا! المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. ثم جرّبي الاختبار الكبير!</span></div><div class="big">🌴🦒</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · Living things (Workbook p.4–15)'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Just like tomorrow's test – no spelling, only tapping!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  speechSynthesis && speechSynthesis.cancel();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.rounds.slice(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  // 2 random questions from each island, shuffled
+  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(sample(l.rounds,2)));
+  return shuffle(qs).slice(0,BIG_TEST_N);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=r.q;
+  $('#sayBtn').onclick=()=>speak(r.q,{force:true});
+  $('#slowBtn').onclick=()=>speak(r.q,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(r.q);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.level.id==='bigtest'?cur.currentQ:cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); if(r.fact) speak(`${praise()} ${r.fact}`); else speak(praise()); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg = stars===3?'Perfect! A real scientist!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = stars===3?'ممتاز! عالمة حقيقية!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
+    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+}
+
+// ============ ROUND TYPES ============
+const ROUNDS={};
+function header(body,r){
+  body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||''));
+  if(r.scene) body.appendChild(el('div','scene'+(r.small?' small':''),r.scene));
+}
+
+// --- pick one correct tile ---
+ROUNDS.pick=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); }); nextBtn(body,done,r); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- multi: tap ALL correct tiles ---
+ROUNDS.multi=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
+  const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
+      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No. ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- count: pick the number ---
+ROUNDS.count=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false; const nums=shuffle([r.answer, r.answer+1, Math.max(0,r.answer-1), r.answer+2].filter((n,i,a)=>a.indexOf(n)===i)).slice(0,4).sort((a,b)=>a-b);
+  nums.forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(n===r.answer){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); nextBtn(body,done,r); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${n}? Count again. Only the living things!`); } };
+    row.appendChild(b); });
+};
+
+// --- sort into Living / Non-living buckets ---
+ROUNDS.sort=function(r,body,done){
+  header(body,r);
+  const items=shuffle(r.items); let i=0;
+  const card=el('div'); body.appendChild(card);
+  const bk=el('div','buckets'); body.appendChild(bk);
+  const B=[{n:'Living',e:'🌱🐾',ar:'حي',v:1},{n:'Non-living',e:'🪨🚗',ar:'غير حي',v:0}];
+  const bEls={};
+  B.forEach(b=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${b.ar}</div><div class="got"></div>`); d.onclick=()=>choose(b.v); bk.appendChild(d); bEls[b.v]=d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const show=()=>{ const it=items[i]; if(!it){ nextBtn(body,done,r); return; }
+    card.innerHTML=`<div class="scene">${it[0]}</div><div class="q" style="font-size:1.4rem">${it[1]} <span class="ar-hint" style="display:inline;color:var(--grape)">${arWord(it[1])}</span></div><div class="feedback"></div>`;
+    counter.textContent=`${i+1} of ${items.length}`; speak(`${it[1]}. Living or non-living?`); };
+  const choose=(v)=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback');
+    if(v===it[2]){ right(); bEls[v].querySelector('.got').appendChild(el('span',null,it[0])); fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! A ${it[1].toLowerCase()} is ${v?'living':'non-living'}.`); i++; setTimeout(show,900); }
+    else { wrong(); bEls[v].classList.add('bad'); setTimeout(()=>bEls[v].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Is a ${it[1].toLowerCase()} ${v?'living':'non-living'}? ${retry()}`); } };
+  show();
+};
+
+// --- order: tap pictures in the right order ---
+ROUNDS.order=function(r,body,done){
+  header(body,r);
+  const slots=el('div','slots'); body.appendChild(slots);
+  r.items.forEach((it,k)=>{ slots.appendChild(el('div','slot','')); if(k<r.items.length-1) slots.appendChild(el('span','arrow','➜')); });
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let k=0;
+  shuffle(r.items.map((it,idx)=>[it,idx])).forEach(([it,idx])=>{ const b=el('button','tile',tileHtml(it[0],it[1])); b.onclick=()=>{ sfx.tap();
+    if(idx===k){ right(); b.classList.add('used'); const s=slots.querySelectorAll('.slot')[k]; s.textContent=it[0]; s.classList.add('fill'); k++; fb.textContent=praise(); fb.classList.remove('bad');
+      if(k===r.items.length) nextBtn(body,done,r); else speak(`${it[1]}. What comes next?`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Not yet. What comes ${k===0?'first':'next'}?`); } };
+    row.appendChild(b); });
+  speak(r.q+' What comes first?');
+};
+
+// --- match: tap a baby, then its grown-up ---
+ROUNDS.match=function(r,body,done){
+  header(body,r);
+  const cols=el('div','cols'); const L=el('div','col'), R=el('div','col'); cols.append(L,R); body.appendChild(cols);
+  const fb=el('div','feedback',''); body.appendChild(fb);
+  let sel=null, left=r.pairs.length;
+  // dataset.k = index of the pair in r.pairs, on both sides
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[0],p[1])); b.dataset.k=k; b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); L.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel')); b.classList.add('sel'); sel=b; speak(`${p[1]}. What does it grow into?`); }; L.appendChild(b); });
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[2],p[3])); b.onclick=()=>{ sfx.tap(); if(!sel){ fb.textContent='Tap a baby animal first!'; fb.classList.add('bad'); speak('Tap a baby animal first!'); return; }
+      const sk=Number(sel.dataset.k);
+      if(sk===k){ right(); sel.classList.remove('sel'); sel.classList.add('ok'); b.classList.add('ok'); sel.style.pointerEvents='none'; b.style.pointerEvents='none'; fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! A ${p[1].toLowerCase()} grows into a ${p[3].toLowerCase()}.`); sel=null; left--; if(left===0) nextBtn(body,done,r); }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`A ${r.pairs[sk][1].toLowerCase()} does not grow into a ${p[3].toLowerCase()}. ${retry()}`); } };
+    R.appendChild(b); });
+  speak(r.q+' Tap a baby, then tap the grown-up.');
+};
+
+// ============ REPORT ============
+function report(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Workbook</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
+    <div class="card"><h3>What the test covers (Mrs. Aya's revision sheet)</h3><ul>
+      <li><b>p.4</b> Animals are living things – they move, eat, grow, breathe, have babies.</li>
+      <li><b>p.6</b> Plants are living things – circle the plants; plants need light, water, air; they grow and make food.</li>
+      <li><b>p.7 Q4a</b> <b>Drawing:</b> draw the plant after it has grown → taller stem, more / bigger leaves, a flower.</li>
+      <li><b>p.8 Q1–Q2</b> Living or non-living – count the living things in a picture; sort living / non-living.</li>
+      <li><b>p.9</b> Keep a small animal (snail) in a beaker with air holes, leaves and water – to keep it alive.</li>
+      <li><b>p.10 Q1</b> Robots can move, but they are NOT alive (they do not grow, eat, breathe or have babies).</li>
+      <li><b>p.12</b> Animals grow and change – baby → adult (chick → hen, lamb → sheep, kitten → cat); they get bigger.</li>
+      <li><b>p.15 Q3a</b> Bean plant: “What is it doing?” → <b>It is growing.</b> Plants need sunlight, water, air; the new plant starts inside the bean.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">No spelling is required in the exam – Mira only circles, ticks, matches or draws. Also revise the worksheets in her science notebook.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>“What do living things do?” → <i>move, eat, grow, breathe, have babies</i> (count on 5 fingers ✋).</li>
+      <li>“What do plants need?” → <i>light, water, air</i> (3 fingers).</li>
+      <li>“Is a robot alive?” → <i>No! It only moves. It needs batteries.</i></li>
+      <li>“Draw me a small plant… now draw it after it has grown!” (taller, more leaves, flower).</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Let us go on a safari!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome or Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>

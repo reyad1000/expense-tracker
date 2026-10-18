@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Number Forest">
+<meta name="theme-color" content="#fff7e6">
+<title>Mira's Number Forest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Number-forest look (the Abacus squirrel lives here): one island map → one big activity card per round, big tappable tiles for a 6-year-old. */
+:root{
+  --bg:#fff7e6;          /* warm cream */
+  --bg2:#ffe9c2;         /* honey */
+  --card:#ffffff;
+  --ink:#3a2a1a;         /* bark ink */
+  --muted:#8a705a;
+  --coral:#ff7a59;       /* main accent */
+  --sun:#ffc93c;
+  --leaf:#4cbb5c;
+  --sky:#3fb0ff;
+  --grape:#9b6cff;
+  --pink:#ff6fae;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(58,42,26,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+button,.dom,.obj{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#dff5cf 0,transparent 32%),radial-gradient(circle at 92% 92%,#cfeeff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--coral)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#eadfca}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#ffe9c2)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.arin{display:none;direction:rtl;color:var(--grape)}
+body.ar .arin{display:inline}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:-2px 0 6px}
+
+/* number track */
+.track{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0}
+.track .cell{width:60px;height:66px;border-radius:14px;background:#e8f4ff;border-bottom:5px solid #bfe0ff;display:grid;place-items:center;font-family:var(--display);font-size:2rem;font-weight:700}
+.track .cell.gap{background:#fff0f6;border:3px dashed var(--pink);border-bottom-width:5px;color:var(--pink);font-size:2.2rem}
+.track .cell.gap.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+@media (max-width:420px){.track .cell{width:50px;height:58px;font-size:1.6rem}}
+.helper{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:8px 0 2px}
+.helper span{width:30px;height:30px;border-radius:8px;background:var(--bg2);display:grid;place-items:center;font-size:.85rem;font-family:var(--display)}
+
+/* object scene (tappable to count) */
+.objs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;margin:10px 0}
+.objs .grp{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;background:var(--bg2);border-radius:20px;padding:10px 12px;min-width:120px;min-height:70px;max-width:280px}
+.objs .grp.empty{background:repeating-linear-gradient(45deg,#fff3dc 0 8px,#ffe9c2 8px 16px);border:3px dashed #e9c98f}
+.objs .plus{font-family:var(--display);font-size:2.4rem;color:var(--muted)}
+.obj{font-size:2.4rem;line-height:1;width:48px;height:48px;display:grid;place-items:center;border-radius:12px;position:relative;transition:transform .1s;user-select:none}
+.obj:hover{transform:scale(1.1)}
+.obj.c{background:#e6f8ea;box-shadow:inset 0 0 0 3px var(--ok)}
+.obj.c::after{content:attr(data-n);position:absolute;right:-4px;top:-6px;background:var(--ok);color:#fff;border-radius:999px;font-size:.75rem;font-family:var(--display);min-width:20px;height:20px;display:grid;place-items:center;padding:0 4px}
+.obj.ghost{opacity:.25;filter:grayscale(1);pointer-events:none}
+
+.sum{font-family:var(--display);font-size:clamp(2rem,7vw,3rem);text-align:center;margin:8px 0;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap}
+.sum .box{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:14px;background:#fff0f6;border:3px dashed var(--pink);color:var(--pink);font-size:.9em}
+.sum .box.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+.sum .n{min-width:1.1em;text-align:center}
+
+/* domino */
+.dominoes{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:10px 0}
+.dom{display:flex;background:#fffdf7;border:4px solid #5a4632;border-radius:16px;box-shadow:0 6px 0 #c9b8a0;padding:6px;gap:6px;position:relative;transition:transform .1s}
+.dom.pick{cursor:pointer}
+.dom.pick:hover{transform:translateY(-3px)}
+.dom.ok{border-color:var(--ok);box-shadow:0 6px 0 var(--ok)}
+.dom.bad{animation:shake .4s;border-color:var(--bad)}
+.dom.used{opacity:.35;pointer-events:none}
+.dom .half{width:92px;height:92px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:2px;padding:6px;border-radius:10px;background:#fff}
+.dom .half+.half{border-left:4px solid #5a4632;border-radius:0 10px 10px 0}
+.dom .half:first-child{border-radius:10px 0 0 10px}
+.dom .d{width:100%;height:100%;display:grid;place-items:center}
+.dom .d i{display:block;width:18px;height:18px;border-radius:50%;background:#2b1d12;transition:transform .1s}
+.dom.sm .half{width:66px;height:66px;padding:4px}
+.dom.sm .d i{width:13px;height:13px}
+.dom .d.tap{cursor:pointer}
+.dom .d.tap:hover i{transform:scale(1.2)}
+.dom .d.c i{background:var(--ok);box-shadow:0 0 0 3px #bdf0c8}
+.dom .d.c::after{content:attr(data-n);position:absolute;font-size:.7rem;color:#1f7a2f;font-family:var(--display);transform:translate(12px,-12px)}
+.dom .d{position:relative}
+.dom .label{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);font-family:var(--display);font-size:1.2rem;color:var(--muted)}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.tile .e{font-size:2.4rem;line-height:1}
+.tile .w{font-size:1.1rem}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+.tile.num{min-width:84px;font-size:2.2rem;padding:10px 18px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#eadfca}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #eadfca}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m" id="mascot-head">🐿️</span> Mira's Number Forest</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🐿️</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Math Mid-Term (Term 1) · Abacus Year 1 Workbook 1 ============
+// Revision sheet: Missing numbers to 20 (counting by 1) · Counting dominoes (p.4) · Simple addition with objects to 10 · Making 4 and 5 (p.6).
+// Every island makes NEW questions each time it is played, so Mira can play again and again.
+
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty','twenty-one'];
+const OBJ=[['🍎','apples'],['⭐','stars'],['🍓','strawberries'],['🐟','fish'],['🎈','balloons'],['🌼','flowers'],['🍪','cookies'],['🚗','cars'],['🦋','butterflies'],['🍌','bananas'],['🧁','cupcakes'],['🐞','ladybirds'],['🍇','grapes'],['⚽','balls'],['🐸','frogs']];
+const FOOD=[['🥪','sandwiches'],['🍳','eggs'],['🍅','tomatoes'],['🍪','cookies'],['🍎','apples'],['🧀','cheese']];
+
+// 4 answer tiles around the right answer
+function choices(ans,lo=0,hi=20){ const s=new Set([ans]); const cand=shuffle([ans-1,ans+1,ans-2,ans+2,ans+3,ans-3]).filter(n=>n>=lo&&n<=hi); for(const c of cand){ if(s.size>=4)break; s.add(c);} return [...s].sort((a,b)=>a-b); }
+
+// ---- generators ----
+function genTrack(){ // missing number in a track of 5 consecutive numbers up to 20
+  const len=5, start=rnd(1,16), pos=pick([0,1,2,2,3,4,4]); // the gap is more often at the end or middle
+  const nums=Array.from({length:len},(_,i)=>start+i); const ans=nums[pos];
+  const shown=nums.map((n,i)=>i===pos?'_':n);
+  const spoken=nums.map((n,i)=>i===pos?'hmm':WORDS[n]).join(', ');
+  return {type:'track',nums,pos,ans,key:'Missing number: '+shown.join(' '),q:'Find the missing number!',ar:'جدي العدد الناقص!',spoken:`Find the missing number. ${spoken}.`,
+    fact:`${WORDS[ans-1][0].toUpperCase()+WORDS[ans-1].slice(1)}, ${WORDS[ans]}, ${ans<21?WORDS[ans+1]:''}. After ${ans-1} comes ${ans}.`,factAr:`بعد ${ans-1} يأتي ${ans}.`};
+}
+function genTrack2(){ // two gaps
+  const start=rnd(1,15), nums=Array.from({length:6},(_,i)=>start+i); let p1=rnd(1,4), p2=p1+pick([1,2]); if(p2>5)p2=5; if(p2===p1)p2=p1+1;
+  const gaps=[p1,p2]; const shown=nums.map((n,i)=>gaps.includes(i)?'_':n);
+  return {type:'track',nums,gaps,key:'Missing numbers: '+shown.join(' '),q:'Two numbers are hiding! Fill the first gap, then the second.',ar:'عددان مختبئان! املئي الفراغ الأول ثم الثاني.',spoken:'Two numbers are hiding. '+nums.map((n,i)=>gaps.includes(i)?'hmm':WORDS[n]).join(', ')+'.',
+    fact:`${nums.join(', ')}. Count by one: each number is one more.`,factAr:'نعدّ واحداً واحداً: كل عدد يزيد واحداً.'};
+}
+function genDomino(){ // count all the dots on one domino
+  const a=rnd(0,6), b=rnd(0,6); const ans=a+b;
+  return {type:'domino',a,b,ans,key:`Domino ${a} | ${b} = ?`,q:'How many dots altogether?',ar:'كم نقطة في الدومينو كلها؟',spoken:'Count the dots on the domino. How many dots altogether?',
+    fact:`${a} dots and ${b} dots make ${ans}. ${a} + ${b} = ${ans}.`,factAr:`${a} نقاط و ${b} نقاط تساوي ${ans}.`};
+}
+function genDominoPick(){ // tap the domino that shows N (like "draw the dots to match")
+  const ans=rnd(1,10); const a=rnd(Math.max(0,ans-6),Math.min(6,ans)); const target=[a,ans-a];
+  const others=[]; while(others.length<2){ const t=rnd(0,10); if(t===ans||others.some(o=>o[0]+o[1]===t))continue; const x=rnd(Math.max(0,t-6),Math.min(6,t)); others.push([x,t-x]); }
+  return {type:'dpick',ans,doms:shuffle([target,...others]),key:`Find the domino that shows ${ans}`,q:`Tap the domino that shows <b>${ans}</b>.`,ar:`المسي الدومينو الذي يُظهر ${ans}.`,spoken:`Tap the domino that shows ${ans}. Count the dots on each one.`,
+    fact:`${target[0]} + ${target[1]} = ${ans}. That domino shows ${ans}!`,factAr:`${target[0]} + ${target[1]} = ${ans}.`};
+}
+function genAdd(){ // objects: a + b = ? (total ≤ 10)
+  const total=rnd(3,10), a=rnd(1,total-1), b=total-a; const [e,name]=pick(OBJ);
+  return {type:'add',a,b,e,name,ans:total,key:`Add: ${a} + ${b}`,q:`How many ${name} altogether?`,ar:'كم العدد كله؟',spoken:`${a} ${name} and ${b} more ${name}. ${a} plus ${b} equals? Tap the ${name} to count them.`,
+    fact:`${a} + ${b} = ${total}. ${WORDS[a]} and ${WORDS[b]} make ${WORDS[total]}!`,factAr:`${a} + ${b} = ${total}`};
+}
+function genMake(){ // making 4 and 5: ☐ + b = T  or  a + ☐ = T, with a tray of food
+  const T=pick([4,5,4,5]); const known=rnd(0,T); const miss=T-known; const first=Math.random()<.5; const [e,name]=pick(FOOD);
+  const eq=first?`? + ${known} = ${T}`:`${known} + ? = ${T}`;
+  return {type:'make',T,known,miss,first,e,name,ans:miss,key:`Making ${T}: ${eq}`,q:`How many more ${name} to make <b>${T}</b>?`,ar:`كم نحتاج أيضاً لنصنع ${T}؟`,spoken:`There are ${known} ${name}. How many more to make ${T}? ${first?'Something':known} plus ${first?known:'something'} equals ${T}.`,
+    fact:`${known} + ${miss} = ${T}. ${WORDS[known]} and ${WORDS[miss]} make ${WORDS[T]}!`,factAr:`${known} + ${miss} = ${T}`};
+}
+function genNext(){ // what comes just after / before
+  const after=Math.random()<.7; const n=after?rnd(1,19):rnd(2,20); const ans=after?n+1:n-1;
+  return {type:'next',n,after,ans,key:`What comes ${after?'after':'before'} ${n}?`,q:`What number comes just <b>${after?'after':'before'}</b> ${n}?`,ar:`ما العدد الذي يأتي ${after?'بعد':'قبل'} ${n} مباشرة؟`,spoken:`What number comes just ${after?'after':'before'} ${WORDS[n]}?`,
+    fact:after?`${n}, then ${ans}. ${ans} is one more than ${n}.`:`${ans}, then ${n}. ${ans} is one less than ${n}.`,factAr:after?`${ans} يأتي بعد ${n}.`:`${ans} يأتي قبل ${n}.`};
+}
+
+const LEVELS=[
+ { id:'train', title:'Number Train', ar:'قطار الأعداد', emoji:'🚂', color:'#3fb0ff', pages:'Missing numbers to 20 · Workbook p.20–22', gen(){ return [genTrack(),genNext(),genTrack(),genTrack(),genNext(),genTrack2(),genTrack()]; } },
+ { id:'domino', title:'Domino Den', ar:'بيت الدومينو', emoji:'🎲', color:'#9b6cff', pages:'Counting dominoes · Workbook p.4', gen(){ return [genDomino(),genDomino(),genDominoPick(),genDomino(),genDomino(),genDominoPick()]; } },
+ { id:'add', title:'Fruit Shop Adding', ar:'جمع الأشياء', emoji:'🍎', color:'#4cbb5c', pages:'Adding objects to 10 · Workbook p.8–9', gen(){ return [genAdd(),genAdd(),genAdd(),genAdd(),genAdd(),genAdd()]; } },
+ { id:'make', title:'Make 4 and 5', ar:'نصنع 4 و 5', emoji:'🍳', color:'#ff7a59', pages:'Making 4 and 5 · Workbook p.6', gen(){ return [genMake(),genMake(),genMake(),genMake(),genMake(),genMake()]; } },
+];
+const BIG_TEST_N=12;
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_math_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_math_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});          // question -> mistakes
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  count(n){ tone(440+n*40,.09,'sine',.08); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?+='’-]/gu,''));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ============ HELPERS ============
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a maths champion!','Amazing!','Nutty good, says the squirrel!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Count again.','Hmm, not that one.','Count slowly and try again.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🐿️'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🐿️ Welcome to the Number Forest!</h1><p>Tap an island, answer the questions and collect ⭐ stars. New questions every time! Finish every island, then try the Big Test.</p><span class="ar">مرحباً ميرا! المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. أسئلة جديدة كل مرة! ثم جرّبي الاختبار الكبير.</span></div><div class="big">🌳🔢</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · Maths Mid-Term (Abacus Workbook 1)'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Just like Sunday's test – 3 questions from each island!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  speechSynthesis && speechSynthesis.cancel();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.gen(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  // 3 fresh questions from each island, shuffled
+  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(shuffle(l.gen()).slice(0,3)));
+  return shuffle(qs).slice(0,BIG_TEST_N);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=r.key;
+  $('#sayBtn').onclick=()=>speak(r.spoken||r.q,{force:true});
+  $('#slowBtn').onclick=()=>speak(r.spoken||r.q,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(r.spoken||r.q);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); b.scrollIntoView({block:'nearest',behavior:'smooth'}); if(r.fact) speak(`${praise()} ${r.fact}`); else speak(praise()); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg = stars===3?'Perfect! A maths champion!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = stars===3?'ممتاز! بطلة الرياضيات!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
+    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+}
+
+// ============ SHARED PIECES ============
+const ROUNDS={};
+function header(body,r){ body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||'')); }
+function helperTrack(body){ // 1–20 number track to count on (like the workbook's "use a number track")
+  const h=el('div','helper'); for(let i=1;i<=20;i++) h.appendChild(el('span',null,String(i))); h.classList.add('hidden');
+  const b=el('button','nextbtn ghost','🧮 Show number track'); b.style.margin='6px auto 0'; b.onclick=()=>{ h.classList.toggle('hidden'); b.textContent=h.classList.contains('hidden')?'🧮 Show number track':'🧮 Hide number track'; };
+  body.append(b,h);
+}
+// number tiles → calls onPick(n, tileEl); returns {lock}
+function numberTiles(body,r,ans,onRight,{lo=0,hi=20,wrongSay}={}){
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  choices(ans,lo,hi).forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(n===ans){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b)t.classList.add('used'); }); onRight(b); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(wrongSay?wrongSay(n):`${n}? ${retry()}`); } };
+    row.appendChild(b); });
+  return {row,fb};
+}
+// tappable objects: each tap counts the next one aloud
+function objGroup(e,n,counter){ const g=el('div','grp'+(n===0?' empty':'')); for(let i=0;i<n;i++){ const o=el('button','obj',e); o.onclick=()=>{ if(o.classList.contains('c')){ o.classList.remove('c'); counter.n--; counter.sync(); return; } counter.n++; o.classList.add('c'); o.dataset.n=counter.n; sfx.count(counter.n); speak(String(counter.n)); counter.sync(); }; g.appendChild(o);} return g; }
+function makeCounter(){ const c={n:0,sync(){}}; return c; }
+
+// ============ ROUND TYPES ============
+// --- track: number track with a gap (or two) ---
+ROUNDS.track=function(r,body,done){
+  header(body,r);
+  const gaps=r.gaps||[r.pos]; let gi=0;
+  const t=el('div','track'); body.appendChild(t);
+  const cells=r.nums.map((n,i)=>{ const c=el('div','cell'+(gaps.includes(i)?' gap':''),gaps.includes(i)?'?':String(n)); t.appendChild(c); return c; });
+  const fb=el('div','feedback',''); const row=el('div','row'); body.append(row,fb);
+  const ask=()=>{ const idx=gaps[gi]; const ans=r.nums[idx]; row.innerHTML=''; cells.forEach((c,i)=>c.style.outline=i===idx?'4px solid var(--sky)':'');
+    let locked=false;
+    choices(ans,1,21).forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+      if(n===ans){ locked=true; right(); b.classList.add('ok'); cells[idx].textContent=String(ans); cells[idx].classList.add('fill'); cells[idx].style.outline=''; fb.textContent=praise(); fb.classList.remove('bad'); gi++;
+        if(gi<gaps.length){ speak(`${ans}! Now the next gap.`); setTimeout(ask,700); } else { row.querySelectorAll('.tile').forEach(x=>{ if(x!==b)x.classList.add('used'); }); nextBtn(body,done,r); } }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${n}? ${r.nums[idx-1]!=null?'After '+r.nums[idx-1]+' comes?':'Before '+r.nums[idx+1]+' comes?'} ${retry()}`); } };
+      row.appendChild(b); }); };
+  ask();
+};
+
+// --- next: what comes just after / before ---
+ROUNDS.next=function(r,body,done){
+  header(body,r);
+  const t=el('div','track'); body.appendChild(t);
+  const cells=r.after?[[r.n,false],[null,true]]:[[null,true],[r.n,false]];
+  const gapCell={};
+  cells.forEach(([n,isGap])=>{ const c=el('div','cell'+(isGap?' gap':''),isGap?'?':String(n)); t.appendChild(c); if(isGap)gapCell.el=c; });
+  numberTiles(body,r,r.ans,()=>{ gapCell.el.textContent=String(r.ans); gapCell.el.classList.add('fill'); nextBtn(body,done,r); },{lo:0,hi:21,wrongSay:n=>`${n}? Count ${r.after?'on from':'back from'} ${r.n}. ${retry()}`});
+  helperTrack(body);
+};
+
+// --- domino: count all the dots ---
+const DOTS={0:[],1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function dominoEl(a,b,{small=false,tap=false,counter=null}={}){
+  const d=el('div','dom'+(small?' sm':'')); [a,b].forEach(n=>{ const h=el('div','half'); for(let i=0;i<9;i++){ const c=el('div','d'+(tap&&DOTS[n].includes(i)?' tap':'')); if(DOTS[n].includes(i)){ c.appendChild(el('i')); if(tap&&counter){ c.onclick=()=>{ if(c.classList.contains('c')){ c.classList.remove('c'); counter.n--; return; } counter.n++; c.classList.add('c'); c.dataset.n=counter.n; sfx.count(counter.n); speak(String(counter.n)); }; } } h.appendChild(c);} d.appendChild(h); }); return d; }
+ROUNDS.domino=function(r,body,done){
+  header(body,r);
+  body.appendChild(el('div','hint','Tap each dot to count it 👆 <span class="arin">المسي كل نقطة لتعدّيها</span>'));
+  const wrap=el('div','dominoes'); const counter=makeCounter(); wrap.appendChild(dominoEl(r.a,r.b,{tap:true,counter})); body.appendChild(wrap);
+  const sum=el('div','sum',`<span style="font-size:.6em;color:var(--muted)">dots</span><span>=</span><span class="box">?</span>`); body.appendChild(sum);
+  numberTiles(body,r,r.ans,()=>{ sum.innerHTML=`<span class="n">${r.a}</span><span>+</span><span class="n">${r.b}</span><span>=</span><span class="box fill">${r.ans}</span>`; nextBtn(body,done,r); },{lo:0,hi:12,wrongSay:n=>`${n}? Tap every dot and count. ${retry()}`});
+  helperTrack(body);
+};
+// --- dpick: tap the domino that shows N ---
+ROUNDS.dpick=function(r,body,done){
+  header(body,r);
+  const wrap=el('div','dominoes'); body.appendChild(wrap); const fb=el('div','feedback',''); body.appendChild(fb);
+  let locked=false;
+  r.doms.forEach(([a,b])=>{ const d=dominoEl(a,b,{small:true}); d.classList.add('pick'); d.setAttribute('role','button'); d.tabIndex=0;
+    const go=()=>{ if(locked)return; sfx.tap();
+      if(a+b===r.ans){ locked=true; right(); d.classList.add('ok'); wrap.querySelectorAll('.dom').forEach(x=>{ if(x!==d)x.classList.add('used'); }); fb.textContent=praise(); fb.classList.remove('bad'); nextBtn(body,done,r); }
+      else { wrong(); d.classList.add('bad'); setTimeout(()=>d.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`That one shows ${a+b}, not ${r.ans}. ${retry()}`); } };
+    d.onclick=go; d.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} }; wrap.appendChild(d); });
+};
+
+// --- add: objects a + b ---
+ROUNDS.add=function(r,body,done){
+  header(body,r);
+  body.appendChild(el('div','hint',`Tap each ${r.e} to count it 👆 <span class="arin">المسي كل واحدة لتعدّيها</span>`));
+  const counter=makeCounter(); const objs=el('div','objs'); objs.append(objGroup(r.e,r.a,counter),el('span','plus','+'),objGroup(r.e,r.b,counter)); body.appendChild(objs);
+  const sum=el('div','sum',`<span class="n">${r.a}</span><span>+</span><span class="n">${r.b}</span><span>=</span><span class="box">?</span>`); body.appendChild(sum);
+  numberTiles(body,r,r.ans,()=>{ const bx=sum.querySelector('.box'); bx.textContent=r.ans; bx.classList.add('fill'); nextBtn(body,done,r); },{lo:0,hi:12,wrongSay:n=>`${n}? Count all the ${r.name}. ${retry()}`});
+  helperTrack(body);
+};
+
+// --- make: ☐ + b = T  (tray with food; tap the empty tray to add food and see) ---
+ROUNDS.make=function(r,body,done){
+  header(body,r);
+  body.appendChild(el('div','hint',`Tap the empty tray to add ${r.e} until you have ${r.T} 👆 <span class="arin">المسي الصينية الفارغة لتضيفي حتى يصبح العدد ${r.T}</span>`));
+  const counter=makeCounter();
+  const known=objGroup(r.e,r.known,counter); known.classList.add(r.known===0?'empty':'x');
+  const tray=el('button','grp empty'); tray.style.cursor='pointer'; tray.setAttribute('aria-label','empty tray'); let added=0;
+  const fb=el('div','feedback','');
+  tray.onclick=()=>{ if(added>=r.T){ speak(`The tray is full. ${r.known} and ${added} is more than ${r.T}!`); return; } added++; const o=el('span','obj',r.e); tray.appendChild(o); sfx.count(added); speak(String(added)); if(r.known+added===r.T){ tray.classList.remove('empty'); fb.textContent=`${r.known} + ${added} = ${r.T} 👍`; fb.classList.remove('bad'); } };
+  const objs=el('div','objs'); if(r.first) objs.append(tray,el('span','plus','+'),known); else objs.append(known,el('span','plus','+'),tray); body.appendChild(objs);
+  const sum=el('div','sum', r.first?`<span class="box">?</span><span>+</span><span class="n">${r.known}</span><span>=</span><span class="n">${r.T}</span>`:`<span class="n">${r.known}</span><span>+</span><span class="box">?</span><span>=</span><span class="n">${r.T}</span>`); body.appendChild(sum);
+  body.appendChild(fb);
+  numberTiles(body,r,r.ans,()=>{ const bx=sum.querySelector('.box'); bx.textContent=r.ans; bx.classList.add('fill'); nextBtn(body,done,r); },{lo:0,hi:6,wrongSay:n=>`${n}? ${r.known} and ${n} is ${r.known+n}, not ${r.T}. ${retry()}`});
+};
+
+// ============ REPORT ============
+function report(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Workbook</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these on paper)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
+    <div class="card"><h3>What the test covers (school revision sheet · Abacus Year 1 Workbook 1)</h3><ul>
+      <li><b>Missing numbers to 20</b> (counting by 1) – a number track with gaps: 11 12 __ 14 15. She writes the number. (Workbook p.20 “Write numbers to 20”, p.22 “1 more, 1 less”.)</li>
+      <li><b>Counting dominoes – p.4</b> – count the dots on both halves and write the total (up to 12); the last row is the other way round: a number is given and she <b>draws the dots</b>.</li>
+      <li><b>Simple addition with objects to 10</b> – pictures of two groups, e.g. 🍎🍎🍎 + 🍎🍎 → 3 + 2 = 5. (Workbook p.8 “Making 4, 5 and 6”, p.9 “Making 10”.)</li>
+      <li><b>Making 4 and 5 – p.6</b> – trays of food with a missing number: ☐ + 2 = 4, 3 + ☐ = 4, ☐ + 3 = 5, 2 + ☐ = 5. She may also be asked to <b>draw the food</b> that is missing.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">The teacher also says: revise all the worksheets in the maths notebook. In the real test Mira <b>writes</b> the numbers – use the printed mock exam for that, and check she writes 6/9, 12/21 and 13/31 the right way round.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>Count up from 1 to 20 together, then “I say 13, you say the next one!” (14). Try 16→17, 19→20, 9→10.</li>
+      <li>Hold up fingers: “3 fingers… how many more to make 5?” (2). “1 finger… how many more to make 4?” (3).</li>
+      <li>Domino game: put 2 dice or dominoes down, count ALL the dots, say the sum “4 and 2 make 6”.</li>
+      <li>Number bonds song: 0+4, 1+3, 2+2, 3+1, 4+0 make 4 · 0+5, 1+4, 2+3, 3+2, 4+1, 5+0 make 5.</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Welcome to the Number Forest!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome or Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>

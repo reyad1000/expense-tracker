@@ -1,0 +1,655 @@
+<title>Mira's Test Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: one playful "island map" home screen → one full-width activity card per round, big tappable tiles for a 6-year-old. Single committed bright look. */
+:root{
+  --bg:#fff7e6;          /* warm paper */
+  --bg2:#ffe9c2;         /* sand */
+  --card:#ffffff;
+  --ink:#3b2a4a;         /* plum ink */
+  --muted:#8a7a99;
+  --coral:#ff6b6b;       /* main accent */
+  --sun:#ffc93c;
+  --leaf:#5cc46a;
+  --sky:#4fb3ff;
+  --grape:#a66cff;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(59,42,74,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 10% 10%,#fff3c4 0,transparent 35%),radial-gradient(circle at 90% 90%,#ffe0e0 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--coral)}
+.brand span.cat{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#e6dccb}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff3c4,#ffe0e0)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.small{width:36px;height:36px;font-size:1rem}
+.speak.turtle{background:var(--leaf)}
+.speak.mic{background:var(--grape)}
+.speak.mic.listening{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:14px 18px;font-size:1.35rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pic{font-size:3rem;line-height:1;padding:12px 16px;min-width:96px;text-align:center}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.cols .col{display:flex;flex-direction:column;gap:12px}
+.sentence{font-family:var(--display);font-size:clamp(1.4rem,4.5vw,2rem);line-height:1.7;text-align:center;margin:10px 0 18px}
+.gap{display:inline-block;min-width:3.6em;border-bottom:4px dashed var(--coral);margin:0 .2em;padding:0 .2em;color:var(--leaf);vertical-align:bottom;text-align:center}
+.gap.filled{border-bottom-color:var(--ok)}
+.gap.next{background:#fff3c4;border-radius:8px}
+.slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+.slot{width:54px;height:62px;border-radius:14px;background:var(--bg2);border-bottom:5px solid #e8d7b0;display:grid;place-items:center;font-family:var(--display);font-size:2rem;color:var(--ink)}
+.slot.word{width:auto;padding:0 14px;font-size:1.6rem}
+.slot.space{width:18px;background:transparent;border:0;position:relative}
+.slot.space::after{content:'';position:absolute;left:4px;right:4px;bottom:8px;height:4px;border-radius:2px;background:#f3c7c7}
+.slot.space.on::after{background:var(--ok)}
+.slot.fill{background:#e6f8ea;border-bottom-color:var(--ok);animation:pop .3s}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.letter{width:60px;height:66px;font-size:1.9rem;padding:0;display:grid;place-items:center}
+.bigpic{font-size:clamp(4rem,16vw,7rem);text-align:center;line-height:1.1;margin:6px 0}
+.label{font-family:var(--display);font-size:clamp(1.8rem,7vw,2.8rem);text-align:center;letter-spacing:.12em;margin-bottom:10px}
+.label b{color:var(--coral);border-bottom:5px dashed var(--coral)}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c94f4f}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent}
+.bucket:hover{border-color:var(--sky)}
+.bucket .h{font-family:var(--display);font-size:1.15rem}
+.bucket .e{font-size:2rem}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:999px;padding:2px 8px;font-size:.8rem}
+@media (max-width:480px){.buckets{grid-template-columns:1fr}.bucket{min-height:0}}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#e6dccb}
+.result h2{font-size:2rem;color:var(--coral)}
+.result p{color:var(--muted);font-size:1.05rem}
+.result .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.cert{background:linear-gradient(135deg,#fff3c4,#ffe0e0);border:6px double var(--sun);border-radius:24px;padding:22px;margin:14px auto;max-width:520px}
+.cert h3{font-size:1.6rem;color:var(--grape)}
+
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.wcard{background:var(--card);border-radius:18px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);border:3px solid transparent}
+.wcard:hover{border-color:var(--sky)}
+.wcard .e{font-size:2.4rem;line-height:1.1}
+.wcard .w{font-family:var(--display);font-size:1.2rem;margin-top:4px}
+.wcard .bar{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.wgroup{margin:18px 0 8px;font-family:var(--display);font-size:1.15rem;color:var(--grape)}
+
+table.report{width:100%;border-collapse:collapse;font-size:.95rem}
+table.report th,table.report td{padding:8px 6px;text-align:left;border-bottom:2px solid var(--bg2)}
+table.report td.n{font-variant-numeric:tabular-nums;text-align:right}
+.hard{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.hard span{background:#ffecec;border-radius:999px;padding:4px 10px;font-size:.9rem}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-size:.95rem;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.mascot{position:fixed;right:10px;bottom:10px;font-size:2.6rem;pointer-events:none;transition:transform .3s;z-index:40;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+.mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-30px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+  <header>
+    <div class="brand"><span class="cat">🐱</span> Mira's Test Adventure</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn" title="Voice on/off">🔊 Voice</button>
+      <button class="chip" id="arBtn" title="Arabic hints">عربي</button>
+      <span class="starbank" id="starbank">⭐ 0</span>
+    </div>
+  </header>
+  <main id="screen"></main>
+</div>
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+<div class="mascot" id="mascot">🐱</div>
+
+<script>
+// ============ DATA (from iPrimary English Activity Book Y1 + the Mid-Term revision sheet) ============
+const AR = {
+  match:'اضغطي على الكلمة ثم على الصورة الصحيحة',
+  fill:'اختاري الكلمة الصحيحة لتكملة الجملة',
+  spell:'اضغطي على الحروف بالترتيب لكتابة الكلمة',
+  build:'رتّبي الكلمات لتكوين الجملة. تذكّري الفراغ بعد كل كلمة',
+  pick:'انظري إلى الصورة واختاري الكلمة الصحيحة',
+  first:'ما هو الحرف الأول الناقص؟',
+  abc:'ما هو الحرف الناقص؟ (حرف كبير)',
+  sort:'هل هذه الكلمة شخص أم مكان أم شيء؟'
+};
+
+const VERB_PICS = {sleeping:'😴', eating:'😋🍎', playing:'⚽😄', hop:'🐇', swim:'🏊', run:'🏃', jump:'🤸', fix:'🔧', mop:'🧹', win:'🏆', read:'📖', sing:'🎤', drink:'🥤', fly:'🦋'};
+
+const LEVELS = [
+ {id:'p6', book:true, title:'Page 6', sub:'Match the words', emoji:'🐱', color:'#ff6b6b', rounds:[
+   {type:'match', title:'Match the word to the picture', items:[
+     {word:'sleeping', emoji:'😴'},{word:'eating', emoji:'😋🍎'},{word:'playing', emoji:'⚽😄'}]},
+   {type:'pick', title:'What is Cat doing?', items:[
+     {emoji:'🐱💤', answer:'sleeping', options:['sleeping','eating','playing']},
+     {emoji:'🐱🍗', answer:'eating', options:['sleeping','eating','playing']},
+     {emoji:'🐱🧶', answer:'playing', options:['sleeping','eating','playing']}]}
+ ]},
+ {id:'p9', book:true, title:'Page 9', sub:'Verbs in sentences', emoji:'✏️', color:'#ffc93c', rounds:[
+   {type:'fill', title:'Put each verb into the correct sentence', options:['sleeping','eating','playing'], items:[
+     {tokens:['The children are',null,'with a ball.'], answers:['playing']},
+     {tokens:['I am',null,'an apple.'], answers:['eating']},
+     {tokens:['The cat is',null,'on my bed.'], answers:['sleeping']}]},
+   {type:'spell', title:'Spell the verbs', words:[{word:'sleeping',emoji:'😴'},{word:'playing',emoji:'⚽😄'},{word:'eating',emoji:'😋🍎'}]}
+ ]},
+ {id:'p15', book:true, title:'Page 15', sub:'key · jar · zoo · bus', emoji:'🔑', color:'#4fb3ff', rounds:[
+   {type:'fill', title:'Can you remember these words? Complete the sentences', options:['key','jar','bus','zoo'], items:[
+     {tokens:['I hid my',null,'in a',null,'.'], answers:['key','jar']},
+     {tokens:['I went to the',null,'on the',null,'.'], answers:['zoo','bus']}]},
+   {type:'spell', title:'Spell the words', words:[{word:'key',emoji:'🔑'},{word:'jar',emoji:'🫙'},{word:'zoo',emoji:'🦁🦒'},{word:'bus',emoji:'🚌'}]}
+ ]},
+ {id:'p20', book:true, title:'Page 20', sub:'Hop, Swim and Run animals', emoji:'🐸', color:'#5cc46a', rounds:[
+   {type:'match', title:'Match the words to the pictures', items:[
+     {word:'rabbit',emoji:'🐰'},{word:'fish',emoji:'🐟'},{word:'mouse',emoji:'🐭'},{word:'frog',emoji:'🐸'}]},
+   {type:'spell', title:'Spell the animals', words:[{word:'fish',emoji:'🐟'},{word:'frog',emoji:'🐸'},{word:'mouse',emoji:'🐭'},{word:'rabbit',emoji:'🐰'}]}
+ ]},
+ {id:'p27', book:true, title:'Page 27', sub:'How animals move', emoji:'🐰', color:'#a66cff', rounds:[
+   {type:'fill', title:'Complete the sentences about how animals move', options:['hop','swim','run'], items:[
+     {tokens:['A rabbit can',null,'.'], answers:['hop']},
+     {tokens:['A fish can',null,'.'], answers:['swim']},
+     {tokens:['A mouse can',null,'.'], answers:['run']}]},
+   {type:'build', title:'Copy the sentence. Leave a space after each word!', sentences:['A rabbit can hop.','A fish can swim.','A mouse can run.']}
+ ]},
+ {id:'abc', title:'ABC Letters', sub:'Missing capital letter', emoji:'🔤', color:'#ff8c42', rounds:[
+   {type:'abc', title:'Which capital letter is missing?', count:8}
+ ]},
+ {id:'verbs', title:'Action Words', sub:'Look and choose the verb', emoji:'🏃', color:'#2ec4b6', rounds:[
+   {type:'pick', title:'Look at the picture. Choose the verb', items:[
+     {emoji:'😴', answer:'sleeping', options:['sleeping','eating','playing']},
+     {emoji:'🏊', answer:'swim', options:['hop','swim','run']},
+     {emoji:'🐇', answer:'hop', options:['hop','swim','run']},
+     {emoji:'🏃', answer:'run', options:['run','mop','fix']},
+     {emoji:'🧹', answer:'mop', options:['mop','win','jump']},
+     {emoji:'🔧🧸', answer:'fix', options:['fix','eat','swim']},
+     {emoji:'🏆', answer:'win', options:['win','hop','sleep']},
+     {emoji:'🤸', answer:'jump', options:['jump','eat','read']},
+     {emoji:'📖', answer:'read', options:['read','run','mop']},
+     {emoji:'😋🍎', answer:'eating', options:['eating','playing','sleeping']}]}
+ ]},
+ {id:'nouns', title:'Nouns', sub:'Person, place or thing?', emoji:'🧑‍🏫', color:'#f26d9c', rounds:[
+   {type:'sort', title:'Is this noun a person, a place or a thing?', items:[
+     {word:'teacher',emoji:'🧑‍🏫',bucket:'Person'},{word:'school',emoji:'🏫',bucket:'Place'},{word:'book',emoji:'📘',bucket:'Thing'},
+     {word:'doctor',emoji:'🧑‍⚕️',bucket:'Person'},{word:'park',emoji:'🌳',bucket:'Place'},{word:'bed',emoji:'🛏️',bucket:'Thing'},
+     {word:'mum',emoji:'👩',bucket:'Person'},{word:'zoo',emoji:'🦁',bucket:'Place'},{word:'clock',emoji:'⏰',bucket:'Thing'},
+     {word:'baby',emoji:'👶',bucket:'Person'},{word:'beach',emoji:'🏖️',bucket:'Place'},{word:'chair',emoji:'🪑',bucket:'Thing'},
+     {word:'king',emoji:'🤴',bucket:'Person'},{word:'shop',emoji:'🏪',bucket:'Place'},{word:'moon',emoji:'🌙',bucket:'Thing'},
+     {word:'girl',emoji:'👧',bucket:'Person'},{word:'home',emoji:'🏠',bucket:'Place'},{word:'ball',emoji:'⚽',bucket:'Thing'}]}
+ ]},
+ {id:'first', title:'First Letter', sub:'Write the missing letter', emoji:'🐶', color:'#ffb703', rounds:[
+   {type:'first', title:'What is the first letter?', items:[
+     {word:'dog',emoji:'🐶'},{word:'egg',emoji:'🥚'},{word:'fish',emoji:'🐟'},{word:'hat',emoji:'🎩'},{word:'sun',emoji:'☀️'},
+     {word:'cat',emoji:'🐱'},{word:'bus',emoji:'🚌'},{word:'key',emoji:'🔑'},{word:'jar',emoji:'🫙'},{word:'pen',emoji:'🖊️'},
+     {word:'bed',emoji:'🛏️'},{word:'cup',emoji:'☕'},{word:'fox',emoji:'🦊'},{word:'moon',emoji:'🌙'},{word:'duck',emoji:'🦆'},
+     {word:'frog',emoji:'🐸'},{word:'ball',emoji:'⚽'},{word:'lamp',emoji:'💡'},{word:'apple',emoji:'🍎'},{word:'mop',emoji:'🧹'}], count:10}
+ ]},
+ {id:'test', test:true, title:'Big Test!', sub:'A little of everything, like the real test', emoji:'🏅', color:'#ff6b6b', rounds:[]}
+];
+
+const WALL = [
+ {g:'Cat Is Sleeping', words:[{w:'sleeping',e:'😴'},{w:'eating',e:'😋🍎'},{w:'playing',e:'⚽😄'},{w:'too',e:'➕'},{w:'cat',e:'🐱'},{w:'bed',e:'🛏️'}]},
+ {g:'Page 15 words', words:[{w:'key',e:'🔑'},{w:'jar',e:'🫙'},{w:'zoo',e:'🦁🦒'},{w:'bus',e:'🚌'}]},
+ {g:'Hop, Swim and Run', words:[{w:'rabbit',e:'🐰'},{w:'fish',e:'🐟'},{w:'mouse',e:'🐭'},{w:'frog',e:'🐸'},{w:'duck',e:'🦆'},{w:'dog',e:'🐶'},{w:'hop',e:'🐇'},{w:'swim',e:'🏊'},{w:'run',e:'🏃'}]},
+ {g:'More verbs', words:[{w:'jump',e:'🤸'},{w:'fix',e:'🔧'},{w:'mop',e:'🧹'},{w:'win',e:'🏆'},{w:'read',e:'📖'},{w:'play',e:'🎲'}]},
+ {g:'First-letter words', words:[{w:'egg',e:'🥚'},{w:'hat',e:'🎩'},{w:'sun',e:'☀️'},{w:'cup',e:'☕'},{w:'fox',e:'🦊'},{w:'pen',e:'🖊️'},{w:'moon',e:'🌙'},{w:'lamp',e:'💡'},{w:'apple',e:'🍎'},{w:'ball',e:'⚽'}]}
+];
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});     // levelId -> {stars, best, plays, last}
+let hardWords = store.get('hard',{});        // word -> mistakes
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);       // [{date, level, stars, mistakes}]
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.55:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function spellOut(word){ // says letters one by one, then the word
+  if(!window.speechSynthesis) return;
+  try{
+    speechSynthesis.cancel();
+    const parts=word.toUpperCase().split('');
+    parts.forEach((ch,i)=>{ const u=new SpeechSynthesisUtterance(ch); if(chosenVoice)u.voice=chosenVoice; u.rate=.8; u.pitch=1.1; speechSynthesis.speak(u); });
+    const u=new SpeechSynthesisUtterance(word); if(chosenVoice)u.voice=chosenVoice; u.rate=.75;u.pitch=1.15; speechSynthesis.speak(u);
+  }catch(e){}
+}
+const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+let srBlocked=false;
+function listenFor(word,btn,onResult){
+  if(!SR||srBlocked) return;
+  try{
+    const r=new SR(); r.lang='en-GB'; r.interimResults=false; r.maxAlternatives=5;
+    btn.classList.add('listening'); speechSynthesis && speechSynthesis.cancel();
+    r.onresult=e=>{ const alts=[...e.results[0]].map(a=>a.transcript.toLowerCase().trim()); const hit=alts.some(t=>t.includes(word.toLowerCase())); onResult(hit,alts[0]); };
+    r.onerror=e=>{ btn.classList.remove('listening'); if(e.error==='not-allowed'||e.error==='service-not-allowed'){ srBlocked=true; document.querySelectorAll('.mic').forEach(m=>m.hidden=true); toast('Microphone is not available here. Use 🔊 to listen and repeat.'); } };
+    r.onend=()=>btn.classList.remove('listening');
+    r.start();
+  }catch(e){ btn.classList.remove('listening'); }
+}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s);
+const screen=$('#screen');
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const el=(tag,cls,html)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e;};
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='happy'?'😸':mood==='think'?'🙀':'🐱'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n,size){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(word){ hardWords[word]=(hardWords[word]||0)+1; store.set('hard',hardWords); }
+const PRAISE=['Yes!','Well done, Mira!','Super!','Great job!','Brilliant!','You got it!','Amazing!','Clever girl!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Look again.','Hmm, not that one.','Listen again and try.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff6b6b','#ffc93c','#5cc46a','#4fb3ff','#a66cff','#ff8c42'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  mascot();
+  const booksDone=LEVELS.filter(l=>l.book).every(l=>(progress[l.id]||{}).stars>0);
+  screen.innerHTML='';
+  const hero=el('div','hero',`
+    <div><h1>Hello Mira! 👋 Ready to collect stars?</h1>
+      <p>Tap an island. Finish it with no mistakes to win 3 stars ★★★. Every word can talk to you, so tap 🔊 whenever you like!<span class="ar">اضغطي على جزيرة. أنهيها بدون أخطاء لتربحي 3 نجوم. كل كلمة يمكنها أن تتكلم، اضغطي 🔊 لتسمعيها</span></p>
+      <div class="row" style="justify-content:flex-start;margin-top:12px;gap:8px">
+        <button class="nextbtn ghost" id="wallBtn">🔊 Word Wall (listen &amp; say)</button>
+        <button class="nextbtn ghost" id="reportBtn">📋 For Mum &amp; Dad</button>
+      </div></div>
+    <div class="big">🏝️</div>`);
+  screen.appendChild(hero);
+  $('#wallBtn').onclick=wordWall; $('#reportBtn').onclick=report;
+
+  screen.appendChild(el('div','sectionTitle','Activity Book pages for the test'));
+  const map1=el('div','map'); LEVELS.filter(l=>l.book).forEach(l=>map1.appendChild(islandCard(l))); screen.appendChild(map1);
+  screen.appendChild(el('div','sectionTitle','Revision sheet skills'));
+  const map2=el('div','map'); LEVELS.filter(l=>!l.book&&!l.test).forEach(l=>map2.appendChild(islandCard(l)));
+  const t=LEVELS.find(l=>l.test); map2.appendChild(islandCard(t)); screen.appendChild(map2);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island'+(l.test?' test':''));
+  b.style.setProperty('--c',l.color);
+  b.innerHTML=`<div class="em">${l.emoji}</div><div style="min-width:0"><div class="t">${l.title}</div><div class="s">${l.sub}</div><div class="stars">${starsHtml(p.stars||0)}</div></div>`;
+  b.onclick=()=>{ sfx.tap(); startLevel(l); };
+  return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(level){
+  let rounds=level.rounds;
+  if(level.test) rounds=buildBigTest();
+  cur={level, rounds, idx:0, mistakes:0, roundMistakes:[]};
+  runRound();
+}
+function buildBigTest(){
+  const fills=[]; LEVELS.filter(l=>l.book).forEach(l=>l.rounds.filter(r=>r.type==='fill').forEach(r=>r.items.forEach(it=>fills.push({tokens:it.tokens,answers:it.answers,options:r.options}))));
+  const verbPick=LEVELS.find(l=>l.id==='verbs').rounds[0].items;
+  const firsts=LEVELS.find(l=>l.id==='first').rounds[0].items;
+  const nouns=LEVELS.find(l=>l.id==='nouns').rounds[0].items;
+  const match=LEVELS.find(l=>l.id==='p20').rounds[0];
+  return [
+    {type:'fill', title:'Complete the sentence', mixed:true, items:sample(fills,3)},
+    {type:'pick', title:'Look at the picture. Choose the verb', items:sample(verbPick,3)},
+    {type:'abc', title:'Which capital letter is missing?', count:3},
+    {type:'sort', title:'Person, place or thing?', items:sample(nouns,4)},
+    {type:'first', title:'What is the first letter?', items:firsts, count:3},
+    {type:'match', title:'Match the words to the pictures', items:match.items},
+    {type:'build', title:'Copy the sentence. Leave a space after each word!', sentences:sample(['A rabbit can hop.','A fish can swim.','A mouse can run.'],1)}
+  ];
+}
+function runRound(){
+  const r=cur.rounds[cur.idx];
+  if(!r){ return finishLevel(); }
+  mascot();
+  screen.innerHTML='';
+  const panel=el('div','panel');
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i style="width:${(cur.idx/cur.rounds.length)*100}%"></i></div><span class="chip">${cur.level.emoji} ${cur.level.title}</span></div>`;
+  const instr=el('div','instr',`<div class="txt"><h2>${r.title}</h2><div class="ar">${AR[r.type]||''}</div></div><button class="speak" title="Read the instruction">🔊</button>`);
+  instr.querySelector('.speak').onclick=()=>speak(r.title,{force:true});
+  panel.appendChild(instr);
+  const body=el('div'); panel.appendChild(body);
+  screen.appendChild(panel);
+  $('#backBtn').onclick=()=>{ sfx.tap(); home(); };
+  speak(r.title);
+  const startMistakes=cur.mistakes;
+  const done=()=>{ cur.roundMistakes.push(cur.mistakes-startMistakes); cur.idx++; setTimeout(runRound,900); };
+  ROUNDS[r.type](r,body,done);
+}
+function wrong(word){ cur.mistakes++; sfx.bad(); mascot('think'); if(word) noteHard(word); }
+function right(){ sfx.ok(); mascot('happy'); }
+
+function finishLevel(){
+  const m=cur.mistakes; const stars=m===0?3:m<=2?2:1;
+  const p=progress[cur.level.id]||{stars:0,plays:0};
+  p.stars=Math.max(p.stars||0,stars); p.plays=(p.plays||0)+1; p.last=new Date().toISOString().slice(0,10); p.lastMistakes=m;
+  progress[cur.level.id]=p; store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:cur.level.title,stars,mistakes:m}); if(history.length>200)history=history.slice(-200); store.set('history',history);
+  updateBank();
+  sfx.win(); confetti(stars===3?220:120); mascot('happy');
+  screen.innerHTML='';
+  const r=el('div','panel result');
+  const msg=stars===3?'Perfect! No mistakes!':stars===2?'Great work! Nearly perfect.':'Good try! Let\'s play it again.';
+  r.innerHTML=`<h2>${cur.level.title} finished!</h2><div class="bigstars">${starsHtml(stars)}</div><p>${msg} You made ${m} mistake${m===1?'':'s'}.</p>
+    ${cur.level.test&&stars>=2?`<div class="cert"><div style="font-size:3rem">🏅</div><h3>Certificate of a Super Star</h3><p style="color:var(--ink)">Mira is ready for the Mid-Term test!<br>${new Date().toLocaleDateString('en-GB')}</p></div>`:''}
+    <div class="actions"><button class="nextbtn" id="againBtn">🔁 Play again</button><button class="nextbtn ghost" id="homeBtn">🏝️ Back to islands</button></div>`;
+  screen.appendChild(r);
+  speak(stars===3?'Wow! Three stars, Mira! Perfect!':stars===2?'Two stars! Great work, Mira!':'One star. Good try! Let\'s play again.');
+  $('#againBtn').onclick=()=>startLevel(cur.level); $('#homeBtn').onclick=home;
+}
+
+// ============ ROUND TYPES ============
+const ROUNDS={};
+
+// --- match: tap word, then picture ---
+ROUNDS.match=function(r,body,done){
+  const items=r.items; let sel=null; let left=items.length;
+  const cols=el('div','cols'); const c1=el('div','col'),c2=el('div','col'); cols.append(c1,c2); body.appendChild(cols);
+  const wordBtns={};
+  shuffle(items).forEach(it=>{ const b=el('button','tile',it.word); b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); speak(it.word,{force:true}); Object.values(wordBtns).forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); sel=it; }; wordBtns[it.word]=b; c1.appendChild(b); });
+  shuffle(items).forEach(it=>{ const b=el('button','tile pic',it.emoji); b.onclick=()=>{ if(b.classList.contains('ok'))return; if(!sel){ toast('First tap a word, then the picture'); speak('First tap a word.',{force:true}); return; }
+    if(sel.word===it.word){ right(); b.classList.add('ok'); wordBtns[sel.word].classList.remove('sel'); wordBtns[sel.word].classList.add('ok'); speak(`${praise()} ${it.word}`); sel=null; left--; if(left===0) done(); }
+    else { wrong(sel.word); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); speak(`${retry()} ${sel.word}`); } }; c2.appendChild(b); });
+  body.appendChild(el('div','counter','Tap a word 🔊, then tap its picture'));
+};
+
+// --- fill: sentence with gaps ---
+ROUNDS.fill=function(r,body,done){
+  let i=0;
+  const show=()=>{
+    const it=r.items[i]; if(!it){ return done(); }
+    const options=it.options||r.options;
+    body.innerHTML='';
+    const s=el('div','sentence'); let g=0; const gaps=[];
+    it.tokens.forEach(t=>{ if(t===null){ const sp=el('span','gap','&nbsp;'); sp.dataset.i=g++; gaps.push(sp); s.appendChild(sp);} else { s.appendChild(document.createTextNode(' '+t+' ')); } });
+    body.appendChild(s);
+    const bar=el('div','row'); const sp=el('button','speak','🔊'); sp.title='Read the sentence'; sp.onclick=()=>speak(it.tokens.map(t=>t===null?'mmm':t).join(' '),{force:true}); bar.appendChild(sp); body.appendChild(bar);
+    const row=el('div','row'); row.style.marginTop='14px'; body.appendChild(row);
+    let next=0; gaps[0].classList.add('next');
+    shuffle(options).forEach(w=>{ const b=el('button','tile',w); b.onclick=()=>{ sfx.tap(); if(next>=gaps.length)return;
+      if(w===it.answers[next]){ right(); gaps[next].textContent=w; gaps[next].classList.add('filled'); gaps[next].classList.remove('next'); b.classList.add('used'); next++; if(gaps[next]) gaps[next].classList.add('next');
+        if(next===gaps.length){ const full=it.tokens.map((t,k)=>t===null?it.answers[it.tokens.slice(0,k).filter(x=>x===null).length]:t).join(' ').replace(/\s+([.?!,])/g,'$1'); speak(`${praise()} ${full}`); const nb=el('button','nextbtn','Next ➜'); nb.onclick=()=>{i++;show();}; body.appendChild(nb); setTimeout(()=>{ if(nb.isConnected){ } },0); }
+        else speak(w);
+      } else { wrong(it.answers[next]); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); speak(`${w}? ${retry()}`); } }; row.appendChild(b); });
+    body.appendChild(el('div','counter',`Sentence ${i+1} of ${r.items.length}`));
+  };
+  show();
+};
+
+// --- spell: tap letters in order ---
+ROUNDS.spell=function(r,body,done){
+  let i=0;
+  const show=()=>{
+    const it=r.words[i]; if(!it){ return done(); }
+    body.innerHTML='';
+    body.appendChild(el('div','bigpic',it.emoji));
+    const bar=el('div','row');
+    const b1=el('button','speak','🔊'); b1.title='Hear the word'; b1.onclick=()=>speak(it.word,{force:true});
+    const b2=el('button','speak turtle','🐢'); b2.title='Spell it slowly'; b2.onclick=()=>spellOut(it.word);
+    const b3=el('button','nextbtn ghost','👀 Show me');
+    bar.append(b1,b2,b3); body.appendChild(bar);
+    const slots=el('div','slots'); const letters=it.word.split(''); const slotEls=letters.map(()=>{const s=el('div','slot',''); slots.appendChild(s); return s;}); body.appendChild(slots);
+    const hint=el('div','counter',''); body.appendChild(hint);
+    b3.onclick=()=>{ hint.innerHTML=`<span style="font-family:var(--display);font-size:1.6rem;letter-spacing:.2em;color:var(--muted)">${it.word}</span>`; cur.mistakes++; };
+    const row=el('div','row'); body.appendChild(row);
+    let pos=0;
+    shuffle(letters.map((l,k)=>({l,k}))).forEach(o=>{ const b=el('button','tile letter',o.l); b.onclick=()=>{ if(pos>=letters.length)return;
+      if(o.l===letters[pos]){ sfx.tap(); slotEls[pos].textContent=o.l; slotEls[pos].classList.add('fill'); b.classList.add('used'); speak(o.l.toUpperCase()); pos++;
+        if(pos===letters.length){ right(); setTimeout(()=>speak(`${it.word}! ${praise()}`),350); const nb=el('button','nextbtn','Next ➜'); nb.onclick=()=>{i++;show();}; body.appendChild(nb); } }
+      else { wrong(it.word); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); } }; row.appendChild(b); });
+    body.appendChild(el('div','counter',`Word ${i+1} of ${r.words.length} · tap 🐢 to hear the letters`));
+    speak(it.word);
+  };
+  show();
+};
+
+// --- build: order the words of a sentence ---
+ROUNDS.build=function(r,body,done){
+  let i=0;
+  const show=()=>{
+    const sent=r.sentences[i]; if(!sent){ return done(); }
+    body.innerHTML='';
+    const words=sent.replace('.','').split(' ');
+    const s=el('div','sentence',sent); body.appendChild(s);
+    const bar=el('div','row'); const sp=el('button','speak','🔊'); sp.onclick=()=>speak(sent,{force:true}); bar.appendChild(sp); body.appendChild(bar);
+    const slots=el('div','slots'); const slotEls=[]; const spaceEls=[];
+    words.forEach((w,k)=>{ const sl=el('div','slot word',''); sl.style.minWidth=(w.length*0.9+1.4)+'em'; slots.appendChild(sl); slotEls.push(sl); if(k<words.length-1){ const sp=el('div','slot space',''); slots.appendChild(sp); spaceEls.push(sp);} });
+    const dot=el('div','slot word','.'); dot.style.minWidth='1.4em'; slots.appendChild(dot); body.appendChild(slots);
+    const row=el('div','row'); body.appendChild(row);
+    let pos=0;
+    shuffle(words.map((w,k)=>({w,k}))).forEach(o=>{ const b=el('button','tile',o.w); b.onclick=()=>{ if(pos>=words.length)return;
+      if(o.w===words[pos]){ sfx.tap(); speak(o.w); slotEls[pos].textContent=o.w; slotEls[pos].classList.add('fill'); if(spaceEls[pos]) spaceEls[pos].classList.add('on'); b.classList.add('used'); pos++;
+        if(pos===words.length){ right(); setTimeout(()=>speak(`${sent} ${praise()}`),400); const nb=el('button','nextbtn','Next ➜'); nb.onclick=()=>{i++;show();}; body.appendChild(nb); } }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); speak(retry()); } }; row.appendChild(b); });
+    body.appendChild(el('div','counter','The pink lines are the spaces between words · Sentence '+(i+1)+' of '+r.sentences.length));
+    speak(sent);
+  };
+  show();
+};
+
+// --- pick: picture → choose word (also used by first & abc) ---
+function pickUI(body,{emoji,label,options,answer,sayOption,onRight,sayAnswer,counter}){
+  body.innerHTML='';
+  if(emoji) body.appendChild(el('div','bigpic',emoji));
+  if(label) body.appendChild(el('div','label',label));
+  const fb=el('div','feedback','');
+  const row=el('div','row'); body.appendChild(row); body.appendChild(fb);
+  let locked=false;
+  shuffle(options).forEach(o=>{ const b=el('button','tile'+(o.length===1?' letter':''),o); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(o===answer){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); speak(`${sayAnswer||answer}. ${praise()}`); setTimeout(onRight,1100); }
+    else { wrong(answer); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${sayOption?o:''}. ${retry()}`); } }; row.appendChild(b); });
+  if(counter) body.appendChild(el('div','counter',counter));
+}
+ROUNDS.pick=function(r,body,done){
+  let i=0; const items=r.items;
+  const show=()=>{ const it=items[i]; if(!it) return done();
+    pickUI(body,{emoji:it.emoji,options:it.options,answer:it.answer,sayOption:true,onRight:()=>{i++;show();},counter:`${i+1} of ${items.length}`}); };
+  show();
+};
+ROUNDS.first=function(r,body,done){
+  const items=sample(r.items,r.count||r.items.length); let i=0;
+  const consonants='bcdfghjklmnprstvwz'.split(''), vowels='aeiou'.split('');
+  const show=()=>{ const it=items[i]; if(!it) return done();
+    const first=it.word[0]; const pool=(vowels.includes(first)?vowels:consonants).filter(c=>c!==first);
+    const opts=[first,...sample(pool,2)];
+    pickUI(body,{emoji:it.emoji,label:`<b>&nbsp;&nbsp;</b>${it.word.slice(1)}`,options:opts,answer:first,sayAnswer:`${first.toUpperCase()}. ${it.word}`,onRight:()=>{i++;show();},counter:`${i+1} of ${items.length} · tap 🔊 above to hear the word`});
+    const bar=el('div','row'); const sp=el('button','speak','🔊'); sp.onclick=()=>speak(it.word,{force:true,slow:true}); bar.appendChild(sp); body.insertBefore(bar,body.children[2]);
+    speak(it.word,{slow:true});
+  };
+  show();
+};
+ROUNDS.abc=function(r,body,done){
+  const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ'; let i=0; const n=r.count||6; const used=new Set();
+  const show=()=>{ if(i>=n) return done();
+    let start; do{ start=Math.floor(Math.random()*23);}while(used.has(start)); used.add(start);
+    const win=A.slice(start,start+4).split(''); const blank=Math.floor(Math.random()*4); const ans=win[blank];
+    const label=win.map((c,k)=>k===blank?'<b>&nbsp;&nbsp;</b>':c).join(' ');
+    const near=[A[start-1],A[start+4],A[start+5],A[start-2]].filter(Boolean); const opts=[ans,...sample(near,2)];
+    pickUI(body,{emoji:'🔤',label,options:opts,answer:ans,sayAnswer:`${ans}. ${win.join(', ')}`,onRight:()=>{i++;show();},counter:`${i+1} of ${n}`});
+    const bar=el('div','row'); const sp=el('button','speak','🔊'); sp.title='Say the letters'; sp.onclick=()=>speak(win.map((c,k)=>k===blank?'mmm':c).join(', '),{force:true,slow:true}); const song=el('button','nextbtn ghost','🎵 ABC song'); song.onclick=()=>speak(A.split('').join(', '),{force:true}); bar.append(sp,song); body.insertBefore(bar,body.children[2]);
+    speak(win.map((c,k)=>k===blank?'mmm':c).join(', '),{slow:true});
+  };
+  show();
+};
+
+// --- sort: person / place / thing ---
+ROUNDS.sort=function(r,body,done){
+  const items=shuffle(r.items); let i=0;
+  const B=[{n:'Person',e:'🧑',ar:'شخص'},{n:'Place',e:'🏫',ar:'مكان'},{n:'Thing',e:'📦',ar:'شيء'}];
+  body.innerHTML='';
+  const card=el('div'); body.appendChild(card);
+  const bk=el('div','buckets'); body.appendChild(bk);
+  const bEls={};
+  B.forEach(b=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${b.ar}</div><div class="got"></div>`); d.onclick=()=>choose(b.n); bk.appendChild(d); bEls[b.n]=d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const show=()=>{ const it=items[i]; if(!it) return done();
+    card.innerHTML=`<div class="bigpic">${it.emoji}</div><div class="label" style="letter-spacing:.04em">${it.word}</div><div class="row"><button class="speak">🔊</button></div><div class="feedback"></div>`;
+    card.querySelector('.speak').onclick=()=>speak(`${it.word}`,{force:true});
+    counter.textContent=`${i+1} of ${items.length}`; speak(`${it.word}. Person, place or thing?`); };
+  const choose=(n)=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback');
+    if(n===it.bucket){ right(); bEls[n].querySelector('.got').appendChild(el('span',null,it.emoji+' '+it.word)); fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! A ${it.word} is a ${n.toLowerCase()}.`); i++; setTimeout(show,1000); }
+    else { wrong(it.word); bEls[n].classList.add('bad'); setTimeout(()=>bEls[n].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Is a ${it.word} a ${n.toLowerCase()}? ${retry()}`); } };
+  show();
+};
+
+// ============ WORD WALL ============
+function wordWall(){
+  screen.innerHTML='';
+  const panel=el('div','panel');
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>🔊 Word Wall</h2><span></span></div>
+  <div class="instr"><div class="txt"><h2>Tap a word to hear it. 🐢 spells it slowly.${SR?' 🎤 lets Mira say it herself.':''}</h2><div class="ar">اضغطي على الكلمة لتسمعيها. 🐢 يتهجّى الحروف ببطء${SR?'. 🎤 لتقولي الكلمة بنفسك':''}</div></div></div>`;
+  screen.appendChild(panel);
+  $('#backBtn').onclick=home;
+  WALL.forEach(g=>{
+    panel.appendChild(el('div','wgroup',g.g));
+    const grid=el('div','wall'); panel.appendChild(grid);
+    g.words.forEach(w=>{
+      const c=el('div','wcard'); c.tabIndex=0;
+      c.innerHTML=`<div class="e">${w.e}</div><div class="w">${w.w}</div><div class="bar"><button class="speak small">🔊</button><button class="speak small turtle">🐢</button>${SR?'<button class="speak small mic">🎤</button>':''}</div>`;
+      c.querySelector('.e').onclick=()=>speak(w.w,{force:true});
+      c.querySelector('.w').onclick=()=>speak(w.w,{force:true});
+      c.querySelector('.speak:not(.turtle):not(.mic)').onclick=()=>speak(w.w,{force:true});
+      c.querySelector('.turtle').onclick=()=>spellOut(w.w);
+      const mic=c.querySelector('.mic'); if(mic) mic.onclick=()=>listenFor(w.w,mic,(hit,heard)=>{ if(hit){ right(); confetti(40); speak(`${praise()} ${w.w}!`,{force:true}); } else { speak(`I heard ${heard||'nothing'}. Listen: ${w.w}. Try again!`,{force:true}); } });
+      grid.appendChild(c);
+    });
+  });
+}
+
+// ============ PARENT REPORT ============
+function report(){
+  screen.innerHTML='';
+  const p=el('div','panel');
+  const rows=LEVELS.map(l=>{ const s=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title} <span style="color:var(--muted)">· ${l.sub}</span></td><td class="n">${starsHtml(s.stars||0)}</td><td class="n">${s.plays||0}</td><td class="n">${s.lastMistakes==null?'–':s.lastMistakes}</td><td class="n">${s.last||'–'}</td></tr>`; }).join('');
+  const hard=Object.entries(hardWords).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const recent=history.slice(-10).reverse().map(h=>`<tr><td>${new Date(h.date).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${h.level}</td><td class="n">${starsHtml(h.stars)}</td><td class="n">${h.mistakes}</td></tr>`).join('');
+  p.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>📋 Progress for Mum &amp; Dad</h2><span></span></div>
+  <p style="color:var(--muted)">Best stars per island, how many times played, mistakes in the last play. Aim: every island at ★★★ before the test, then one Big Test with 2–3 stars.</p>
+  <div style="overflow-x:auto"><table class="report"><thead><tr><th>Island</th><th style="text-align:right">Best</th><th style="text-align:right">Plays</th><th style="text-align:right">Last mistakes</th><th style="text-align:right">Last played</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <h3 style="margin-top:18px">Words to practise (most mistakes first)</h3>
+  <div class="hard">${hard.length?hard.map(([w,n])=>`<span>${w} <b>×${n}</b></span>`).join(''):'<span style="background:#e6f8ea">No mistakes recorded yet 🎉</span>'}</div>
+  <h3 style="margin-top:18px">Recent plays</h3>
+  <div style="overflow-x:auto"><table class="report"><thead><tr><th>When</th><th>Island</th><th style="text-align:right">Stars</th><th style="text-align:right">Mistakes</th></tr></thead><tbody>${recent||'<tr><td colspan="4" style="color:var(--muted)">Nothing yet</td></tr>'}</tbody></table></div>
+  <div class="row" style="margin-top:16px"><button class="nextbtn ghost" id="resetBtn">Reset all progress</button></div>
+  <div id="resetConfirm" hidden class="row" style="margin-top:8px"><span class="chip">Really reset everything?</span><button class="nextbtn ghost" id="resetYes">Yes, reset</button><button class="nextbtn ghost" id="resetNo">No</button></div>`;
+  screen.appendChild(p);
+  $('#backBtn').onclick=home;
+  $('#resetBtn').onclick=()=>{$('#resetConfirm').hidden=false;};
+  $('#resetNo').onclick=()=>{$('#resetConfirm').hidden=true;};
+  $('#resetYes').onclick=()=>{ progress={};hardWords={};history=[]; store.set('progress',{});store.set('hard',{});store.set('history',[]); updateBank(); report(); toast('Progress reset'); };
+}
+
+// ============ SETTINGS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome or Edge.');
+home();
+</script>

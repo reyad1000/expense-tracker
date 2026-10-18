@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Computer Lab">
+<meta name="theme-color" content="#eef4ff">
+<title>Mira's Computer Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Computer-lab look: one island map → one big activity card per round, big tappable tiles for a 6-year-old. */
+:root{
+  --bg:#eef4ff;          /* pale sky-blue */
+  --bg2:#dbe7ff;         /* light blue */
+  --card:#ffffff;
+  --ink:#1e2a4a;         /* navy ink */
+  --muted:#6b7a9c;
+  --coral:#ff7a59;       /* main accent */
+  --sun:#ffc93c;
+  --leaf:#4cbb5c;
+  --sky:#3fb0ff;
+  --grape:#9b6cff;
+  --pink:#ff6fae;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(30,42,74,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+button,.dom,.bucket,.obj{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#fff6c4 0,transparent 32%),radial-gradient(circle at 92% 92%,#e6dcff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--grape)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#dde4f3}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#dbe7ff)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.arin{display:none;direction:rtl;color:var(--grape)}
+body.ar .arin{display:inline}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:-2px 0 6px}
+.scene{font-size:clamp(2.6rem,9vw,4rem);text-align:center;line-height:1.2;margin:8px 0}
+.scene svg{width:1.3em;height:1.3em;vertical-align:middle}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.tile .e{font-size:2.4rem;line-height:1;height:2.4rem;display:grid;place-items:center}
+.tile .e svg{width:2.4rem;height:2.4rem}
+.tile .w{font-size:1.1rem}
+.tile .wa{font-size:.9rem;color:var(--grape);direction:rtl;display:none}
+body.ar .tile .wa{display:block}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.buckets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.buckets.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:460px){.buckets.three{grid-template-columns:1fr 1fr}.buckets.three .bucket:last-child{grid-column:1/-1}}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent;border-top:8px solid var(--c,var(--sky))}
+.bucket:hover{border-color:var(--sky)}
+.bucket .h{font-family:var(--display);font-size:1.15rem}
+.bucket .e{font-size:2rem}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:999px;padding:2px 8px;font-size:1rem;display:inline-grid;place-items:center}
+.bucket .got span svg{width:1.2em;height:1.2em}
+.bucket.bad{animation:shake .4s;border-color:var(--bad)}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+/* build-a-computer canvas */
+.build{display:flex;justify-content:center;margin:6px 0 4px}
+.build svg{width:min(100%,420px);height:auto}
+.build .part{opacity:0;transition:opacity .35s,transform .35s;transform:translateY(8px)}
+.build .part.on{opacity:1;transform:none}
+.build .part.glow{filter:drop-shadow(0 0 6px var(--sun))}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#dde4f3}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #c9d6f2}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m" id="mascot-head">🤖</span> Mira's Computer Lab</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🤖</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Computer Mid-Term (Term 1) · Inspire Computing Year 1 Workbook, Unit 1 ============
+// Revision sheet: p.5 Q5 input or output (matching) · p.10 Q1 home / school / both (matching) · p.15 Q3 draw a computer.
+// Answers follow Pearson's Inspire Computing Y1 workbook answer key (Unit 1, Lessons 1 & 3).
+
+// --- small drawings for things that have no emoji ---
+const SVG={
+  whiteboard:`<svg viewBox="0 0 64 64"><rect x="6" y="10" width="52" height="36" rx="3" fill="#fff" stroke="#1e2a4a" stroke-width="3"/><rect x="6" y="44" width="52" height="5" fill="#8a9bc4"/><path d="M14 22h20M14 30h28M14 38h14" stroke="#3fb0ff" stroke-width="3" stroke-linecap="round"/><path d="M24 49v9M40 49v9" stroke="#1e2a4a" stroke-width="3"/></svg>`,
+  remote:`<svg viewBox="0 0 64 64"><rect x="22" y="6" width="20" height="52" rx="6" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><circle cx="32" cy="16" r="3.5" fill="#ff7a59"/><rect x="26" y="25" width="12" height="4" rx="2" fill="#dbe7ff"/><rect x="26" y="33" width="12" height="4" rx="2" fill="#dbe7ff"/><circle cx="28" cy="46" r="2.5" fill="#dbe7ff"/><circle cx="36" cy="46" r="2.5" fill="#dbe7ff"/><circle cx="28" cy="53" r="2.5" fill="#dbe7ff"/><circle cx="36" cy="53" r="2.5" fill="#dbe7ff"/></svg>`,
+  washer:`<svg viewBox="0 0 64 64"><rect x="8" y="6" width="48" height="52" rx="5" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/><circle cx="32" cy="36" r="14" fill="#9fd4ff" stroke="#1e2a4a" stroke-width="3"/><circle cx="32" cy="36" r="8" fill="#3fb0ff"/><circle cx="16" cy="14" r="2.5" fill="#ff7a59"/><rect x="24" y="12" width="20" height="4" rx="2" fill="#8a9bc4"/></svg>`,
+  microwave:`<svg viewBox="0 0 64 64"><rect x="4" y="14" width="56" height="36" rx="4" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/><rect x="10" y="20" width="32" height="24" rx="2" fill="#2f3a5c"/><circle cx="51" cy="26" r="3" fill="#ff7a59"/><rect x="48" y="34" width="6" height="8" rx="2" fill="#8a9bc4"/></svg>`,
+  calculator:`<svg viewBox="0 0 64 64"><rect x="14" y="6" width="36" height="52" rx="5" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><rect x="19" y="12" width="26" height="10" rx="2" fill="#bdf0c8"/><g fill="#dbe7ff"><rect x="19" y="27" width="7" height="6" rx="1"/><rect x="28" y="27" width="7" height="6" rx="1"/><rect x="37" y="27" width="7" height="6" rx="1"/><rect x="19" y="36" width="7" height="6" rx="1"/><rect x="28" y="36" width="7" height="6" rx="1"/><rect x="37" y="36" width="7" height="6" rx="1"/><rect x="19" y="45" width="7" height="6" rx="1"/><rect x="28" y="45" width="7" height="6" rx="1"/><rect x="37" y="45" width="7" height="6" rx="1" fill="#ff7a59"/></g></svg>`,
+  monitor:`<svg viewBox="0 0 64 64"><rect x="6" y="8" width="52" height="36" rx="4" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><rect x="11" y="13" width="42" height="26" rx="2" fill="#9fd4ff"/><rect x="26" y="46" width="12" height="6" fill="#8a9bc4"/><rect x="18" y="52" width="28" height="4" rx="2" fill="#1e2a4a"/></svg>`,
+  power:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><path d="M32 18v14" stroke="#4cbb5c" stroke-width="5" stroke-linecap="round"/><path d="M22 24a14 14 0 1 0 20 0" fill="none" stroke="#4cbb5c" stroke-width="5" stroke-linecap="round"/></svg>`,
+  plug:`<svg viewBox="0 0 64 64"><path d="M8 56c10-2 14-10 18-18" stroke="#1e2a4a" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="24" y="22" width="22" height="18" rx="5" fill="#8a9bc4" stroke="#1e2a4a" stroke-width="3" transform="rotate(-45 35 31)"/><path d="M40 16l6-6M48 24l6-6" stroke="#1e2a4a" stroke-width="4" stroke-linecap="round"/></svg>`,
+};
+const AR={ // Arabic labels (shown only when عربي is on)
+ 'Mouse':'فأرة','Keyboard':'لوحة مفاتيح','Screen':'شاشة','Speakers':'سماعات','Microphone':'ميكروفون','Camera':'كاميرا','Printer':'طابعة','Headphones':'سماعات رأس','Touchscreen':'شاشة لمس',
+ 'Computer':'حاسوب','Whiteboard':'سبورة بيضاء','Gaming console':'جهاز ألعاب','TV remote':'جهاز التحكم','Washing machine':'غسالة','Microwave':'ميكروويف','Calculator':'آلة حاسبة','Tablet':'جهاز لوحي','Laptop':'حاسوب محمول','TV':'تلفاز','Printer ':'طابعة',
+ 'On/off button':'زر التشغيل','Wires and plug':'أسلاك وقابس','Bicycle':'دراجة','Book':'كتاب','Ball':'كرة','Phone':'هاتف',
+ 'Input':'إدخال','Output':'إخراج','Home':'البيت','School':'المدرسة','Both':'كلاهما','Yes':'نعم','No':'لا'
+};
+const Q=(type,obj)=>Object.assign({type},obj);
+const ICON=(e)=>SVG[e]||e;
+
+// ---------- Island 1: Input or Output (p.5 Q5) ----------
+const IO_ITEMS=[['🖱️','Mouse',1],['⌨️','Keyboard',1],['🖥️','Screen',0],['🔊','Speakers',0],['🎤','Microphone',1],['📷','Camera',1],['🖨️','Printer',0],['🎧','Headphones',0]];
+const IO_BUCKETS=[{n:'Input',e:'👉💻',ar:'إدخال',v:1,c:'#3fb0ff',say:'We tell the computer something'},{n:'Output',e:'💻👉',ar:'إخراج',v:0,c:'#ff7a59',say:'The computer shows or tells us something'}];
+function genIO(){ return [
+  Q('pick',{ q:'Which one is an <b>INPUT</b> device? (We use it to tell the computer what to do.)', ar:'أي واحد جهاز إدخال؟ (نستخدمه لنُخبر الحاسوب ماذا يفعل.)', opts:[['🖱️','Mouse',1],['🖥️','Screen',0],['🔊','Speakers',0]], fact:'A mouse is an INPUT device – we click it to tell the computer what to do.', factAr:'الفأرة جهاز إدخال – نضغطها لنُخبر الحاسوب ماذا يفعل.' }),
+  Q('pick',{ q:'Which one is an <b>OUTPUT</b> device? (The computer uses it to show or tell us something.)', ar:'أي واحد جهاز إخراج؟ (الحاسوب يستخدمه ليُرينا أو يُسمعنا شيئاً.)', opts:[['🖥️','Screen',1],['⌨️','Keyboard',0],['🖱️','Mouse',0]], fact:'The screen is an OUTPUT device – the computer shows us pictures and words on it.', factAr:'الشاشة جهاز إخراج – الحاسوب يُرينا الصور والكلمات عليها.' }),
+  Q('sort',{ q:'Input or output? Sort the devices.', ar:'إدخال أم إخراج؟ صنّفي الأجهزة.', buckets:IO_BUCKETS, items:[['🖱️','Mouse',1],['⌨️','Keyboard',1],['🖥️','Screen',0],['🔊','Speakers',0]], fact:'Workbook p.5: INPUT = mouse, keyboard. OUTPUT = screen, speakers.', factAr:'الإدخال: الفأرة ولوحة المفاتيح. الإخراج: الشاشة والسماعات.' }),
+  Q('pick',{ q:'We <b>type</b> words with it. Input or output?', ar:'نكتب به الكلمات. إدخال أم إخراج؟', scene:'⌨️', opts:[['👉💻','Input',1],['💻👉','Output',0]], fact:'The keyboard is INPUT – we put words IN.', factAr:'لوحة المفاتيح إدخال – نُدخل بها الكلمات.' }),
+  Q('pick',{ q:'We <b>hear</b> music from them. Input or output?', ar:'نسمع منها الموسيقى. إدخال أم إخراج؟', scene:'🔊', opts:[['💻👉','Output',1],['👉💻','Input',0]], fact:'Speakers are OUTPUT – the sound comes OUT of the computer.', factAr:'السماعات إخراج – الصوت يخرج من الحاسوب.' }),
+  Q('sort',{ q:'Harder! Sort these too.', ar:'أصعب! صنّفي هذه أيضاً.', buckets:IO_BUCKETS, items:[['🎤','Microphone',1],['🖨️','Printer',0],['📷','Camera',1],['🎧','Headphones',0]], fact:'Microphone and camera put things IN. Printer and headphones send things OUT.', factAr:'الميكروفون والكاميرا إدخال. الطابعة وسماعات الرأس إخراج.' }),
+];}
+
+// ---------- Island 2: Home, School or Both (p.10 Q1) ----------
+const HS_BUCKETS=[{n:'Home',e:'🏠',ar:'البيت',v:'h',c:'#ff7a59'},{n:'School',e:'🏫',ar:'المدرسة',v:'s',c:'#3fb0ff'},{n:'Both',e:'🏠🏫',ar:'كلاهما',v:'b',c:'#9b6cff'}];
+function genHS(){ return [
+  Q('sort',{ q:'Where do we use it? Home, school or both?', ar:'أين نستخدمه؟ البيت أم المدرسة أم كلاهما؟', buckets:HS_BUCKETS, items:[['🖥️','Computer','b'],['whiteboard','Whiteboard','s'],['🎮','Gaming console','h'],['remote','TV remote','b']], fact:'Workbook p.10: computer → both, whiteboard → school, gaming console → home, TV remote → both.', factAr:'الحاسوب: كلاهما · السبورة: المدرسة · جهاز الألعاب: البيت · جهاز التحكم: كلاهما.' }),
+  Q('pick',{ q:'Where do we use a <b>whiteboard</b>?', ar:'أين نستخدم السبورة البيضاء؟', scene:'whiteboard', opts:[['🏫','School',1],['🏠','Home',0]], fact:'A whiteboard is used at SCHOOL – the teacher writes on it.', factAr:'السبورة البيضاء نستخدمها في المدرسة.' }),
+  Q('pick',{ q:'Where do we use a <b>gaming console</b>?', ar:'أين نستخدم جهاز الألعاب؟', scene:'🎮', opts:[['🏠','Home',1],['🏫','School',0]], fact:'A gaming console is used at HOME – not at school!', factAr:'جهاز الألعاب نستخدمه في البيت – ليس في المدرسة!' }),
+  Q('pick',{ q:'Where do we use a <b>computer</b>?', ar:'أين نستخدم الحاسوب؟', scene:'🖥️', opts:[['🏠🏫','Both',1],['🏠','Home',0],['🏫','School',0]], fact:'A computer is used at home AND at school – both!', factAr:'الحاسوب نستخدمه في البيت وفي المدرسة – كلاهما!' }),
+  Q('pick',{ q:'Where do we use a <b>TV remote</b>?', ar:'أين نستخدم جهاز التحكم بالتلفاز؟', scene:'remote', opts:[['🏠🏫','Both',1],['🏠','Home',0],['🏫','School',0]], fact:'The workbook says a TV remote is used at home AND at school – there is a TV in school too!', factAr:'الكتاب يقول: جهاز التحكم نستخدمه في البيت وفي المدرسة.' }),
+  Q('sort',{ q:'More things! Home, school or both?', ar:'أشياء أخرى! البيت أم المدرسة أم كلاهما؟', buckets:HS_BUCKETS, items:[['washer','Washing machine','h'],['calculator','Calculator','s'],['📱','Tablet','b'],['microwave','Microwave','h'],['🖨️','Printer','s']], fact:'Washing machine and microwave → home. Calculator and printer → school. Tablet → both.', factAr:'الغسالة والميكروويف: البيت · الآلة الحاسبة والطابعة: المدرسة · الجهاز اللوحي: كلاهما.' }),
+];}
+
+// ---------- Island 3: Computer Parts (for p.15 Q3 drawing) ----------
+const PARTS=[['monitor','Screen'],['⌨️','Keyboard'],['🖱️','Mouse'],['🔊','Speakers'],['power','On/off button'],['plug','Wires and plug']];
+function genParts(){ return [
+  Q('pick',{ q:'Tap the <b>screen</b>. It shows us pictures and words.', ar:'المسي الشاشة. تُرينا الصور والكلمات.', opts:[['monitor','Screen',1],['⌨️','Keyboard',0],['🖱️','Mouse',0]], fact:'The screen (monitor) is the big part we look at.', factAr:'الشاشة هي الجزء الكبير الذي ننظر إليه.' }),
+  Q('pick',{ q:'Tap the <b>keyboard</b>. We press its keys to type.', ar:'المسي لوحة المفاتيح. نضغط أزرارها لنكتب.', opts:[['⌨️','Keyboard',1],['🔊','Speakers',0],['monitor','Screen',0]], fact:'The keyboard has letters and numbers on its keys.', factAr:'لوحة المفاتيح عليها حروف وأرقام.' }),
+  Q('pick',{ q:'Tap the <b>mouse</b>. We move it and click.', ar:'المسي الفأرة. نحرّكها ونضغط.', opts:[['🖱️','Mouse',1],['plug','Wires and plug',0],['power','On/off button',0]], fact:'The mouse moves the little arrow on the screen.', factAr:'الفأرة تحرّك السهم الصغير على الشاشة.' }),
+  Q('pick',{ q:'Which button turns the computer <b>on</b>?', ar:'أي زر يشغّل الحاسوب؟', opts:[['power','On/off button',1],['🖱️','Mouse',0],['🔊','Speakers',0]], fact:'The on/off button starts the computer. Ask a grown-up before you press it!', factAr:'زر التشغيل يُشغّل الحاسوب.' }),
+  Q('multi',{ q:'Tap ALL the parts of a computer.', ar:'المسي كل أجزاء الحاسوب.', opts:[['monitor','Screen',1],['⌨️','Keyboard',1],['🖱️','Mouse',1],['🔊','Speakers',1],['🚲','Bicycle',0],['⚽','Ball',0],['📚','Book',0]], fact:'Screen, keyboard, mouse and speakers – these are the parts you draw in the test!', factAr:'الشاشة ولوحة المفاتيح والفأرة والسماعات – هذه الأجزاء التي ترسمينها في الاختبار!' }),
+  Q('pick',{ q:'Which one is <b>NOT</b> a digital device?', ar:'أي واحد ليس جهازاً رقمياً؟', opts:[['🚲','Bicycle',1],['💻','Laptop',0],['📱','Tablet',0],['📷','Camera',0]], fact:'A bicycle has no microchip inside. Laptops, tablets and cameras all have microchips – they are digital devices.', factAr:'الدراجة ليس فيها شريحة إلكترونية. الحاسوب المحمول والجهاز اللوحي والكاميرا أجهزة رقمية.' }),
+];}
+
+// ---------- Island 4: Build a Computer (p.15 Q3 – draw a computer) ----------
+function genBuild(){ return [
+  Q('build',{ q:'Build the computer! Tap the parts in order.', ar:'ابني الحاسوب! المسي الأجزاء بالترتيب.', steps:[['monitor','Screen','First, the big screen.'],['⌨️','Keyboard','Next, the keyboard under the screen.'],['🖱️','Mouse','Then the mouse, next to the keyboard.'],['🔊','Speakers','Now the speakers, one on each side.'],['power','On/off button','The on/off button on the screen.'],['plug','Wires and plug','Last, the wire and the plug!']], fact:'Screen on top, keyboard under it, mouse beside the keyboard, speakers at the sides, a button, and a wire. Now draw it on paper just like this!', factAr:'الشاشة فوق، لوحة المفاتيح تحتها، الفأرة بجانبها، السماعات على الجانبين، زر، وسلك. الآن ارسميه على الورق!' }),
+  Q('pick',{ q:'In your drawing, what goes <b>on top</b>?', ar:'في رسمتك، ماذا يكون في الأعلى؟', opts:[['monitor','Screen',1],['⌨️','Keyboard',0],['🖱️','Mouse',0]], fact:'The screen goes on top – it is the biggest part.', factAr:'الشاشة في الأعلى – إنها أكبر جزء.' }),
+  Q('pick',{ q:'What goes <b>under</b> the screen?', ar:'ماذا يكون تحت الشاشة؟', opts:[['⌨️','Keyboard',1],['🔊','Speakers',0],['plug','Wires and plug',0]], fact:'The keyboard sits under the screen.', factAr:'لوحة المفاتيح تحت الشاشة.' }),
+  Q('pick',{ q:'What goes <b>next to</b> the keyboard?', ar:'ماذا يكون بجانب لوحة المفاتيح؟', opts:[['🖱️','Mouse',1],['monitor','Screen',0],['🚲','Bicycle',0]], fact:'The mouse goes next to the keyboard, on the right.', factAr:'الفأرة بجانب لوحة المفاتيح، على اليمين.' }),
+  Q('build',{ q:'One more time! Build the computer.', ar:'مرة أخرى! ابني الحاسوب.', steps:[['monitor','Screen','First, the big screen.'],['⌨️','Keyboard','Next, the keyboard.'],['🖱️','Mouse','Then the mouse.'],['🔊','Speakers','Now the speakers.'],['power','On/off button','The on/off button.'],['plug','Wires and plug','Last, the wire and plug!']], fact:'Perfect computer! Say the parts as you draw: screen, keyboard, mouse, speakers.', factAr:'حاسوب ممتاز! قولي الأجزاء وأنتِ ترسمين: شاشة، لوحة مفاتيح، فأرة، سماعات.' }),
+];}
+
+const LEVELS=[
+ { id:'io', title:'Input or Output', ar:'إدخال أم إخراج', emoji:'🖱️', color:'#3fb0ff', pages:'Workbook p.5 Q5', gen:genIO },
+ { id:'hs', title:'Home or School', ar:'البيت أم المدرسة', emoji:'🏠', color:'#ff7a59', pages:'Workbook p.10 Q1', gen:genHS },
+ { id:'parts', title:'Computer Parts', ar:'أجزاء الحاسوب', emoji:'🖥️', color:'#9b6cff', pages:'For p.15 Q3 drawing', gen:genParts },
+ { id:'build', title:'Build a Computer', ar:'ابني حاسوباً', emoji:'🧩', color:'#4cbb5c', pages:'Workbook p.15 Q3 · draw it', gen:genBuild },
+];
+const BIG_TEST_N=12;
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_comp_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_comp_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’\/-]/gu,''));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a computer expert!','Amazing!','Beep boop – correct!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Look again.','Hmm, not that one.','Listen again and try.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🤖'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+function arWord(w){ return AR[w]||''; }
+function tileHtml(e,w){ return `<span class="e">${ICON(e)}</span><span class="w">${w}</span><span class="wa">${arWord(w)}</span>`; }
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🤖 Welcome to the Computer Lab!</h1><p>Tap an island, answer the questions and collect ⭐ stars. Finish every island, then try the Big Test!</p><span class="ar">مرحباً ميرا! المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. ثم جرّبي الاختبار الكبير!</span></div><div class="big">💻✨</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · Computer Mid-Term (Inspire Computing Workbook, Unit 1)'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Just like Monday's test – matching and building!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  speechSynthesis && speechSynthesis.cancel();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.gen(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  // 3 questions from each island (the sort rounds are the real test format, so one sort from io and hs is always in)
+  let qs=[];
+  LEVELS.forEach(l=>{ const r=l.gen(); const sorts=r.filter(x=>x.type==='sort'); const rest=r.filter(x=>x.type!=='sort'); qs=qs.concat(sorts.length?[sorts[0]]:[], sample(rest, sorts.length?2:3)); });
+  return shuffle(qs).slice(0,BIG_TEST_N);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=r.q.replace(/<[^>]+>/g,'');
+  $('#sayBtn').onclick=()=>speak(r.q,{force:true});
+  $('#slowBtn').onclick=()=>speak(r.q,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(r.q);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); b.scrollIntoView({block:'nearest',behavior:'smooth'}); if(r.fact) speak(`${praise()} ${r.fact}`); else speak(praise()); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg = stars===3?'Perfect! A real computer expert!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = stars===3?'ممتاز! خبيرة حاسوب حقيقية!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
+    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+}
+
+// ============ ROUND TYPES ============
+const ROUNDS={};
+function header(body,r){
+  body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||''));
+  if(r.scene) body.appendChild(el('div','scene',ICON(r.scene)));
+}
+
+// --- pick one correct tile ---
+ROUNDS.pick=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); }); nextBtn(body,done,r); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- multi: tap ALL correct tiles ---
+ROUNDS.multi=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
+  const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
+      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No. ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- sort: one item at a time into 2 or 3 buckets ---
+ROUNDS.sort=function(r,body,done){
+  header(body,r);
+  const items=shuffle(r.items); let i=0;
+  const card=el('div'); body.appendChild(card);
+  const bk=el('div','buckets'+(r.buckets.length===3?' three':'')); body.appendChild(bk);
+  const bEls={};
+  r.buckets.forEach(b=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${b.ar}</div><div class="got"></div>`); d.style.setProperty('--c',b.c||'var(--sky)'); d.onclick=()=>choose(b.v); bk.appendChild(d); bEls[b.v]=d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const name=v=>r.buckets.find(b=>b.v===v).n;
+  const show=()=>{ const it=items[i]; if(!it){ nextBtn(body,done,r); return; }
+    card.innerHTML=`<div class="scene">${ICON(it[0])}</div><div class="q" style="font-size:1.4rem">${it[1]} <span class="arin">${arWord(it[1])}</span></div><div class="feedback"></div>`;
+    counter.textContent=`${i+1} of ${items.length}`; speak(`${it[1]}. ${r.buckets.map(b=>b.n).join(', or ')}?`); };
+  const choose=(v)=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback');
+    if(v===it[2]){ right(); bEls[v].querySelector('.got').appendChild(el('span',null,ICON(it[0]))); fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${it[1]}: ${name(v)}.`); i++; setTimeout(show,900); }
+    else { wrong(); bEls[v].classList.add('bad'); setTimeout(()=>bEls[v].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${it[1]}, ${name(v)}? ${retry()}`); } };
+  show();
+};
+
+// --- build: tap the parts in order; each one appears on the drawing ---
+function computerSvg(){ return `<svg viewBox="0 0 420 300" aria-label="a desktop computer">
+  <g class="part" data-p="Wires and plug"><path d="M300 200 C330 230 330 262 380 262" fill="none" stroke="#1e2a4a" stroke-width="5" stroke-linecap="round"/><rect x="378" y="250" width="30" height="24" rx="5" fill="#8a9bc4" stroke="#1e2a4a" stroke-width="3"/><path d="M386 250v-10M400 250v-10" stroke="#1e2a4a" stroke-width="4" stroke-linecap="round"/></g>
+  <g class="part" data-p="Speakers"><rect x="20" y="130" width="46" height="76" rx="8" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><circle cx="43" cy="156" r="11" fill="#9fd4ff"/><circle cx="43" cy="186" r="7" fill="#9fd4ff"/><rect x="354" y="130" width="46" height="76" rx="8" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><circle cx="377" cy="156" r="11" fill="#9fd4ff"/><circle cx="377" cy="186" r="7" fill="#9fd4ff"/></g>
+  <g class="part" data-p="Screen"><rect x="90" y="30" width="240" height="160" rx="12" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="4"/><rect x="104" y="44" width="212" height="122" rx="6" fill="#9fd4ff"/><path d="M130 140 l30-40 25 30 20-18 30 28z" fill="#4cbb5c"/><circle cx="280" cy="70" r="12" fill="#ffc93c"/><rect x="195" y="192" width="30" height="14" fill="#8a9bc4"/><rect x="165" y="206" width="90" height="8" rx="4" fill="#1e2a4a"/></g>
+  <g class="part" data-p="On/off button"><circle cx="300" cy="178" r="7" fill="#4cbb5c" stroke="#1e2a4a" stroke-width="2"/></g>
+  <g class="part" data-p="Keyboard"><rect x="110" y="226" width="170" height="46" rx="8" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/>${[0,1,2,3,4,5,6,7].map(i=>`<rect x="${120+i*20}" y="234" width="14" height="10" rx="2" fill="#8a9bc4"/>`).join('')}${[0,1,2,3,4,5,6].map(i=>`<rect x="${128+i*20}" y="248" width="14" height="10" rx="2" fill="#8a9bc4"/>`).join('')}<rect x="150" y="260" width="90" height="7" rx="3" fill="#8a9bc4"/></g>
+  <g class="part" data-p="Mouse"><path d="M298 232 a18 22 0 1 1 36 0 v18 a18 18 0 0 1 -36 0z" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/><path d="M316 212v22M298 234h36" stroke="#1e2a4a" stroke-width="2"/><path d="M316 212 C316 200 290 200 290 190" fill="none" stroke="#1e2a4a" stroke-width="3"/></g>
+</svg>`; }
+ROUNDS.build=function(r,body,done){
+  header(body,r);
+  const wrap=el('div','build',computerSvg()); body.appendChild(wrap);
+  const partEl={}; wrap.querySelectorAll('.part').forEach(p=>partEl[p.dataset.p]=p);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let k=0;
+  const tiles=shuffle(r.steps.map((s,idx)=>[s,idx]));
+  tiles.forEach(([s,idx])=>{ const b=el('button','tile',tileHtml(s[0],s[1])); b.onclick=()=>{ sfx.tap();
+    if(idx===k){ right(); b.classList.add('used'); partEl[s[1]].classList.add('on','glow'); setTimeout(()=>partEl[s[1]].classList.remove('glow'),700); k++; fb.textContent=praise(); fb.classList.remove('bad');
+      if(k===r.steps.length) nextBtn(body,done,r); else speak(`${s[1]}! ${r.steps[k][2]}`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Not yet. ${r.steps[k][2]}`); } };
+    row.appendChild(b); });
+  speak(`${r.q} ${r.steps[0][2]}`);
+};
+
+// ============ REPORT ============
+function report(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Workbook</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
+    <div class="card"><h3>What the test covers (school revision sheet · Inspire Computing Y1 Workbook, Unit 1)</h3><ul>
+      <li><b>p.5 Q5 – Input or output (matching):</b> <b>INPUT</b> = mouse, keyboard (we tell the computer something) · <b>OUTPUT</b> = screen/monitor, speakers (the computer shows or tells us something). These four are the official workbook answers.</li>
+      <li><b>p.10 Q1 – Home / school / both (matching):</b> computer → <b>both</b> · whiteboard → <b>school</b> · gaming console → <b>home</b> · TV remote → <b>both</b> (the answer key says both, not just home).</li>
+      <li><b>p.15 Q3 – Draw a computer:</b> a desktop computer with a <b>screen</b> on top, <b>keyboard</b> under it, <b>mouse</b> beside the keyboard; extra credit for speakers, an on/off button and a wire/plug. The “Build a Computer” island shows the picture to copy.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">Use the printed mock exam (Mira Computer Mock Exam.pdf) for the drawing – she should draw it at least twice on paper.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>“Input or output?” – point at things: mouse (input), keyboard (input), screen (output), speakers (output). Trick: <i>IN-put = we put IN, OUT-put = comes OUT.</i></li>
+      <li>“Where do we see it?” – whiteboard (school), gaming console (home), computer (both), TV remote (both).</li>
+      <li>Draw a computer in the air with a finger: big rectangle (screen) – wide flat rectangle under it (keyboard) – little egg beside it (mouse).</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Welcome to the Computer Lab!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome or Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>
