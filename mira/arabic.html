@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="مغامرة الألف">
+<meta name="theme-color" content="#eef9fb">
+<title>مغامرة ميرا مع الألف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Baloo+Bhaijaan+2:wght@600;700;800&family=Noto+Naskh+Arabic:wght@500;700&display=swap">
+<style>
+/* Seaside-kite look, right-to-left: one island map, then one big activity card per question with large tappable letter tiles for a 6-year-old. */
+:root{
+  --bg:#eef9fb;          /* pale sea air */
+  --bg2:#d3eff3;         /* shallow water */
+  --card:#ffffff;
+  --ink:#16404d;         /* deep teal ink */
+  --muted:#5b808c;
+  --rose:#ee4b7e;        /* main accent (pomegranate) */
+  --rose-deep:#bf2f5e;
+  --sun:#ffc93c;
+  --mint:#2fbf9b;
+  --sky:#2f9bff;
+  --grape:#8a63f5;
+  --ok:#27a857;
+  --ok-bg:#e3f7e9;
+  --ok-ink:#1b7a3c;
+  --bad:#e5484d;
+  --bad-bg:#ffecec;
+  --sel-bg:#e6f2ff;
+  --off:#d5e6ea;
+  --guide:#cfe4e8;
+  --shadow:0 6px 0 rgba(22,64,77,.12);
+  --display:'Baloo Bhaijaan 2','Almarai','Segoe UI',Tahoma,sans-serif;
+  --body:'Almarai','Segoe UI',Tahoma,sans-serif;
+  --letters:'Noto Naskh Arabic','Amiri','Traditional Arabic','Times New Roman',serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+button,.bucket{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:700;font-size:16px;
+  background-image:radial-gradient(circle at 92% 6%,#fff3bf 0,transparent 30%),radial-gradient(circle at 6% 94%,#ffe0ea 0,transparent 38%)}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 48px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.45rem;font-weight:800;color:var(--rose)}
+.brand .m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.5}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.4rem,4vw,2rem)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem;line-height:1.8}
+.hero .when{display:inline-block;margin-top:10px;background:var(--bg2);border-radius:999px;padding:6px 14px;font-size:.9rem}
+.hero .big{font-family:var(--letters);font-size:4.2rem;line-height:1.5;color:var(--rose)}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1rem;color:var(--muted);margin:16px 4px 8px;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:start;display:flex;flex-direction:column;gap:6px;transition:transform .12s;border-top:8px solid var(--c,var(--rose))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1.2}
+.island .t{font-family:var(--display);font-size:1.15rem;font-weight:800;line-height:1.6}
+.island .s{font-size:.82rem;color:var(--muted);line-height:1.7}
+.stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.stars .off{color:var(--off)}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(270deg,#fff3bf,#ffe0ea)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(270deg,var(--mint),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:18px;padding:10px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.2rem}
+.instr .sub{font-size:.85rem;color:var(--muted)}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--mint)}
+
+.q{font-family:var(--display);font-size:clamp(1.25rem,4vw,1.7rem);text-align:center;margin:6px 0 4px;line-height:1.7}
+.scene{font-size:clamp(2.6rem,9vw,3.8rem);text-align:center;line-height:1.3;margin:8px 0}
+.scene.ltrs{font-family:var(--letters);font-weight:700;font-size:clamp(3.4rem,13vw,5rem);line-height:1.9;color:var(--ink)}
+.wordline{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:6px 0 10px}
+.wordline .pic{font-size:clamp(2.8rem,10vw,4rem);line-height:1.2}
+.wordline .word{font-family:var(--letters);font-weight:700;font-size:clamp(3rem,12vw,4.6rem);line-height:1.9}
+.wordline .gap{display:inline-block;min-width:.7em;color:var(--rose);border-bottom:5px dashed var(--rose);text-align:center;line-height:1.3;margin-inline-end:.08em}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:10px 16px;font-size:1.2rem;font-family:var(--display);font-weight:700;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:108px}
+.tile .e{font-size:2.5rem;line-height:1.25}
+.tile .w{font-size:1.15rem;line-height:1.7}
+.tile.big .w{font-family:var(--letters);font-weight:700;font-size:2.7rem;line-height:1.75}
+.tile.mid .w{font-family:var(--letters);font-weight:700;font-size:2rem;line-height:1.8}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:var(--sel-bg)}
+.tile.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok-ink)}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:var(--bad-bg)}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+.tile.ltile{min-width:78px;padding:4px 10px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.cols .col{display:flex;flex-direction:column;gap:12px}
+.cols .tile{min-width:0;min-height:86px}
+.feedback{text-align:center;font-family:var(--display);font-size:1.35rem;min-height:2.4rem;margin:10px 0;color:var(--ok)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--rose);color:#fff;border-radius:999px;padding:12px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 var(--rose-deep)}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px;margin:0}
+.buckets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent}
+.bucket:hover{border-color:var(--sky)}
+.bucket.bad{animation:shake .4s;border-color:var(--bad)}
+.bucket .h{font-family:var(--display);font-size:1.2rem}
+.bucket .e{font-size:2rem;line-height:1.3}
+.bucket .got{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:14px;padding:0 12px;font-family:var(--letters);font-size:1.6rem;line-height:1.8}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px;font-variant-numeric:tabular-nums}
+.fact{background:#fff3bf;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center;line-height:1.9}
+.fact b{font-family:var(--letters);font-size:1.5em;font-weight:700;color:var(--rose-deep)}
+
+.padwrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.pad{background:var(--card);border:3px dashed var(--guide);border-radius:22px;touch-action:none;max-width:100%;cursor:crosshair}
+.padtools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0;color:var(--sun)}
+.result .bigstars .off{color:var(--off)}
+.result h2{font-size:1.7rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px;line-height:1.9;font-weight:400}
+.report .card h3{font-size:1.1rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-inline-start:20px;font-size:.98rem}
+.report li{margin:3px 0}
+.report .lt{font-family:var(--letters);font-weight:700;font-size:1.35em;color:var(--rose-deep)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{padding:6px 8px;text-align:start;border-bottom:1px solid #bfdde2}
+th{color:var(--muted);font-weight:800;font-size:.85rem}
+
+#mascot{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center;line-height:1.7}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.brand .m,#mascot.happy,.tile.bad,.bucket.bad{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app" dir="rtl" lang="ar">
+  <header>
+    <div class="brand"><span class="m">🐰</span> مغامرة ميرا مع الألف</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 الصوت</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🐰</div>
+<div id="toast" dir="rtl" lang="ar"></div>
+
+<script>
+// ============ المحتوى: اللغة العربية – الفصل الأول – حرف الألف ============
+// ورقة المراجعة: ضع دائرة حول الهمزة · اكتب حرف الألف بالحركات القصيرة · اكتب حرف الألف بالحركات الطويلة · وصل الكلمة بالصورة
+const Q=(type,obj)=>Object.assign({type},obj);
+const SHORT=[['','أَ',0],['','أُ',0],['','إِ',0]];
+const LONG=[['','آ',0],['','أُو',0],['','إِي',0]];
+const opt=(set,i)=>set.map((o,k)=>[o[0],o[1],k===i?1:0]);
+const HARAKA=[['','فَتْحَة'],['','ضَمَّة'],['','كَسْرَة']];
+const hk=i=>HARAKA.map((o,k)=>[o[0],o[1],k===i?1:0]);
+
+const LEVELS=[
+ { id:'hamza', title:'صَيَّادَةُ الهَمْزَة', sub:'ضع دائرة حول الهمزة', emoji:'🔎', color:'#ee4b7e', rounds:[
+   Q('pick',{ q:'أَيُّ حَرْفٍ هُوَ الهَمْزَة؟', big:true, opts:[['','أ',1],['','ب',0],['','د',0]], fact:'هذه هي الهمزة <b>أ</b> : رأس صغير <b>ء</b> يجلس فوق الألف.' }),
+   Q('tap',{ q:'المسي الهمزة في كلمة أَرْنَب.', word:'أَرْنَب', pic:'🐰' }),
+   Q('tap',{ q:'المسي الهمزة في كلمة أَسَد.', word:'أَسَد', pic:'🦁' }),
+   Q('tap',{ q:'المسي الهمزة في كلمة أُمّ.', word:'أُمّ', pic:'👩' }),
+   Q('tap',{ q:'المسي الهمزة في كلمة إِصْبَع.', word:'إِصْبَع', pic:'☝️', fact:'مع الكسرة تنزل الهمزة تحت الألف: <b>إِ</b>' }),
+   Q('tap',{ q:'المسي الهمزة في كلمة أُذُن.', word:'أُذُن', pic:'👂' }),
+   Q('multi',{ q:'المسي كل الحروف التي فيها همزة.', big:true, opts:[['','أَ',1],['','إِ',1],['','أُ',1],['','ا',0],['','ب',0],['','ل',0]], fact:'الألف وحدها <b>ا</b> بدون رأس صغير ليست همزة.' }),
+   Q('tap',{ q:'انتبهي! المسي الهمزة فقط في كلمة أَنَانَاس.', word:'أَنَانَاس', pic:'🍍', fact:'<b>أ</b> همزة، أما <b>ا</b> فهي ألف بدون همزة.' }),
+   Q('pick',{ q:'أَيُّ كلمة تبدأ بالهمزة؟', mid:true, opts:[['🐰','أَرْنَب',1],['🐟','سَمَكَة',0],['🐈','قِطَّة',0]] }),
+   Q('pick',{ q:'أَيُّ كلمة تبدأ بالهمزة؟', mid:true, opts:[['🦁','أَسَد',1],['🐘','فِيل',0],['🐦','عُصْفُور',0]] }),
+   Q('tap',{ q:'تحدّي! الهمزة هنا في وسط الكلمة. المسيها في كلمة فَأْر.', word:'فَأْر', pic:'🐭' }),
+   Q('tap',{ q:'تحدّي! الهمزة هنا في آخر الكلمة. المسيها في كلمة قَرَأَ.', word:'قَرَأَ', pic:'📖' }),
+ ]},
+ { id:'short', title:'الحَرَكَاتُ القَصِيرَة', sub:'اكتب حرف الألف بالحركات القصيرة', emoji:'🎈', color:'#2fbf9b', rounds:[
+   Q('pick',{ q:'ما اسم هذه الحركة؟', scene:'أَ', ltrs:true, opts:hk(0), fact:'<b>أَ</b> ألف بالفتحة. الفتحة خط صغير فوق الحرف.' }),
+   Q('pick',{ q:'ما اسم هذه الحركة؟', scene:'أُ', ltrs:true, opts:hk(1), fact:'<b>أُ</b> ألف بالضمة. الضمة مثل واو صغيرة فوق الحرف.' }),
+   Q('pick',{ q:'ما اسم هذه الحركة؟', scene:'إِ', ltrs:true, opts:hk(2), fact:'<b>إِ</b> ألف بالكسرة. الكسرة خط صغير تحت الحرف، والهمزة تنزل تحت الألف.' }),
+   Q('pick',{ q:'اختاري الألف بالفَتْحَة.', big:true, opts:opt(SHORT,0) }),
+   Q('pick',{ q:'اختاري الألف بالضَّمَّة.', big:true, opts:opt(SHORT,1) }),
+   Q('pick',{ q:'اختاري الألف بالكَسْرَة.', big:true, opts:opt(SHORT,2) }),
+   Q('pick',{ q:'أكملي الكلمة: ما الحرف الناقص في أَرْنَب؟', fill:{pic:'🐰',rest:'رْنَب',full:'أَرْنَب'}, big:true, opts:opt(SHORT,0) }),
+   Q('pick',{ q:'أكملي الكلمة: ما الحرف الناقص في أُذُن؟', fill:{pic:'👂',rest:'ذُن',full:'أُذُن'}, big:true, opts:opt(SHORT,1) }),
+   Q('pick',{ q:'أكملي الكلمة: ما الحرف الناقص في إِصْبَع؟', fill:{pic:'☝️',rest:'صْبَع',full:'إِصْبَع'}, big:true, opts:opt(SHORT,2) }),
+   Q('pick',{ q:'أكملي الكلمة: ما الحرف الناقص في أَسَد؟', fill:{pic:'🦁',rest:'سَد',full:'أَسَد'}, big:true, opts:opt(SHORT,0) }),
+   Q('pick',{ q:'أكملي الكلمة: ما الحرف الناقص في أُمّ؟', fill:{pic:'👩',rest:'مّ',full:'أُمّ'}, big:true, opts:opt(SHORT,1) }),
+   Q('trace',{ q:'اكتبي بإصبعك: الألف بالفَتْحَة.', letter:'أَ' }),
+   Q('trace',{ q:'اكتبي بإصبعك: الألف بالضَّمَّة.', letter:'أُ' }),
+   Q('trace',{ q:'اكتبي بإصبعك: الألف بالكَسْرَة.', letter:'إِ' }),
+ ]},
+ { id:'long', title:'الحَرَكَاتُ الطَّوِيلَة', sub:'اكتب حرف الألف بالحركات الطويلة', emoji:'🚂', color:'#8a63f5', rounds:[
+   Q('pick',{ q:'أَيُّ واحد هو المدّ بالألف؟ صوت طويل: آآآ', big:true, opts:opt(LONG,0), fact:'<b>آ</b> صوت طويل مثل القطار: آآآ. أما <b>أَ</b> فصوت قصير وسريع.' }),
+   Q('pick',{ q:'أَيُّ واحد هو المدّ بالواو؟ صوت طويل: أُووو', big:true, opts:opt(LONG,1), fact:'<b>أُو</b> ألف بالضمة وبعدها واو.' }),
+   Q('pick',{ q:'أَيُّ واحد هو المدّ بالياء؟ صوت طويل: إِييي', big:true, opts:opt(LONG,2), fact:'<b>إِي</b> ألف بالكسرة وبعدها ياء.' }),
+   Q('sort',{ q:'حركة قصيرة أم طويلة؟ المسي الصندوق الصحيح.', buckets:[{n:'قَصِيرَة',e:'🐇',say:'قصيرة'},{n:'طَوِيلَة',e:'🚂',say:'طويلة'}], items:[['أَ',0],['آ',1],['أُ',0],['أُو',1],['إِ',0],['إِي',1]] }),
+   Q('match',{ q:'صِلي الحركة القصيرة بالحركة الطويلة.', big:true, pairs:[['','أَ','','آ'],['','أُ','','أُو'],['','إِ','','إِي']], hintL:'المسي الحركة القصيرة أولاً!' }),
+   Q('pick',{ q:'الفتحة تصير طويلة. ماذا تصبح؟', scene:'أَ', ltrs:true, big:true, opts:opt(LONG,0) }),
+   Q('pick',{ q:'الضمة تصير طويلة. ماذا تصبح؟', scene:'أُ', ltrs:true, big:true, opts:opt(LONG,1) }),
+   Q('pick',{ q:'الكسرة تصير طويلة. ماذا تصبح؟', scene:'إِ', ltrs:true, big:true, opts:opt(LONG,2) }),
+   Q('pick',{ q:'أَيُّ واحدة حركة قصيرة؟', big:true, opts:[['','إِ',1],['','إِي',0],['','آ',0]] }),
+   Q('pick',{ q:'أَيُّ واحدة حركة طويلة؟', big:true, opts:[['','أُو',1],['','أُ',0],['','أَ',0]] }),
+   Q('trace',{ q:'اكتبي بإصبعك: المدّ بالألف.', letter:'آ' }),
+   Q('trace',{ q:'اكتبي بإصبعك: المدّ بالواو.', letter:'أُو', size:130 }),
+   Q('trace',{ q:'اكتبي بإصبعك: المدّ بالياء.', letter:'إِي', size:130 }),
+ ]},
+ { id:'match', title:'الكَلِمَةُ وَالصُّورَة', sub:'وصل الكلمة بالصورة', emoji:'🖼️', color:'#2f9bff', rounds:[
+   Q('match',{ q:'صِلي الكلمة بالصورة.', mid:true, pairs:[['','أَرْنَب','🐰',''],['','أَسَد','🦁',''],['','أُمّ','👩',''],['','أُذُن','👂','']] }),
+   Q('match',{ q:'صِلي الكلمة بالصورة.', mid:true, pairs:[['','أَنْف','👃',''],['','أَب','👨',''],['','إِصْبَع','☝️',''],['','أَنَانَاس','🍍','']] }),
+   Q('match',{ q:'صِلي الكلمة بالصورة.', mid:true, pairs:[['','أَسْنَان','🦷',''],['','أَرْض','🌍',''],['','أُسْرَة','👨‍👩‍👧',''],['','أَخْطَبُوط','🐙','']] }),
+   Q('pick',{ q:'أين الأَسَد؟ المسي الصورة.', hideWords:true, opts:[['🦁','أسد',1],['🐰','أرنب',0],['🐙','أخطبوط',0]] }),
+   Q('pick',{ q:'أين الأُذُن؟ المسي الصورة.', hideWords:true, opts:[['👂','أذن',1],['👃','أنف',0],['☝️','إصبع',0]] }),
+   Q('pick',{ q:'أين الأَرْنَب؟ المسي الصورة.', hideWords:true, opts:[['🐰','أرنب',1],['🦁','أسد',0],['🐭','فأر',0]] }),
+   Q('pick',{ q:'ما هذه؟ اختاري الكلمة الصحيحة.', scene:'🐰', mid:true, opts:[['','أَرْنَب',1],['','أَسَد',0],['','أَنْف',0]] }),
+   Q('pick',{ q:'ما هذا؟ اختاري الكلمة الصحيحة.', scene:'👃', mid:true, opts:[['','أَنْف',1],['','أُذُن',0],['','أَب',0]] }),
+   Q('pick',{ q:'من هذه؟ اختاري الكلمة الصحيحة.', scene:'👩', mid:true, opts:[['','أُمّ',1],['','أَب',0],['','أَرْض',0]] }),
+   Q('pick',{ q:'ما هذا؟ اختاري الكلمة الصحيحة.', scene:'☝️', mid:true, opts:[['','إِصْبَع',1],['','أَسْنَان',0],['','أُسْرَة',0]] }),
+ ]},
+];
+const PER_ISLAND=3;   // الامتحان الكبير = 3 أسئلة من كل جزيرة = 12 سؤالاً
+
+// ============ الحالة ============
+const store={
+  get(k,d){ try{ const v=localStorage.getItem('mira_ar_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_ar_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress=store.get('progress',{});
+let hard=store.get('hard',{});
+let voiceOn=store.get('voice',true);
+let history=store.get('history',[]);
+
+// ============ المؤثرات الصوتية ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ القراءة بصوت عربي ============
+const synth=window.speechSynthesis||null;
+let arVoice=null, voicesSeen=false, warned=false;
+function pickVoice(){
+  if(!synth) return;
+  const all=synth.getVoices()||[]; if(all.length) voicesSeen=true;
+  const ar=all.filter(v=>/^ar/i.test(v.lang));
+  const prefs=['Iman','Salma','Zariyah','Hala','Laila','Amina','Hoda','Google','Maged','Majed','Hamed','Naayf','Tarik','Mariam'];
+  arVoice=null;
+  for(const p of prefs){ const v=ar.find(v=>v.name.includes(p)); if(v){arVoice=v;break;} }
+  if(!arVoice) arVoice=ar[0]||null;
+}
+if(synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
+function plain(t){ return String(t).replace(/<[^>]+>/g,' ').replace(/[^\p{L}\p{M}\p{N}\s.,!?،؟:]/gu,' ').replace(/\s+/g,' ').trim(); }
+function speak(text,{slow=false,force=false}={}){
+  if(!synth) return;
+  if(!voiceOn && !force) return;
+  if(voicesSeen && !arVoice && !warned){ warned=true; toast('لا يوجد صوت عربي في هذا الجهاز. على الآيباد: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية.'); }
+  try{
+    synth.cancel();
+    const u=new SpeechSynthesisUtterance(plain(text));
+    if(arVoice) u.voice=arVoice;
+    u.lang=(arVoice&&arVoice.lang)||'ar-SA';
+    u.rate=slow?0.6:0.85; u.pitch=1.1;
+    synth.speak(u);
+  }catch(e){}
+}
+function hush(){ try{ synth&&synth.cancel(); }catch(e){} }
+
+// ============ أدوات ============
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const PRAISE=['أحسنتِ!','ممتاز يا ميرا!','رائع!','شاطرة!','بطلة!','إجابة صحيحة!','مدهش!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['حاولي مرة أخرى!','قريبة! انظري جيداً.','ليست هذه. جرّبي غيرها.','فكّري ثم حاولي.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🐰'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+function tileHtml(e,w,r){ return (e?`<span class="e">${e}</span>`:'')+((w&&!(r&&r.hideWords))?`<span class="w">${w}</span>`:''); }
+function tileClass(r){ return 'tile'+(r.big?' big':'')+(r.mid?' mid':''); }
+
+// تقسيم الكلمة إلى حروف مع المحافظة على شكل الحرف المتصل (ZWJ)
+const MARK=/[ً-ْٰ]/;
+const NOJOIN='اأإآدذرزوؤةءى';
+const HAMZA='أإؤئء';
+function splitWord(word){
+  const segs=[]; for(const ch of word){ if(MARK.test(ch)&&segs.length) segs[segs.length-1]+=ch; else segs.push(ch); }
+  return segs.map((s,i)=>{ const base=s[0], prev=i>0?segs[i-1][0]:null, next=i<segs.length-1?segs[i+1][0]:null;
+    const jp=prev&&!NOJOIN.includes(prev)&&base!=='ء';
+    const jn=next&&!NOJOIN.includes(base)&&next!=='ء';
+    return {text:(jp?'‍':'')+s+(jn?'‍':''), hamza:HAMZA.includes(base)}; });
+}
+
+// قصاصات ملونة
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ if(matchMedia('(prefers-reduced-motion:reduce)').matches) return; cv.width=innerWidth;cv.height=innerHeight; const cols=['#ee4b7e','#ffc93c','#2fbf9b','#2f9bff','#8a63f5'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ الصفحة الرئيسية ============
+function home(){
+  hush();
+  const v=$('#view'); v.innerHTML='';
+  v.appendChild(el('div','hero',`<div><h1>أهلاً ميرا! 🐰 هيا نلعب مع حرف الألف</h1><p>المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐ وبعدها جرّبي الامتحان الكبير!</p><span class="when">📘 اللغة العربية · الفصل الأول · حرف الألف والهمزة</span></div><div class="big">أَ أُ إِ</div>`));
+  v.appendChild(el('div','sectionTitle','الجزر الأربع · مثل ورقة المراجعة من المدرسة'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1;min-width:0"><div class="t">الامتحان الكبير · 12 سؤالاً من كل الجزر</div><div class="s">مثل الامتحان تماماً. بعده اكتبي الحروف على الورقة مع ماما أو بابا.</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 لماما وبابا'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 ابدئي من جديد'); let armed=false, armT;
+  reset.onclick=()=>{ if(!armed){ armed=true; reset.textContent='متأكدة؟ اضغطي مرة ثانية لمسح النجوم'; clearTimeout(armT); armT=setTimeout(()=>{armed=false; reset.textContent='🔄 ابدئي من جديد';},3500); return; }
+    progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); toast('تم مسح النجوم. بداية جديدة!'); };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.sub}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ محرّك الأسئلة ============
+let cur=null;
+function startLevel(id){
+  hush();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'الامتحان الكبير',sub:'12 سؤالاً من كل الجزر',emoji:'🏆'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.rounds.slice(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">➡ الجزر</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="اقرئي لي السؤال" aria-label="اقرئي لي السؤال">🔊</button><button class="speak turtle" id="slowBtn" title="ببطء" aria-label="اقرئي ببطء">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="sub">${level.sub}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(sample(l.rounds.filter(r=>r.type!=='trace'),PER_ISLAND)));
+  return shuffle(qs);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.key=plain(r.q)+(r.scene&&r.ltrs?' ('+r.scene+')':'');
+  $('#sayBtn').onclick=()=>speak(r.q,{force:true});
+  $('#slowBtn').onclick=()=>speak(r.q,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(r.q);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.key); }
+function right(){ sfx.ok(); mascot('happy'); }
+function nextBtn(body,done,r){
+  if(r.fact) body.appendChild(el('div','fact','💡 '+r.fact));
+  const b=el('button','nextbtn','التالي ⬅'); b.onclick=done; body.appendChild(b);
+  speak(praise()+(r.fact?' '+r.fact:''));
+}
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars=mistakes===0?3:mistakes<=2?2:1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.id,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg=stars===3?'ممتاز! كل الإجابات صحيحة!':stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟':'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><p>${total} سؤالاً · عدد الأخطاء: ${mistakes}</p>
+    <div class="row"><button class="nextbtn" id="again" style="margin:0">العبي مرة أخرى 🔁</button><button class="nextbtn ghost" id="toHome">العودة إلى الجزر 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(msg);
+}
+
+// ============ أنواع الأسئلة ============
+const ROUNDS={};
+function header(body,r){
+  body.appendChild(el('div','q',r.q));
+  if(r.fill) body.appendChild(el('div','wordline',`<span class="pic">${r.fill.pic}</span><span class="word"><span class="gap">؟</span>${r.fill.rest}</span>`));
+  else if(r.scene) body.appendChild(el('div','scene'+(r.ltrs?' ltrs':''),r.scene));
+}
+
+// --- اختيار إجابة واحدة ---
+ROUNDS.pick=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button',tileClass(r),tileHtml(e,w,r)); if(r.hideWords) b.setAttribute('aria-label',w);
+    b.onclick=()=>{ if(locked)return; sfx.tap();
+      if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); });
+        if(r.fill){ const wd=body.querySelector('.wordline .word'); if(wd) wd.textContent=r.fill.full; }
+        nextBtn(body,done,r); }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(fb.textContent); } };
+    row.appendChild(b); });
+};
+
+// --- اختيار كل الإجابات الصحيحة ---
+ROUNDS.multi=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
+  const counter=el('div','counter',`وجدتِ 0 من ${need}`); body.appendChild(counter);
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button',tileClass(r),tileHtml(e,w,r)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`وجدتِ ${got} من ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
+      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak('نعم! ابحثي عن غيرها.'); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(fb.textContent); } };
+    row.appendChild(b); });
+};
+
+// --- لمس الهمزة داخل الكلمة ---
+ROUNDS.tap=function(r,body,done){
+  body.appendChild(el('div','q',r.q));
+  body.appendChild(el('div','wordline',`<span class="pic">${r.pic||''}</span><span class="word">${r.word}</span>`));
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  splitWord(r.word).forEach(s=>{ const b=el('button','tile big ltile',`<span class="w">${s.text}</span>`); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(s.hamza){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); }); nextBtn(body,done,r); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent='ليست همزة. ابحثي عن الرأس الصغير ء'; fb.classList.add('bad'); speak('ليست همزة. حاولي مرة أخرى!'); } };
+    row.appendChild(b); });
+};
+
+// --- فرز في صندوقين ---
+ROUNDS.sort=function(r,body,done){
+  body.appendChild(el('div','q',r.q));
+  const items=shuffle(r.items); let i=0;
+  const card=el('div'); body.appendChild(card);
+  const bk=el('div','buckets'); body.appendChild(bk);
+  const bEls=r.buckets.map((b,k)=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="got"></div>`); d.onclick=()=>choose(k); bk.appendChild(d); return d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const show=()=>{ const it=items[i]; if(!it){ card.innerHTML=''; counter.textContent=''; nextBtn(body,done,r); return; }
+    card.innerHTML=`<div class="scene ltrs">${it[0]}</div><div class="feedback"></div>`;
+    counter.textContent=`${i+1} من ${items.length}`; };
+  let busy=false;
+  const choose=(k)=>{ const it=items[i]; if(!it||busy)return; const fb=card.querySelector('.feedback'); sfx.tap();
+    if(k===it[1]){ busy=true; right(); bEls[k].querySelector('.got').appendChild(el('span',null,it[0])); fb.textContent=praise(); fb.classList.remove('bad'); speak('نعم! حركة '+r.buckets[k].say+'.'); i++; setTimeout(()=>{busy=false;show();},900); }
+    else { wrong(); bEls[k].classList.add('bad'); setTimeout(()=>bEls[k].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(fb.textContent); } };
+  show();
+};
+
+// --- توصيل: المسي من العمود الأول ثم ما يناسبه من العمود الثاني ---
+ROUNDS.match=function(r,body,done){
+  body.appendChild(el('div','q',r.q));
+  const cols=el('div','cols'); const A=el('div','col'), B=el('div','col'); cols.append(A,B); body.appendChild(cols);
+  const fb=el('div','feedback',''); body.appendChild(fb);
+  let sel=null, left=r.pairs.length;
+  const idx=r.pairs.map((p,k)=>[p,k]);
+  shuffle(idx).forEach(([p,k])=>{ const b=el('button',tileClass(r),tileHtml(p[0],p[1])); b.dataset.k=k;
+    b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); A.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel')); b.classList.add('sel'); sel=b; fb.textContent=''; if(!r.big) speak(p[1]); };
+    A.appendChild(b); });
+  shuffle(idx).forEach(([p,k])=>{ const b=el('button',tileClass(r),tileHtml(p[2],p[3]));
+    b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap();
+      if(!sel){ fb.textContent=r.hintL||'المسي الكلمة أولاً!'; fb.classList.add('bad'); speak(fb.textContent); return; }
+      if(Number(sel.dataset.k)===k){ right(); sel.classList.remove('sel'); sel.classList.add('ok'); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); sel=null; left--;
+        if(left===0) nextBtn(body,done,r); else speak(fb.textContent); }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(fb.textContent); } };
+    B.appendChild(b); });
+};
+
+// --- الكتابة بالإصبع فوق الحرف الباهت ---
+ROUNDS.trace=function(r,body,done){
+  body.appendChild(el('div','q',r.q));
+  const wrap=el('div','padwrap'); body.appendChild(wrap);
+  const pad=el('canvas','pad'); pad.setAttribute('aria-label','لوحة الكتابة'); wrap.appendChild(pad);
+  const W=Math.max(240,Math.min(body.clientWidth||320,440)), H=270, dpr=window.devicePixelRatio||1;
+  pad.style.width=W+'px'; pad.style.height=H+'px'; pad.width=W*dpr; pad.height=H*dpr;
+  const c=pad.getContext('2d'); c.scale(dpr,dpr);
+  const base=H*0.68, size=r.size||150; let len=0;
+  const css=getComputedStyle(document.documentElement);
+  function guide(){ c.clearRect(0,0,W,H);
+    c.strokeStyle=css.getPropertyValue('--guide').trim()||'#cfe4e8'; c.lineWidth=2; c.setLineDash([8,8]); c.beginPath(); c.moveTo(16,base); c.lineTo(W-16,base); c.stroke(); c.setLineDash([]);
+    c.fillStyle=css.getPropertyValue('--guide').trim()||'#cfe4e8'; c.font=`700 ${size}px "Noto Naskh Arabic","Amiri","Traditional Arabic",serif`; c.textAlign='center'; c.textBaseline='alphabetic'; try{c.direction='rtl';}catch(e){}
+    c.fillText(r.letter,W/2,base); len=0; }
+  guide();
+  if(document.fonts&&document.fonts.load) document.fonts.load(`700 ${size}px "Noto Naskh Arabic"`,r.letter).then(()=>{ if(len===0) guide(); }).catch(()=>{});
+  let last=null;
+  const pos=e=>{ const b=pad.getBoundingClientRect(); return {x:e.clientX-b.left,y:e.clientY-b.top}; };
+  pad.onpointerdown=e=>{ e.preventDefault(); try{pad.setPointerCapture(e.pointerId);}catch(_){} last=pos(e); c.fillStyle=css.getPropertyValue('--rose').trim()||'#ee4b7e'; c.beginPath(); c.arc(last.x,last.y,5,0,Math.PI*2); c.fill(); len+=2; };
+  pad.onpointermove=e=>{ if(!last)return; const p=pos(e); c.strokeStyle=css.getPropertyValue('--rose').trim()||'#ee4b7e'; c.lineWidth=10; c.lineCap='round'; c.lineJoin='round'; c.beginPath(); c.moveTo(last.x,last.y); c.lineTo(p.x,p.y); c.stroke(); len+=Math.hypot(p.x-last.x,p.y-last.y); last=p; };
+  pad.onpointerup=pad.onpointercancel=()=>{ last=null; };
+  const tools=el('div','padtools'); wrap.appendChild(tools);
+  const clr=el('button','nextbtn ghost','🧽 امسحي'); clr.onclick=()=>{ sfx.tap(); guide(); };
+  const ok=el('button','nextbtn','✔ انتهيت'); ok.style.margin='0';
+  const fb=el('div','feedback','');
+  ok.onclick=()=>{ if(len<90){ fb.textContent='اكتبي الحرف بإصبعك أولاً!'; fb.classList.add('bad'); speak(fb.textContent); return; }
+    right(); fb.textContent=praise(); fb.classList.remove('bad'); ok.remove(); clr.remove(); pad.style.pointerEvents='none';
+    nextBtn(body,done,{fact:'والآن اكتبيه بالقلم على الورقة: <b>'+r.letter+'</b>'}); };
+  tools.append(clr,ok); body.appendChild(fb);
+};
+
+// ============ صفحة الوالدين ============
+const LNAME={hamza:'🔎 صيّادة الهمزة',short:'🎈 الحركات القصيرة',long:'🚂 الحركات الطويلة',match:'🖼️ الكلمة والصورة'};
+function report(){
+  hush();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${LNAME[l.id]}</td><td>${l.sub}</td><td class="stars">${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">➡ الجزر</button><h2>لماما وبابا 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>تقدّم ميرا</h3><div class="tablewrap"><table><tr><th>الجزيرة</th><th>سؤال الامتحان</th><th>أفضل نتيجة</th><th>مرات اللعب</th></tr>${rows}<tr><td>🏆 الامتحان الكبير</td><td>كل الأسئلة</td><td class="stars">${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div></div>
+    <div class="card"><h3>الأسئلة التي أخطأت فيها ميرا (تحتاج تكراراً)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p style="margin:0">لا توجد أخطاء بعد. العبوا بعض الجزر أولاً.</p>'}</div>
+    <div class="card"><h3>ماذا في الامتحان؟ (ورقة المراجعة من المدرسة)</h3><ul>
+      <li><b>ضع دائرة حول الهمزة:</b> تبحث عن <span class="lt">أ</span> أو <span class="lt">إ</span> داخل الكلمة وتحوّطها. الألف بدون رأس صغير <span class="lt">ا</span> ليست همزة.</li>
+      <li><b>اكتب حرف الألف بالحركات القصيرة:</b> <span class="lt">أَ</span> فتحة · <span class="lt">أُ</span> ضمة · <span class="lt">إِ</span> كسرة (الهمزة تنزل تحت الألف مع الكسرة).</li>
+      <li><b>اكتب حرف الألف بالحركات الطويلة:</b> <span class="lt">آ</span> مدّ بالألف · <span class="lt">أُو</span> مدّ بالواو · <span class="lt">إِي</span> مدّ بالياء.</li>
+      <li><b>وصل الكلمة بالصورة:</b> كلمات تبدأ بالهمزة مثل أَرْنَب، أَسَد، أُمّ، أُذُن، أَنْف.</li>
+    </ul></div>
+    <div class="card"><h3>مهم: راجعوا الكراسة</h3><ul>
+      <li>الكلمات والصور في اللعبة من اختياري لأن كتاب العربي وكراسة ميرا ليسا عندي. الكلمات التي كتبتها المعلمة في الكراسة هي الأقرب للامتحان، فراجعوها أولاً.</li>
+      <li>انظروا كيف تكتب المعلمة المدّ بالألف: <span class="lt">آ</span> أم <span class="lt">أَا</span>، ودرّبوا ميرا على طريقة الكراسة نفسها.</li>
+    </ul></div>
+    <div class="card"><h3>5 دقائق قبل النوم</h3><ul>
+      <li>اكتبوا 5 كلمات على ورقة (أَرْنَب، أَسَد، أُمّ، إِصْبَع، أُذُن) واطلبوا منها دائرة حول الهمزة.</li>
+      <li>قولوا "فتحة" فتكتب <span class="lt">أَ</span>، "ضمة" فتكتب <span class="lt">أُ</span>، "كسرة" فتكتب <span class="lt">إِ</span>. ثم بالطويلة: <span class="lt">آ</span> <span class="lt">أُو</span> <span class="lt">إِي</span>.</li>
+      <li>لعبة الصوت: "أَ" قصيرة مثل قفزة الأرنب 🐇، و"آآآ" طويلة مثل القطار 🚂.</li>
+      <li>في الامتحان الكتابة بالقلم، فاجعلوا آخر تمرين على الورقة وليس على الشاشة.</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ التشغيل ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 الصوت':'🔇 الصوت'; }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('أهلاً ميرا! هيا نلعب مع حرف الألف.',{force:true}); else hush(); };
+syncChips(); home();
+if(!synth) toast('هذا المتصفح لا يدعم القراءة بالصوت. افتحي اللعبة في Chrome أو Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>
