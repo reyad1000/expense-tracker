@@ -3,36 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mira's Day &amp; School</title>
+<title>Mira's World Around Me</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
 <style>
-/* Evening-sky + school-yellow look. Same engine as the other islands games: one map → one big activity card per round. */
+/* Whole Social book "The World Around Me" (Horizon, Grade 1) – 5 units → unit tabs → islands → one big activity card per round. */
 :root{
-  --bg:#f3f0ff;          /* pale lavender evening */
-  --bg2:#e4ddff;
-  --card:#ffffff;
-  --ink:#2a2338;
-  --muted:#7c7390;
-  --coral:#ff7a59;
-  --sun:#ffc93c;
-  --leaf:#4cbb5c;
-  --sky:#3fb0ff;
-  --grape:#9b6cff;
-  --night:#5b4bc4;
-  --ok:#3fb950;
-  --bad:#e5484d;
-  --shadow:0 6px 0 rgba(42,35,56,.12);
+  --bg:#f3f0ff; --bg2:#e4ddff; --card:#ffffff; --ink:#2a2338; --muted:#7c7390;
+  --coral:#ff7a59; --sun:#ffc93c; --leaf:#4cbb5c; --sky:#3fb0ff; --grape:#9b6cff; --night:#5b4bc4;
+  --ok:#3fb950; --bad:#e5484d; --shadow:0 6px 0 rgba(42,35,56,.12);
   --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
-  --body:'Nunito','Segoe UI',system-ui,sans-serif;
-  color-scheme:light;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif; color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
   background-image:radial-gradient(circle at 8% 8%,#fff6c4 0,transparent 32%),radial-gradient(circle at 92% 92%,#cfeeff 0,transparent 40%);}
 button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
-button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+button:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
 #app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--night)}
@@ -42,16 +30,21 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
 .chip.on{background:var(--sun)}
 .starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
-
 h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
-.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
-.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:14px}
+.hero h1{font-size:clamp(1.4rem,4vw,2rem)}
 .hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
-.hero .big{font-size:3.4rem;line-height:1}
+.hero .big{font-size:3.2rem;line-height:1}
 .hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
 @media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
-
-.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.units{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.unit{flex:1 1 140px;background:var(--card);border-radius:18px;padding:10px 12px;box-shadow:var(--shadow);text-align:left;border-bottom:6px solid var(--c);display:flex;align-items:center;gap:8px;transition:transform .12s}
+.unit .e{font-size:1.7rem}
+.unit .t{font-family:var(--display);font-size:1rem;line-height:1.15}
+.unit .u{font-size:.75rem;color:var(--muted)}
+.unit.on{background:var(--c);color:#fff;transform:translateY(-2px)}
+.unit.on .u{color:rgba(255,255,255,.85)}
+.sectionTitle{font-size:1rem;color:var(--muted);margin:14px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
 .map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
 .island:hover{transform:translateY(-3px)}
@@ -62,7 +55,7 @@ h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
 .island .stars .off{color:#e4ddff}
 .island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#e4ddff)}
 .island.test .em{font-size:3rem}
-
+.island.test.book{background:linear-gradient(90deg,#ffe1d6,#fff6c4)}
 .panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
@@ -78,19 +71,17 @@ body.ar .ar-hint{display:block}
 .speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
 .speak:active{transform:translateY(2px);box-shadow:none}
 .speak.turtle{background:var(--leaf)}
-
-.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
-.q .blank{display:inline-block;min-width:3.2em;border-bottom:4px solid var(--grape);color:var(--grape);padding:0 6px}
+.q{font-family:var(--display);font-size:clamp(1.25rem,4vw,1.7rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.q .blank{display:inline-block;min-width:3em;border-bottom:4px solid var(--grape);color:var(--grape);padding:0 6px}
 .qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
 body.ar .qar{display:block}
 .scene{font-size:clamp(2.6rem,9vw,4rem);text-align:center;line-height:1.2;margin:8px 0;letter-spacing:.08em}
-.scene.small{font-size:clamp(2rem,7vw,3rem)}
+.scene.small{font-size:clamp(1.8rem,6vw,2.6rem)}
 .arrow{color:var(--muted);font-size:.6em;vertical-align:middle}
-
 .tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:120px}
 .tile .e{font-size:2.4rem;line-height:1}
 .tile .e:empty{display:none}
-.tile .w{font-size:1.1rem}
+.tile .w{font-size:1.1rem;text-align:center}
 .tile .wa{font-size:.9rem;color:var(--grape);direction:rtl;display:none}
 body.ar .tile .wa{display:block}
 .tile:hover{transform:translateY(-2px)}
@@ -99,6 +90,8 @@ body.ar .tile .wa{display:block}
 .tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
 .tile.used{opacity:.35;pointer-events:none;transform:none}
 .tile.word{min-width:0;padding:10px 16px;font-size:1.35rem;min-height:54px}
+.tile.tfb{min-width:140px;font-size:1.4rem}
+.tile.tfb.t{border-color:#bfe8c8}.tile.tfb.f{border-color:#f5c6c6}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
@@ -109,17 +102,23 @@ body.ar .tile .wa{display:block}
 .nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
 .nextbtn:active{transform:translateY(3px);box-shadow:none}
 .nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.buckets{display:grid;grid-template-columns:repeat(var(--n,2),1fr);gap:10px;margin-top:14px}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent}
+.bucket:hover{border-color:var(--sky)}
+.bucket.bad{animation:shake .4s;border-color:var(--bad)}
+.bucket .h{font-family:var(--display);font-size:1.1rem}
+.bucket .e{font-size:2rem}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:999px;padding:2px 8px;font-size:1rem}
 .counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
 .slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:14px 0}
-.slot{width:78px;height:78px;border-radius:18px;background:var(--bg2);border-bottom:5px solid #c9bdfb;display:grid;place-items:center;font-size:2.4rem;position:relative}
+.slot{width:78px;height:78px;border-radius:18px;background:var(--bg2);border-bottom:5px solid #c9bdfb;display:grid;place-items:center;font-size:2.2rem;position:relative}
 .slot.fill{background:#e6f8ea;border-bottom-color:var(--ok);animation:pop .3s}
 .slot .n{position:absolute;top:-10px;left:-6px;background:var(--grape);color:#fff;font-size:.8rem;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--display)}
 @keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
-/* sentence builder */
 .sentence{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:64px;background:var(--bg2);border-radius:18px;padding:12px;margin:12px 0;font-family:var(--display);font-size:1.5rem}
 .sentence .wslot{min-width:70px;height:46px;border-bottom:4px dashed #c9bdfb;border-radius:6px}
 .sentence .wdone{background:#e6f8ea;color:#1f7a2f;border-radius:12px;padding:4px 12px;animation:pop .3s}
-/* story strip */
 .story{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
 .step{background:var(--bg2);border-radius:18px;padding:12px 10px;text-align:center;cursor:pointer;transition:transform .1s;border:3px solid transparent}
 .step:active{transform:scale(.97)}
@@ -129,10 +128,16 @@ body.ar .tile .wa{display:block}
 .step .s{font-size:.9rem;color:var(--muted)}
 .step .a{font-size:.85rem;color:var(--grape);direction:rtl;display:none}
 body.ar .step .a{display:block}
+.text{background:#fff6c4;border-radius:18px;padding:14px 16px;font-size:1.15rem;line-height:1.6;margin:10px 0}
+.text b{color:var(--night)}
+.text .ar{direction:rtl;color:var(--grape);display:none;margin-top:8px;font-size:1.05rem}
+body.ar .text .ar{display:block}
+.stmt{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;background:var(--bg2);border-radius:18px;padding:16px;margin:10px 0}
+.stmt .ar{direction:rtl;color:var(--grape);font-size:1.1rem;display:none;margin-top:6px}
+body.ar .stmt .ar{display:block}
 .fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
 .fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
 body.ar .fact .ar{display:block}
-
 .result{text-align:center;padding:10px}
 .result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
 .result .bigstars .off{color:#e4ddff}
@@ -146,21 +151,19 @@ body.ar .fact .ar{display:block}
 table{width:100%;border-collapse:collapse;font-size:.9rem}
 td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #d6cdf5}
 th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
-
 #mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
 #mascot.happy{animation:jump .6s}
 @keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
 #toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%)}
 #confetti{position:fixed;inset:0;pointer-events:none}
-.hidden{display:none !important}
 </style>
 </head>
 <body>
 <canvas id="confetti"></canvas>
 <div id="app">
   <header>
-    <div class="brand"><span class="m">🦉</span> Mira's Day &amp; School</div>
+    <div class="brand"><span class="m">🦉</span> Mira's World Around Me</div>
     <div class="tools">
       <button class="chip" id="voiceBtn">🔊 Voice</button>
       <button class="chip" id="arBtn">عربي</button>
@@ -173,144 +176,389 @@ th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;l
 <div id="toast"></div>
 
 <script>
-// ============ CONTENT: Social "The World Around Me" · Unit 2 My Daily Life · Lesson 2 My Evening Routine (p.32–34) + Lesson 3 What I Do in School (p.35–37) ============
-
-const AR = { // Arabic labels (shown only when عربي is on)
-  'First':'أولاً','Next':'بعد ذلك','After that':'بعد ذلك','Then':'ثم','Later':'لاحقاً','Finally':'أخيراً',
-  'Go home':'يذهب إلى البيت','Eat lunch':'يأكل الغداء','Do homework':'يعمل الواجب','Eat dinner':'يأكل العشاء','Put on pyjama':'يلبس البيجاما','Go to bed':'يذهب إلى السرير',
-  'Make new friends':'يكوّن أصدقاء جدداً','Read and write':'يقرأ ويكتب','Count':'يعدّ','Ask questions':'يسأل أسئلة','Draw and color':'يرسم ويلوّن','Do sports':'يمارس الرياضة',
-  'Sleep all day':'ينام طوال اليوم','Drive a car':'يقود سيارة','Cook dinner':'يطبخ العشاء','Watch TV':'يشاهد التلفاز',
-  'Ali':'علي','Mariam':'مريم','Ahmed':'أحمد','Fatima':'فاطمة',
-  'Write':'يكتب','Color':'يلوّن','Sports':'الرياضة','Draw':'يرسم',
-  'Asking a question':'يسأل سؤالاً','Counting':'تعدّ','Making new friends':'يكوّن أصدقاء','Reading':'تقرأ','Sleeping':'ينام','Eating':'يأكل',
-  'lunch':'غداء','bed':'سرير','then':'ثم','home':'بيت','she':'هي','friends':'أصدقاء','that':'ذلك','school':'مدرسة','fish':'سمكة','teacher':'معلّمة','chair':'كرسي','three':'ثلاثة'
+// ===================== CONTENT · Social Studies "The World Around Me" (Horizon, Grade 1) · all 5 units =====================
+const AR = {
+ // body & senses
+ 'Eye':'عين','Nose':'أنف','Ear':'أذن','Mouth':'فم','Hand':'يد','Foot':'قدم','Knee':'ركبة','Hair':'شعر','Head':'رأس','Leg':'ساق','Neck':'رقبة','Finger':'إصبع',
+ 'head':'رأس','nose':'أنف','mouth':'فم','neck':'رقبة','hair':'شعر','eyes':'عينان','ears':'أذنان','hands':'يدان','legs':'ساقان','feet':'قدمان','knees':'ركبتان','fingers':'أصابع',
+ 'Ears':'أذنان','Eyes':'عينان','Tongue':'لسان','Hands':'يدان','Hear':'يسمع','See':'يرى','Taste':'يتذوق','Touch':'يلمس','Smell':'يشم',
+ 'ears':'أذنيّ','eyes ':'عينيّ','tongue':'لساني','hands ':'يديّ','nose ':'أنفي','arms':'ذراعيّ',
+ // family & home
+ 'Mother':'أم','Father':'أب','Brother':'أخ','Sister':'أخت','Grandmother':'جدة','Grandfather':'جد','Grandparents':'الجدان','Teacher':'معلّمة','Doctor':'طبيب',
+ 'Bedroom':'غرفة النوم','Dining room':'غرفة الطعام','Hall':'المدخل','Living room':'غرفة المعيشة','Bathroom':'الحمّام','Kitchen':'المطبخ',
+ 'Sleep':'ننام','Eat':'نأكل','Keep shoes':'نضع الأحذية','Watch TV':'نشاهد التلفاز','Wash hands':'نغسل الأيدي','Mom cooks':'ماما تطبخ',
+ 'Bed':'سرير','Table':'طاولة','Shoe rack':'رف الأحذية','Sofa':'كنبة','Sink':'مغسلة','Stove':'موقد','House':'بيت','Flat':'شقة',
+ // past & now
+ 'Past':'في الماضي','Now':'الآن','Baby bottle':'رضّاعة','Rattle':'خشخيشة','Bib':'مريلة','Blocks':'مكعبات','Crawling':'يحبو','Rice meal':'وجبة أرز','Bicycle':'دراجة','Skateboard':'لوح تزلج','Game console':'جهاز ألعاب','Jacket':'سترة','Jump rope':'حبل القفز','Teddy':'دبدوب',
+ 'I was born':'وُلدت','Started to crawl':'بدأت أحبو','Started to walk':'بدأت أمشي','Started school':'بدأت المدرسة','In first grade':'في الصف الأول',
+ // routines
+ 'First':'أولاً','Next':'بعد ذلك','After that':'بعد ذلك','Then':'ثم','Later':'لاحقاً','Finally':'أخيراً',
+ 'Wake up':'يستيقظ','Wash face':'يغسل وجهه','Brush teeth':'يفرّش أسنانه','Eat breakfast':'يأكل الفطور','Get dressed':'يلبس ملابسه','Go to school':'يذهب إلى المدرسة',
+ 'Go home':'يذهب إلى البيت','Eat lunch':'يأكل الغداء','Do homework':'يعمل الواجب','Eat dinner':'يأكل العشاء','Put on pyjama':'يلبس البيجاما','Go to bed':'يذهب إلى السرير',
+ // school & feelings & play
+ 'Make new friends':'يكوّن أصدقاء جدداً','Read and write':'يقرأ ويكتب','Count':'يعدّ','Ask questions':'يسأل أسئلة','Draw and color':'يرسم ويلوّن','Do sports':'يمارس الرياضة','Sleep all day':'ينام طوال اليوم','Drive a car':'يقود سيارة',
+ 'Ali':'علي','Mariam':'مريم','Ahmed':'أحمد','Fatima':'فاطمة','Write':'يكتب','Color':'يلوّن','Sports':'الرياضة','Draw':'يرسم',
+ 'Asking a question':'يسأل سؤالاً','Counting':'تعدّ','Making new friends':'يكوّن أصدقاء','Reading':'تقرأ','Sleeping':'ينام','Eating':'يأكل','He':'هو','She':'هي',
+ 'Happy':'سعيد','Sad':'حزين','Angry':'غاضب','Clap and cheer':'نصفّق ونشجّع','Say something nice':'نقول شيئاً لطيفاً','Give a hug':'نعطي حضناً','Invite him to play':'ندعوه للعب','Help him find it':'نساعده في البحث','Laugh at him':'نضحك عليه','Hit and shout':'نضرب ونصرخ','Ask for help':'نطلب المساعدة','Say: Please don\'t push':'نقول: من فضلك لا تدفع','Talk to the teacher':'نكلّم المعلمة','Push back':'ندفعه',
+ 'Drawing':'الرسم','Building blocks':'المكعبات','Origami':'طي الورق','Story writing':'كتابة القصص','Pretend play':'اللعب التخيّلي','Reading books':'قراءة الكتب','Puzzles':'الألغاز','Hula hoop':'الطوق','Watching TV all day':'مشاهدة التلفاز طوال اليوم',
+ // surroundings
+ 'Tree':'شجرة','Car':'سيارة','Flower':'زهرة','Bird':'عصفور','Flowers':'زهور','Dog':'كلب','Cat':'قطة','Buildings':'مباني','Big':'كبير','Small':'صغير',
+ 'Chirping':'زقزقة','Honking':'تزمير','Ringing':'رنين','Crying':'بكاء','Splashing':'رشّ الماء','Birds':'العصافير','Bell':'الجرس','Baby':'الرضيع','Water':'الماء','Loud':'عالٍ','Quiet':'هادئ','Bee':'نحلة','Bus':'حافلة','Mouse':'فأر','Whistle':'صفّارة','Lion':'أسد','Drum':'طبل','Fan':'مروحة',
+ 'Red':'أحمر','Blue':'أزرق','Pink':'وردي','Gray':'رمادي','Orange':'برتقالي','Green':'أخضر','Brown':'بني','Yellow':'أصفر','Purple':'بنفسجي','Black':'أسود','White':'أبيض',
+ 'Circle':'دائرة','Square':'مربع','Triangle':'مثلث','Rectangle':'مستطيل','Diamond':'معيّن','Oval':'بيضاوي','0':'صفر','3':'ثلاثة','4':'أربعة',
+ 'School':'مدرسة','Shop':'متجر','Park':'حديقة','Home':'بيت','Mosque':'مسجد','Bakery':'مخبز','Hospital':'مستشفى','Doctors':'الأطباء','Teachers':'المعلمون','Shopkeepers':'أصحاب المتاجر','Help us when we are sick':'يساعدوننا عندما نمرض','Teach children to read':'يعلّمون الأطفال القراءة','Sell us things we need':'يبيعوننا ما نحتاج','Neighbors':'الجيران',
+ // maps
+ 'Above':'من فوق','Below':'من تحت','Places':'الأماكن','People':'الناس','Real place':'مكان حقيقي','Map':'خريطة','Map key':'مفتاح الخريطة','Compass rose':'وردة البوصلة','Symbol':'رمز','Pictures':'صور','Airport':'مطار','Mall':'مركز تسوّق','Police station':'مركز شرطة',
+ 'North':'شمال','South':'جنوب','East':'شرق','West':'غرب','Elephant':'فيل','Giraffe':'زرافة','Zebra':'حمار وحشي','Bear':'دب',
+ 'Neighborhood':'الحي','City':'مدينة','Country':'دولة','Continent':'قارة','Tripoli':'طرابلس','Libya':'ليبيا','Africa':'أفريقيا','Cities':'مدن','Neighborhoods':'أحياء','Countries':'دول',
+ // travelling
+ 'Land':'البر','Air':'الجو','Walking':'المشي','Train':'قطار','Airplane':'طائرة','Helicopter':'هليكوبتر','Rocket':'صاروخ','Hot air balloon':'منطاد','Sailboat':'مركب شراعي','Motorboat':'قارب بمحرك','Ship':'سفينة','Canoe':'زورق',
+ 'People walked':'الناس مشوا','Used animals':'استخدموا الحيوانات','Animals with the wheel':'الحيوانات مع العجلة','Wheels without animals':'العجلات بدون حيوانات','Motor cars':'سيارات بمحرك',
+ 'Stop at the curb':'قف عند الرصيف','Look left and right':'انظر يميناً ويساراً','Listen for cars':'استمع للسيارات','Hand':'يد','Street':'الشارع','Cross':'اعبر','Sidewalk':'الرصيف','Stop':'تقف','Walk on the sidewalk':'المشي على الرصيف','Play near the street':'اللعب قرب الشارع','Hold a grown-up\'s hand':'إمساك يد شخص كبير','Run across the street':'الجري عبر الشارع','Cross where cars can see you':'العبور حيث تراك السيارات','Play ball in the street':'لعب الكرة في الشارع',
+ 'Seatbelt':'حزام الأمان','Head':'الرأس','Hands':'اليدان','Standing':'الوقوف','Climbing':'التسلّق','12':'12','Wear a seatbelt':'نلبس حزام الأمان','Sit in the back seat':'نجلس في المقعد الخلفي','Stay in your seat':'نبقى في مقعدنا','Fight with your brother':'نتشاجر مع الأخ','Stick your head out':'نُخرج رأسنا من النافذة','Stand on the chair':'نقف على المقعد',
+ 'STOP':'قف','WAIT':'انتظر','GO':'انطلق','Stop and look first':'قف وانظر أولاً','Don\'t enter':'ممنوع الدخول','Go left soon':'اتجه يساراً','No parking':'ممنوع الوقوف','You can park':'يمكنك الوقوف','Hospital here':'مستشفى هنا','A train passes here':'قطار يمر هنا',
+ 'walk':'أمشي','sleep':'أنام','cry':'أبكي','rice':'الأرز','milk only':'الحليب فقط','nothing':'لا شيء','that':'ذلك','home':'بيت','bed':'سرير','she':'هي','school':'مدرسة','chair':'كرسي','lunch':'غداء','three':'ثلاثة','Cars':'سيارات','Pizza slice':'شريحة بيتزا','Egg':'بيضة','TV':'تلفاز','Donut':'كعكة دونات','Window':'نافذة','Kite':'طائرة ورقية','The school from above':'المدرسة من فوق','The school door from the front':'باب المدرسة من الأمام','Homes':'بيوت',"Grandfather's house":'بيت الجد','Bread':'خبز','Go':'انطلق','Honk':'تزمّر','Hat':'قبعة','Shoes':'حذاء','Feet':'قدمان','Sitting':'الجلوس','100':'100','Sitting with a seatbelt':'جالس بحزام الأمان','Hands out of the window':'يداه خارج النافذة','Standing on the seat':'واقف على المقعد','STOP sign':'لافتة قف','Red circle with a line':'دائرة حمراء بخط','Blue P':'حرف P أزرق','Blue H':'حرف H أزرق','P with a red line':'P بخط أحمر','Arrow left':'سهم يساراً','Fish':'سمكة',
+ 'Grandma':'الجدة','Plane':'الطائرة','Clouds':'الغيوم','Hug':'حضن','Toys':'ألعاب','X':'إكس','Seatbelt ':'حزام الأمان'
 };
 
-const Q = (type, obj) => Object.assign({type}, obj);
+const Q=(type,obj)=>Object.assign({type},obj);
+// helpers for compact content
+const pick=(q,ar,scene,opts,extra)=>Q('pick',Object.assign({q,ar,scene,opts},extra||{}));
+const blank=(q,ar,scene,opts,extra)=>Q('pick',Object.assign({q:q.replace('___','<span class="blank">___</span>'),say:q.replace('___','blank')+' Which word goes in the blank?',ar,scene,opts},extra||{}));
+const tf=(q,ar,items,extra)=>Q('tf',Object.assign({q,ar,items},extra||{}));
+const uns=(q,ar,scene,words,extra)=>Q('unscramble',Object.assign({q,ar,scene,words},extra||{}));
+const ord=(q,ar,items,extra)=>Q('order',Object.assign({q,ar,items},extra||{}));
+const mat=(q,ar,pairs,extra)=>Q('match',Object.assign({q,ar,pairs},extra||{}));
+const multi=(q,ar,scene,opts,extra)=>Q('multi',Object.assign({q,ar,scene,opts},extra||{}));
+const sort=(q,ar,buckets,items,extra)=>Q('sort',Object.assign({q,ar,buckets,items},extra||{}));
+const SEQ=['First','Next','After that','Then','Later','Finally'];
+const seqOpts=(right,a,b)=>[['',right,1],['',a,0],['',b,0]];
 
-// Ahmed's evening routine, exactly in the book's order (p.32)
-const ROUTINE = [
-  ['🏠','First','Ahmed goes home.','أولاً، أحمد يذهب إلى البيت.','Go home'],
-  ['🍝','Next','he eats lunch.','بعد ذلك يأكل الغداء.','Eat lunch'],
-  ['📖','After that','he does his homework.','بعد ذلك يعمل واجبه.','Do homework'],
-  ['🍽️','Then','he eats dinner.','ثم يأكل العشاء.','Eat dinner'],
-  ['👘','Later','he puts on his pyjama.','لاحقاً يلبس البيجاما.','Put on pyjama'],
-  ['🛏️','Finally','he goes to bed.','أخيراً يذهب إلى السرير.','Go to bed'],
-];
-const SEQ = ['First','Next','After that','Then','Later','Finally'];
-const seqOpts = (right)=> shuffle(SEQ.filter(w=>w!==right)).slice(0,2).concat([right]).map(w=>['',w,w===right?1:0]);
+const MORNING=[['⏰','First','Ahmed wakes up in the morning.','أولاً، أحمد يستيقظ في الصباح.','Wake up'],['🧼','Next','he washes his face.','بعد ذلك يغسل وجهه.','Wash face'],['🪥','After that','he brushes his teeth.','بعد ذلك يفرّش أسنانه.','Brush teeth'],['🥣','Then','he eats breakfast.','ثم يأكل الفطور.','Eat breakfast'],['👕','Later','he gets dressed.','لاحقاً يلبس ملابسه.','Get dressed'],['🏫','Finally','he goes to school.','أخيراً يذهب إلى المدرسة.','Go to school']];
+const EVENING=[['🏠','First','Ahmed goes home.','أولاً، أحمد يذهب إلى البيت.','Go home'],['🍝','Next','he eats lunch.','بعد ذلك يأكل الغداء.','Eat lunch'],['📖','After that','he does his homework.','بعد ذلك يعمل واجبه.','Do homework'],['🍽️','Then','he eats dinner.','ثم يأكل العشاء.','Eat dinner'],['👘','Later','he puts on his pyjama.','لاحقاً يلبس البيجاما.','Put on pyjama'],['🛏️','Finally','he goes to bed.','أخيراً يذهب إلى السرير.','Go to bed']];
+const TRAVEL_HIST=[['🚶','People walked'],['🐪','Used animals'],['🐴🛒','Animals with the wheel'],['🚲','Wheels without animals'],['🚗','Motor cars']];
 
-const LEVELS = [
- { id:'story', title:"Ahmed's Evening", ar:'مساء أحمد', emoji:'🌙', color:'#5b4bc4', pages:'Book p.32–33', rounds:[
-   Q('story',{ q:"Tap each picture and listen to Ahmed's evening. Then tap Next.", ar:'المسي كل صورة واستمعي إلى مساء أحمد. ثم المسي التالي.' }),
-   Q('order',{ q:'Number the pictures in order. What does Ahmed do first?', ar:'رتّبي الصور. ماذا يفعل أحمد أولاً؟', items:ROUTINE.map(r=>[r[0],r[4]]), fact:'First home 🏠, next lunch 🍝, after that homework 📖, then dinner 🍽️, later pyjama 👘, finally bed 🛏️.', factAr:'أولاً البيت، بعد ذلك الغداء، ثم الواجب، ثم العشاء، لاحقاً البيجاما، أخيراً السرير.' }),
-   Q('pick',{ q:'<span class="blank">___</span>, Ahmed goes home.', say:'Blank, Ahmed goes home. Which word goes in the blank?', ar:'___، أحمد يذهب إلى البيت.', scene:'🏠', opts:()=>seqOpts('First'), fact:'FIRST is for the thing we do at the very start.', factAr:'"أولاً" للشيء الذي نفعله في البداية.' }),
-   Q('pick',{ q:'<span class="blank">___</span> he eats lunch.', say:'Blank, he eats lunch. Which word goes in the blank?', ar:'___ يأكل الغداء.', scene:'🏠 <span class="arrow">➜</span> 🍝', small:true, opts:()=>[['','Next',1],['','First',0],['','Finally',0]] }),
-   Q('pick',{ q:'<span class="blank">___</span> he does his homework.', say:'Blank, he does his homework. Which word goes in the blank?', ar:'___ يعمل واجبه.', scene:'🍝 <span class="arrow">➜</span> 📖', small:true, opts:()=>[['','After that',1],['','First',0],['','Finally',0]] }),
-   Q('pick',{ q:'<span class="blank">___</span> he eats dinner.', say:'Blank, he eats dinner. Which word goes in the blank?', ar:'___ يأكل العشاء.', scene:'📖 <span class="arrow">➜</span> 🍽️', small:true, opts:()=>[['','Then',1],['','First',0],['','Finally',0]] }),
-   Q('pick',{ q:'<span class="blank">___</span> he puts on his pyjama.', say:'Blank, he puts on his pyjama. Which word goes in the blank?', ar:'___ يلبس البيجاما.', scene:'🍽️ <span class="arrow">➜</span> 👘', small:true, opts:()=>[['','Later',1],['','First',0],['','Next',0]] }),
-   Q('pick',{ q:'<span class="blank">___</span> he goes to bed.', say:'Blank, he goes to bed. Which word goes in the blank?', ar:'___ يذهب إلى السرير.', scene:'👘 <span class="arrow">➜</span> 🛏️', small:true, opts:()=>[['','Finally',1],['','First',0],['','Next',0]], fact:'FINALLY is for the very last thing. Good night, Ahmed! 😴', factAr:'"أخيراً" لآخر شيء. تصبح على خير يا أحمد!' }),
+const UNITS=[
+// ===================== UNIT 1 =====================
+{ id:'u1', n:1, title:'All About Me', ar:'كل شيء عني', emoji:'🧒', color:'#ff7a59', pages:'p.6–27', levels:[
+ { id:'body', title:'My Body Parts', ar:'أجزاء جسمي', emoji:'🙋', color:'#ff7a59', pages:'p.6–9', rounds:[
+   blank('This is my ___.','هذه عيني.','👁️',[['','Eye',1],['','Nose',0],['','Ear',0]]),
+   blank('This is my ___.','هذا أنفي.','👃',[['','Nose',1],['','Mouth',0],['','Hand',0]]),
+   blank('This is my ___.','هذه أذني.','👂',[['','Ear',1],['','Eye',0],['','Foot',0]]),
+   blank('This is my ___.','هذا فمي.','👄',[['','Mouth',1],['','Knee',0],['','Hair',0]]),
+   blank('This is my ___.','هذه يدي.','✋',[['','Hand',1],['','Foot',0],['','Head',0]]),
+   blank('This is my ___.','هذه قدمي.','🦶',[['','Foot',1],['','Hand',0],['','Neck',0]]),
+   sort('I have ONE or I have TWO? Tap the right box.','عندي واحد أم اثنان؟ المسي الصندوق الصحيح.',[{n:'I have one',e:'1️⃣',ar:'عندي واحد',v:1},{n:'I have two',e:'2️⃣',ar:'عندي اثنان',v:2}],[['🗣️','head',1],['👃','nose',1],['👄','mouth',1],['👀','eyes',2],['👂👂','ears',2],['🙌','hands',2],['🦵🦵','legs',2],['🦶🦶','feet',2],['💇','hair',1]],{fact:'One head, one nose, one mouth, one neck. Two eyes, two ears, two hands, two legs, two feet, two knees. And TEN fingers!',factAr:'رأس واحد، أنف واحد، فم واحد. عينان، أذنان، يدان، ساقان، قدمان، ركبتان. وعشرة أصابع!'}),
+   tf('True or false? (Book p.9)','صح أم خطأ؟',[['I have two mouths.',0,'عندي فمان.'],['I have one eye.',0,'عندي عين واحدة.'],['I have two feet.',1,'عندي قدمان.'],['I have two heads.',0,'عندي رأسان.'],['I have one hand.',0,'عندي يد واحدة.'],['I have two legs.',1,'عندي ساقان.'],['I have one ear.',0,'عندي أذن واحدة.'],['I have two fingers.',0,'عندي إصبعان.'],['I have two knees.',1,'عندي ركبتان.'],['I have one nose.',1,'عندي أنف واحد.']],{fact:'Spelling trap: one foot, two FEET (not foots)!',factAr:'انتبهي: foot للواحدة، feet للاثنتين!'}),
  ]},
- { id:'build', title:'Build the Sentence', ar:'ركّبي الجملة', emoji:'🧩', color:'#ff7a59', pages:'Book p.33 · Q1', rounds:[
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🏠', words:['First,','Ahmed','goes','home.'] }),
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🍝', words:['Next','he','eats','lunch.'] }),
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'📖', words:['After that','he','does','his','homework.'] }),
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🍽️', words:['Then','he','eats','dinner.'] }),
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'👘', words:['Later','he','puts on','his','pyjama.'] }),
-   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🛏️', words:['Finally','he','goes','to','bed.'], fact:'The sentence always starts with a capital letter and ends with a full stop.', factAr:'الجملة تبدأ بحرف كبير وتنتهي بنقطة.' }),
+ { id:'senses', title:'What Can My Body Do?', ar:'ماذا يستطيع جسمي؟', emoji:'👀', color:'#ffc93c', pages:'p.10–13', rounds:[
+   mat('Match the body part to what it can do.','صِلي جزء الجسم بما يفعله.',[['👂','Ears','🎵','Hear'],['👀','Eyes','🌈','See'],['👅','Tongue','🍎','Taste'],['🙌','Hands','🧸','Touch'],['👃','Nose','🌸','Smell']],{lines:{Ears:'My ears can hear.',Eyes:'My eyes can see.',Tongue:'My tongue can taste.',Hands:'My hands can touch.',Nose:'My nose can smell.'},fact:'You have 5 body parts that help you: ears hear, eyes see, tongue tastes, hands touch, nose smells.',factAr:'خمسة أجزاء تساعدك: الأذنان تسمعان، العينان تريان، اللسان يتذوق، اليدان تلمسان، الأنف يشم.'}),
+   blank('I can hear birds singing with my ___.','أسمع العصافير بأذنيّ.','🐦🎵',[['👂','ears',1],['👀','eyes ',0],['👃','nose ',0]]),
+   blank('I can see the sky with my ___.','أرى السماء بعينيّ.','☁️',[['👀','eyes ',1],['👅','tongue',0],['🙌','hands ',0]]),
+   blank('I can taste food with my ___.','أتذوق الطعام بلساني.','🍎',[['👅','tongue',1],['👂','ears',0],['👃','nose ',0]]),
+   blank('I can touch water with my ___.','ألمس الماء بيديّ.','💧',[['🙌','hands ',1],['👀','eyes ',0],['👂','ears',0]]),
+   blank('I can smell flowers with my ___.','أشم الزهور بأنفي.','🌸',[['👃','nose ',1],['👅','tongue',0],['🙌','hands ',0]]),
+   tf('True or false? (Book p.13)','صح أم خطأ؟',[['I can see with my nose.',0,'أرى بأنفي.'],['I can taste with my tongue.',1,'أتذوق بلساني.'],['I can taste a rainbow with my eyes.',0,'أتذوق قوس قزح بعينيّ.'],['I can hear with my ears.',1,'أسمع بأذنيّ.'],['I can smell yummy food with my nose.',1,'أشم الطعام اللذيذ بأنفي.'],['I can smell a clock with my ears.',0,'أشم الساعة بأذنيّ.'],['I can see the moon with my eyes.',1,'أرى القمر بعينيّ.'],['I can touch a soft kitty with my hands.',1,'ألمس القطة الناعمة بيديّ.']]),
  ]},
- { id:'mine', title:'My Routine', ar:'روتيني', emoji:'👧', color:'#ee4b7e', pages:'Book p.34', rounds:[
-   Q('unscramble',{ q:'Now it is YOU, Mira! Build your routine.', ar:'الآن أنتِ يا ميرا! ركّبي روتينك.', scene:'🏠', words:['First','I','go','home.'], fact:'For Ahmed we say "he goes". For me we say "I go" – no s!', factAr:'لأحمد نقول he goes. لنفسي أقول I go – بدون s!' }),
-   Q('unscramble',{ q:'What do you do next?', ar:'ماذا تفعلين بعد ذلك؟', scene:'🍝', words:['Next','I','eat','my','lunch.'] }),
-   Q('unscramble',{ q:'And after that?', ar:'وبعد ذلك؟', scene:'📖', words:['After that','I','do','my','homework.'] }),
-   Q('unscramble',{ q:'Then?', ar:'ثم؟', scene:'🍽️', words:['Then','I','eat','dinner.'] }),
-   Q('unscramble',{ q:'Later…', ar:'لاحقاً…', scene:'👘', words:['Later','I','put on','my','pyjama.'] }),
-   Q('unscramble',{ q:'And finally?', ar:'وأخيراً؟', scene:'🛏️', words:['Finally','I','go','to','bed.'], fact:'In the book you DRAW your routine in 6 boxes and write the 6 sentences. You can say them all now!', factAr:'في الكتاب ترسمين روتينك في 6 مربعات وتكتبين 6 جمل. تستطيعين قولها كلها الآن!' }),
-   Q('order',{ q:'Put YOUR routine in order.', ar:'رتّبي روتينك.', items:ROUTINE.map(r=>[r[0],r[4]]) }),
+ { id:'family', title:'My Family', ar:'عائلتي', emoji:'👨‍👩‍👧', color:'#ee4b7e', pages:'p.14–16', rounds:[
+   multi('Tap ALL the people in a family.','المسي كل أفراد العائلة.','👨‍👩‍👧‍👦',[['👩','Mother',1],['👨','Father',1],['👦','Brother',1],['👧','Sister',1],['👵','Grandmother',1],['👴','Grandfather',1],['👩‍🏫','Teacher',0],['👨‍⚕️','Doctor',0]],{fact:'Every person in our family gives us something we need.',factAr:'كل فرد في عائلتنا يعطينا شيئاً نحتاجه.'}),
+   pick('Who takes care of us, helps us put on our shoes and cooks yummy food?','من يعتني بنا ويساعدنا في لبس الحذاء ويطبخ لنا؟','👟🍲',[['👩','Mother',1],['👦','Brother',0],['👴','Grandfather',0]]),
+   pick('Who keeps us safe, teaches us new things and buys us what we need?','من يحمينا ويعلّمنا ويشتري لنا ما نحتاج؟','🛡️🛍️',[['👨','Father',1],['👧','Sister',0],['👵','Grandmother',0]]),
+   pick('Who is a great friend, plays with us and makes us laugh?','من هو صديق رائع يلعب معنا ويضحكنا؟','😂⚽',[['👦','Brother',1],['👩','Mother',0],['👴','Grandfather',0]]),
+   pick('Who is helpful and kind and helps take care of us?','من هي اللطيفة التي تساعد في الاعتناء بنا؟','💗',[['👧','Sister',1],['👨','Father',0],['👵','Grandmother',0]]),
+   pick('Who loves to give hugs, kisses and sweets?','من يحب أن يعطي الحضن والقبلات والحلويات؟','🤗🍬',[['👵👴','Grandparents',1],['👦','Brother',0],['👧','Sister',0]]),
+   blank('This is my ___.','هذه أمي.','👩',[['','Mother',1],['','Sister',0],['','Grandmother',0]]),
+   blank('This is my ___.','هذا جدي.','👴',[['','Grandfather',1],['','Father',0],['','Brother',0]]),
  ]},
- { id:'school', title:'At School', ar:'في المدرسة', emoji:'🏫', color:'#ffc93c', pages:'Book p.35–36', rounds:[
-   Q('multi',{ q:'School is a fun place! Tap ALL the things you do in school.', ar:'المدرسة مكان ممتع! المسي كل الأشياء التي تفعلينها في المدرسة.', opts:[['🤝','Make new friends',1],['📖','Read and write',1],['🧮','Count',1],['🙋','Ask questions',1],['🎨','Draw and color',1],['⚽','Do sports',1],['😴','Sleep all day',0],['🚗','Drive a car',0]], fact:'In school you make new friends, learn to read and write, learn to count, ask questions, draw and color, and do sports.', factAr:'في المدرسة تكوّنين أصدقاء، تتعلمين القراءة والكتابة والعدّ، تسألين، ترسمين وتلوّنين، وتمارسين الرياضة.' }),
-   Q('pick',{ q:'The boy has an abacus with beads. What is he learning?', ar:'الولد معه معداد. ماذا يتعلم؟', scene:'🧮', opts:[['','Count',1],['','Do sports',0],['','Draw and color',0]], fact:'You learn to count: one, two, three…', factAr:'تتعلمين العدّ: واحد، اثنان، ثلاثة…' }),
-   Q('pick',{ q:'The boy has a pencil and an open book. What is he learning?', ar:'الولد معه قلم وكتاب مفتوح. ماذا يتعلم؟', scene:'✏️📖', opts:[['','Read and write',1],['','Count',0],['','Do sports',0]] }),
-   Q('pick',{ q:'Three children are holding hands and smiling. What are they doing?', ar:'ثلاثة أطفال يمسكون الأيدي ويبتسمون. ماذا يفعلون؟', scene:'🧒🤝🧒', opts:[['','Make new friends',1],['','Count',0],['','Ask questions',0]] }),
-   Q('pick',{ q:'He is thinking: "Hmm…?" and his hand is on his chin. What is he doing?', ar:'يفكر: "همم…؟" ويده على ذقنه. ماذا يفعل؟', scene:'🤔❓', opts:[['','Ask questions',1],['','Do sports',0],['','Eat lunch',0]], fact:'Asking questions is how we learn new things!', factAr:'طرح الأسئلة هو طريقة تعلّم الأشياء الجديدة!' }),
-   Q('pick',{ q:'She has a brush, paints and paper. What is she doing?', ar:'معها فرشاة وألوان وورقة. ماذا تفعل؟', scene:'🎨🖌️', opts:[['','Draw and color',1],['','Read and write',0],['','Make new friends',0]] }),
-   Q('pick',{ q:'He is kicking a ball on the grass. What is he doing?', ar:'يركل الكرة على العشب. ماذا يفعل؟', scene:'⚽🏃', opts:[['','Do sports',1],['','Count',0],['','Ask questions',0]] }),
+ { id:'home', title:'My Home', ar:'بيتي', emoji:'🏠', color:'#4cbb5c', pages:'p.17–21', rounds:[
+   mat('Match the room to what we do there.','صِلي الغرفة بما نفعله فيها.',[['🛏️','Bedroom','😴','Sleep'],['🍽️','Dining room','🍛','Eat'],['🚪','Hall','👟','Keep shoes'],['🛋️','Living room','📺','Watch TV'],['🚿','Bathroom','🧼','Wash hands'],['🍳','Kitchen','👩‍🍳','Mom cooks']],{lines:{Bedroom:'Bedroom.','Dining room':'Dining room.',Hall:'Hall.','Living room':'Living room.',Bathroom:'Bathroom.',Kitchen:'Kitchen.'},fact:'Where you live is your home. Home is where you and your family live together.',factAr:'حيث تعيشين هو بيتك. البيت حيث تعيشين أنت وعائلتك معاً.'}),
+   blank('I sleep in the ___.','أنام في غرفة النوم.','😴',[['🛏️','Bedroom',1],['🍳','Kitchen',0],['🚪','Hall',0]]),
+   blank('I eat dinner in the ___.','آكل العشاء في غرفة الطعام.','🍽️',[['🍽️','Dining room',1],['🚿','Bathroom',0],['🛏️','Bedroom',0]]),
+   blank('I wash my hands in the ___.','أغسل يديّ في الحمّام.','🧼',[['🚿','Bathroom',1],['🛋️','Living room',0],['🚪','Hall',0]]),
+   blank('I watch TV in the ___.','أشاهد التلفاز في غرفة المعيشة.','📺',[['🛋️','Living room',1],['🍳','Kitchen',0],['🚿','Bathroom',0]]),
+   blank('Mom cooks food in the ___.','ماما تطبخ في المطبخ.','👩‍🍳',[['🍳','Kitchen',1],['🛏️','Bedroom',0],['🍽️','Dining room',0]]),
+   blank('I keep my shoes in the ___.','أضع حذائي في المدخل.','👟',[['🚪','Hall',1],['🍳','Kitchen',0],['🛋️','Living room',0]]),
+   tf('Where are the things? True or false? (Book p.21)','أين الأشياء؟ صح أم خطأ؟',[['The sink is in the bathroom.',1,'المغسلة في الحمّام.'],['The TV is in the dining room.',0,'التلفاز في غرفة الطعام.'],['The shoe rack is in the hall.',1,'رف الأحذية في المدخل.'],['The sofa is in the bedroom.',0,'الكنبة في غرفة النوم.'],['The bed is in the bathroom.',0,'السرير في الحمّام.'],['The table is in the dining room.',1,'الطاولة في غرفة الطعام.'],['The stove is in the hall.',0,'الموقد في المدخل.'],['The bed is in the bedroom.',1,'السرير في غرفة النوم.']]),
  ]},
- { id:'friends', title:'Who Loves What?', ar:'من يحب ماذا؟', emoji:'💛', color:'#4cbb5c', pages:'Book p.37 · Q1', rounds:[
-   Q('match',{ q:'Read and match. Tap the child, then tap what they love.', ar:'اقرئي وصِلي. المسي الطفل ثم المسي ما يحبه.', pairs:[['👦','Ali','✍️','Write'],['👧','Mariam','🖍️','Color'],['🧒','Ahmed','⚽','Sports'],['👧🏽','Fatima','🎨','Draw']], lines:{Ali:'I’m Ali, I love to write.',Mariam:'I’m Mariam, I love to color.',Ahmed:'I’m Ahmed, I love sports.',Fatima:'I’m Fatima, I love to draw.'}, fact:'Ali loves to write ✍️ · Mariam loves to color 🖍️ · Ahmed loves sports ⚽ · Fatima loves to draw 🎨', factAr:'علي يحب الكتابة · مريم تحب التلوين · أحمد يحب الرياضة · فاطمة تحب الرسم' }),
-   Q('pick',{ q:'"I’m Ali, I love to…"', say:'I am Ali, I love to… what?', ar:'"أنا علي، أحب أن…"', scene:'👦✍️', opts:[['','Write',1],['','Color',0],['','Draw',0]] }),
-   Q('pick',{ q:'"I’m Mariam, I love to…"', say:'I am Mariam, I love to… what?', ar:'"أنا مريم، أحب أن…"', scene:'👧🖍️', opts:[['','Color',1],['','Write',0],['','Sports',0]] }),
-   Q('pick',{ q:'"I’m Ahmed, I love…"', say:'I am Ahmed, I love… what?', ar:'"أنا أحمد، أحب…"', scene:'🧒⚽', opts:[['','Sports',1],['','Draw',0],['','Color',0]] }),
-   Q('pick',{ q:'"I’m Fatima, I love to…"', say:'I am Fatima, I love to… what?', ar:'"أنا فاطمة، أحب أن…"', scene:'👧🏽🎨', opts:[['','Draw',1],['','Write',0],['','Sports',0]] }),
-   Q('pick',{ q:'And YOU, Mira? What do you love to do in school?', say:'And you, Mira? What do you love to do in school? Tap your favourite!', ar:'وأنتِ يا ميرا؟ ماذا تحبين أن تفعلي في المدرسة؟', scene:'👧💛', opts:[['✍️','Write',1],['🖍️','Color',1],['⚽','Sports',1],['🎨','Draw',1]], any:true, fact:'Say it: "I’m Mira, I love to …!"', factAr:'قوليها: "أنا ميرا، أحب أن …!"' }),
+ { id:'past', title:'Past and Now', ar:'الماضي والآن', emoji:'👶', color:'#9b6cff', pages:'p.22–25', rounds:[
+   sort('In the PAST (when you were a baby) or NOW (you are big)?','في الماضي (رضيعة) أم الآن (كبيرة)؟',[{n:'Past',e:'👶',ar:'في الماضي',v:0},{n:'Now',e:'🧒',ar:'الآن',v:1}],[['🍼','Baby bottle',0],['🍛','Rice meal',1],['🪇','Rattle',0],['🚲','Bicycle',1],['🧸','Teddy',0],['🛹','Skateboard',1],['🧱','Blocks',0],['🎮','Game console',1],['🧥','Jacket',1],['🤸','Jump rope',1]],{fact:'In the past you were a baby. Now you are big! You look different, eat different food, wear different clothes and play with different toys.',factAr:'في الماضي كنتِ رضيعة. الآن أنتِ كبيرة! شكلك وطعامك وملابسك وألعابك تغيّرت.'}),
+   ord('Read the timeline. Put it in order from the past to now.','رتّبي الخط الزمني من الماضي إلى الآن.',[['👶','I was born'],['🐛','Started to crawl'],['🚶','Started to walk'],['🎒','Started school'],['🧒','In first grade']],{fact:'I was born → I started to crawl → I started to walk → I started school → now I am in first grade!',factAr:'وُلدت ← بدأت أحبو ← بدأت أمشي ← بدأت المدرسة ← الآن في الصف الأول!'}),
+   blank('In the past I crawled. Now I ___.','في الماضي كنت أحبو. الآن أمشي.','🐛 <span class="arrow">➜</span> 🚶',[['','walk',1],['','sleep',0],['','cry',0]],{small:true}),
+   blank('In the past I ate baby food. Now I eat ___.','في الماضي أكلت طعام الأطفال. الآن آكل الأرز.','🍼 <span class="arrow">➜</span> 🍛',[['','rice',1],['','milk only',0],['','nothing',0]],{small:true}),
+   tf('True or false?','صح أم خطأ؟',[['In the past I was a baby.',1,'في الماضي كنت رضيعة.'],['Now I am big.',1,'الآن أنا كبيرة.'],['In the past I ran. Now I crawl.',0,'في الماضي كنت أجري والآن أحبو.'],['Babies play with a rattle.',1,'الرضّع يلعبون بالخشخيشة.'],['Babies ride a bicycle.',0,'الرضّع يركبون الدراجة.'],['We can show how we changed with a timeline.',1,'نُظهر كيف تغيّرنا بخط زمني.']]),
  ]},
- { id:'doing', title:'What Is He Doing?', ar:'ماذا يفعل؟', emoji:'🙋', color:'#3fb0ff', pages:'Book p.37 · Q2', rounds:[
-   Q('unscramble',{ q:'What is he doing? Build the answer.', ar:'ماذا يفعل؟ ركّبي الإجابة.', scene:'🤔❓', words:['He','is','asking','a','question.'] }),
-   Q('unscramble',{ q:'What is she doing? Build the answer.', ar:'ماذا تفعل؟ ركّبي الإجابة.', scene:'👧🧮', words:['She','is','counting.'] }),
-   Q('unscramble',{ q:'What is he doing? Build the answer.', ar:'ماذا يفعل؟ ركّبي الإجابة.', scene:'🧒🤝🧒', words:['He','is','making','new','friends.'] }),
-   Q('unscramble',{ q:'What is she doing? Build the answer.', ar:'ماذا تفعل؟ ركّبي الإجابة.', scene:'👧📖', words:['She','is','reading.'], fact:'"He" is for a boy. "She" is for a girl. Then "is" + the doing word with -ing!', factAr:'He للولد. She للبنت. ثم is + الفعل مع ing!' }),
-   Q('pick',{ q:'He is looking at an open book and reading the words. What is he doing?', ar:'ينظر إلى كتاب مفتوح ويقرأ الكلمات. ماذا يفعل؟', scene:'👦📖', opts:[['','Reading',1],['','Counting',0],['','Sleeping',0]] }),
-   Q('pick',{ q:'She is saying "one, two, three" on her fingers. What is she doing?', ar:'تقول "واحد، اثنان، ثلاثة" على أصابعها. ماذا تفعل؟', scene:'👧✋', opts:[['','Counting',1],['','Reading',0],['','Eating',0]] }),
-   Q('pick',{ q:'Is it HE or SHE? 👧', say:'Look at the girl. Is it he or she?', ar:'هل هي He أم She؟ (بنت)', scene:'👧', opts:[['','She',1],['','He',0]], fact:'A girl is SHE. A boy is HE.', factAr:'البنت She. الولد He.' }),
-   Q('pick',{ q:'Is it HE or SHE? 👦', say:'Look at the boy. Is it he or she?', ar:'هل هو He أم She؟ (ولد)', scene:'👦', opts:[['','He',1],['','She',0]] }),
+ { id:'story1', title:'Story: My Amazing Body', ar:'قصة: جسمي المدهش', emoji:'📖', color:'#3fb0ff', pages:'p.26', rounds:[
+   Q('story',{q:'Listen to the story, then answer.',ar:'استمعي للقصة ثم أجيبي.',text:'Fatima woke up and stretched her arms. "What can my body do today?" she wondered. She touched her soft blanket with her <b>hands</b>, heard birds sing with her <b>ears</b>, and smelled breakfast with her <b>nose</b>. At school, she saw colorful toys with her <b>eyes</b> and for lunch she tasted sweet fruit with her <b>tongue</b>. "My body is amazing!" Fatima laughed. That night, she hugged her mom with her <b>arms</b> and walked to bed with her <b>legs</b>.',textAr:'استيقظت فاطمة ومدّت ذراعيها. لمست بطانيتها الناعمة بيديها، وسمعت العصافير بأذنيها، وشمّت الفطور بأنفها. في المدرسة رأت الألعاب الملوّنة بعينيها، وتذوّقت الفاكهة الحلوة بلسانها. "جسمي مدهش!" ضحكت فاطمة. في الليل عانقت أمها بذراعيها ومشت إلى السرير بساقيها.'}),
+   blank('Fatima touched her soft blanket with her ___.','لمست فاطمة بطانيتها بيديها.','🧣',[['🙌','hands ',1],['👂','ears',0],['👃','nose ',0]]),
+   blank('She heard birds sing with her ___.','سمعت العصافير بأذنيها.','🐦',[['👂','ears',1],['👀','eyes ',0],['👅','tongue',0]]),
+   blank('She smelled breakfast with her ___.','شمّت الفطور بأنفها.','🥞',[['👃','nose ',1],['🙌','hands ',0],['👂','ears',0]]),
+   blank('She saw colorful toys with her ___.','رأت الألعاب بعينيها.','🧸',[['👀','eyes ',1],['👅','tongue',0],['👃','nose ',0]]),
+   blank('She tasted sweet fruit with her ___.','تذوّقت الفاكهة بلسانها.','🍓',[['👅','tongue',1],['👂','ears',0],['🙌','hands ',0]]),
+   blank('She hugged her mom with her ___.','عانقت أمها بذراعيها.','🤗',[['💪','arms',1],['🦵','legs',0],['👃','nose ',0]]),
+ ]},
+]},
+// ===================== UNIT 2 =====================
+{ id:'u2', n:2, title:'My Daily Life', ar:'حياتي اليومية', emoji:'🌙', color:'#5b4bc4', pages:'p.28–51', levels:[
+ { id:'morning', title:"Ahmed's Morning", ar:'صباح أحمد', emoji:'🌅', color:'#ffc93c', pages:'p.28–31', rounds:[
+   Q('story',{q:"Tap each picture and listen to Ahmed's morning routine.",ar:'المسي كل صورة واستمعي إلى روتين أحمد الصباحي.',steps:MORNING,intro:"Routine is when you do the same thing over and over again. Let's read about Ahmed's morning routine. Do you do the same things?"}),
+   ord('Number the pictures in order. What does Ahmed do first in the morning?','رتّبي الصور. ماذا يفعل أحمد أولاً في الصباح؟',MORNING.map(r=>[r[0],r[4]]),{seq:true}),
+   blank('___, Ahmed wakes up in the morning.','أولاً، أحمد يستيقظ.','⏰',seqOpts('First','Then','Finally')),
+   blank('___ he washes his face.','بعد ذلك يغسل وجهه.','⏰ <span class="arrow">➜</span> 🧼',seqOpts('Next','First','Finally'),{small:true}),
+   blank('___ he goes to school.','أخيراً يذهب إلى المدرسة.','👕 <span class="arrow">➜</span> 🏫',seqOpts('Finally','First','Next'),{small:true}),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','⏰',['First,','Ahmed','wakes up','in the','morning.']),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','🪥',['After that','he','brushes','his','teeth.']),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','👕',['Later','he','gets','dressed.']),
+   uns('Now YOU, Mira! Build your morning.','الآن أنتِ يا ميرا! ركّبي صباحك.','⏰',['First','I','wake','up.'],{fact:'For Ahmed: "he wakes". For me: "I wake" – no s!',factAr:'لأحمد: he wakes. لنفسي: I wake – بدون s!'}),
+   uns('And then?','وبعد ذلك؟','🥣',['Then','I','eat','breakfast.']),
+ ]},
+ { id:'evening', title:"Ahmed's Evening", ar:'مساء أحمد', emoji:'🌙', color:'#5b4bc4', pages:'p.32–34', rounds:[
+   Q('story',{q:"Tap each picture and listen to Ahmed's evening.",ar:'المسي كل صورة واستمعي إلى مساء أحمد.',steps:EVENING,intro:"After school, Ahmed goes back home. Let's read about his evening routine. Do you do the same things too?"}),
+   ord('Number the pictures in order. What does Ahmed do first after school?','رتّبي الصور. ماذا يفعل أحمد أولاً بعد المدرسة؟',EVENING.map(r=>[r[0],r[4]]),{seq:true,fact:'First home, next lunch, after that homework, then dinner, later pyjama, finally bed.',factAr:'أولاً البيت، بعد ذلك الغداء، ثم الواجب، ثم العشاء، لاحقاً البيجاما، أخيراً السرير.'}),
+   blank('___, Ahmed goes home.','أولاً، أحمد يذهب إلى البيت.','🏠',seqOpts('First','Later','Finally')),
+   blank('___ he does his homework.','بعد ذلك يعمل واجبه.','🍝 <span class="arrow">➜</span> 📖',seqOpts('After that','First','Finally'),{small:true}),
+   blank('___ he puts on his pyjama.','لاحقاً يلبس البيجاما.','🍽️ <span class="arrow">➜</span> 👘',seqOpts('Later','First','Next'),{small:true}),
+   blank('___ he goes to bed.','أخيراً يذهب إلى السرير.','👘 <span class="arrow">➜</span> 🛏️',seqOpts('Finally','First','Next'),{small:true}),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','🏠',['First,','Ahmed','goes','home.']),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','🍽️',['Then','he','eats','dinner.']),
+   uns('Tap the words in the right order.','المسي الكلمات بالترتيب الصحيح.','🛏️',['Finally','he','goes','to','bed.'],{fact:'A sentence starts with a capital letter and ends with a full stop.',factAr:'الجملة تبدأ بحرف كبير وتنتهي بنقطة.'}),
+   uns('Now YOU, Mira! Build your evening.','الآن أنتِ! ركّبي مساءك.','📖',['After that','I','do','my','homework.']),
+   uns('And finally?','وأخيراً؟','🛏️',['Finally','I','go','to','bed.']),
+ ]},
+ { id:'school', title:'What I Do in School', ar:'ماذا أفعل في المدرسة', emoji:'🏫', color:'#ffc93c', pages:'p.35–38', rounds:[
+   multi('School is a fun place! Tap ALL the things you do in school.','المدرسة مكان ممتع! المسي كل ما تفعلينه في المدرسة.','',[['🤝','Make new friends',1],['📖','Read and write',1],['🧮','Count',1],['🙋','Ask questions',1],['🎨','Draw and color',1],['⚽','Do sports',1],['😴','Sleep all day',0],['🚗','Drive a car',0]],{fact:'In school you make new friends, learn to read and write, learn to count, ask questions, draw and color, and do sports.',factAr:'في المدرسة تكوّنين أصدقاء، تتعلمين القراءة والكتابة والعدّ، تسألين، ترسمين وتلوّنين، وتمارسين الرياضة.'}),
+   pick('The boy has an abacus with beads. What is he learning?','الولد معه معداد. ماذا يتعلم؟','🧮',[['','Count',1],['','Do sports',0],['','Draw and color',0]]),
+   pick('He is thinking "Hmm…?" with his hand on his chin. What is he doing?','يفكر ويده على ذقنه. ماذا يفعل؟','🤔❓',[['','Ask questions',1],['','Do sports',0],['','Count',0]]),
+   pick('He is kicking a ball on the grass. What is he doing?','يركل الكرة على العشب. ماذا يفعل؟','⚽🏃',[['','Do sports',1],['','Count',0],['','Read and write',0]]),
+   mat('Read and match. Tap the child, then what they love.','اقرئي وصِلي. المسي الطفل ثم ما يحبه.',[['👦','Ali','✍️','Write'],['👧','Mariam','🖍️','Color'],['🧒','Ahmed','⚽','Sports'],['👧🏽','Fatima','🎨','Draw']],{lines:{Ali:'I’m Ali, I love to write.',Mariam:'I’m Mariam, I love to color.',Ahmed:'I’m Ahmed, I love sports.',Fatima:'I’m Fatima, I love to draw.'}}),
+   uns('What is he doing? Build the answer.','ماذا يفعل؟ ركّبي الإجابة.','🤔❓',['He','is','asking','a','question.']),
+   uns('What is she doing? Build the answer.','ماذا تفعل؟ ركّبي الإجابة.','👧🧮',['She','is','counting.']),
+   uns('What is he doing? Build the answer.','ماذا يفعل؟','🧒🤝🧒',['He','is','making','new','friends.']),
+   uns('What is she doing? Build the answer.','ماذا تفعل؟','👧📖',['She','is','reading.'],{fact:'"He" is for a boy. "She" is for a girl. Then "is" + the doing word with -ing!',factAr:'He للولد. She للبنت. ثم is + الفعل مع ing!'}),
+   uns('Things I do in school (p.38).','أشياء أفعلها في المدرسة.','🤝',['I','make','friends.']),
+   uns('Things I do in school (p.38).','أشياء أفعلها في المدرسة.','🙋',['I','ask','questions.']),
+ ]},
+ { id:'feelings', title:'Feelings', ar:'المشاعر', emoji:'😊', color:'#ee4b7e', pages:'p.39–43', rounds:[
+   pick('He scored a goal in soccer! How does he feel?','سجّل هدفاً! كيف يشعر؟','⚽🥅🎉',[['😊','Happy',1],['😢','Sad',0],['😠','Angry',0]],{fact:'When you are happy, you feel warm inside and smile.',factAr:'عندما تكونين سعيدة تشعرين بالدفء وتبتسمين.'}),
+   pick('He got a bad mark and no one wants to play with him. How does he feel?','حصل على علامة سيئة ولا أحد يلعب معه. كيف يشعر؟','📝❌',[['😢','Sad',1],['😊','Happy',0],['😠','Angry',0]],{fact:'When you are sad, you need a hug or a friend to talk to.',factAr:'عندما تكونين حزينة تحتاجين حضناً أو صديقاً تتكلمين معه.'}),
+   pick('Someone pushed him in line. His body says "this is not fair!" How does he feel?','دفعه أحدهم في الطابور. كيف يشعر؟','😤',[['😠','Angry',1],['😊','Happy',0],['😢','Sad',0]]),
+   multi("It's your friend's birthday! What can you do? Tap the good things.",'عيد ميلاد صديقك! ماذا تفعلين؟','🎂🎈',[['👏','Clap and cheer',1],['💬','Say something nice',1],['🤗','Give a hug',1],['😂','Laugh at him',0]]),
+   multi('Your friend is sad – he lost his favorite pencil. What can you do?','صديقك حزين – ضاع قلمه. ماذا تفعلين؟','😢✏️',[['🔍','Help him find it',1],['💬','Say something nice',1],['🙋','Invite him to play',1],['😂','Laugh at him',0]]),
+   pick('Someone pushed you in line. What should you say?','دفعك أحدهم في الطابور. ماذا تقولين؟','😠',[['💬','Say: Please don\'t push',1],['👊','Push back',0],['📢','Hit and shout',0]],{fact:'Use words, not hands. Say: "Please don\'t push, I was here first."',factAr:'استخدمي الكلمات لا اليدين. قولي: "من فضلك لا تدفع، كنت هنا أولاً."'}),
+   pick("You can't do the math problem. What can you do?",'لا تستطيعين حل مسألة الرياضيات. ماذا تفعلين؟','🧮❓',[['🙋','Ask for help',1],['😠','Hit and shout',0],['😴','Sleep all day',0]],{fact:'Say: "I\'m stuck, can you show me how?"',factAr:'قولي: "أنا محتارة، هل تريني كيف؟"'}),
+   tf('True or false? (Book p.43)','صح أم خطأ؟',[['We are happy when someone else is happy.',1,'نفرح عندما يفرح غيرنا.'],['When we are angry, we hit and shout.',0,'عندما نغضب نضرب ونصرخ.'],["When we don't know something we ask for help.",1,'عندما لا نعرف شيئاً نطلب المساعدة.'],['When someone is lonely we talk to them.',1,'عندما يكون أحد وحيداً نكلّمه.'],['When someone is sad we laugh.',0,'عندما يحزن أحد نضحك.']]),
+ ]},
+ { id:'play', title:'Fun and Playtime', ar:'المرح واللعب', emoji:'🎨', color:'#4cbb5c', pages:'p.44–48', rounds:[
+   multi('You are bored! Tap the fun things you can do by yourself.','تشعرين بالملل! المسي الأشياء الممتعة التي تفعلينها وحدك.','🙂',[['🎨','Drawing',1],['🧱','Building blocks',1],['📄','Origami',1],['📝','Story writing',1],['🧸','Pretend play',1],['📚','Reading books',1],['🧩','Puzzles',1],['🤸','Jump rope',1],['📺','Watching TV all day',0]],{fact:'Reading a book is like watching TV inside your head!',factAr:'قراءة الكتاب مثل مشاهدة التلفاز داخل رأسك!'}),
+   pick('She is holding a rope and jumping. What is she doing?','تمسك حبلاً وتقفز. ماذا تفعل؟','🤸',[['','Jump rope',1],['','Reading books',0],['','Origami',0]]),
+   pick('He is folding colored paper into a puppy. What is he doing?','يطوي ورقة ملوّنة. ماذا يفعل؟','📄🐶',[['','Origami',1],['','Puzzles',0],['','Jump rope',0]]),
+   pick('She has glasses and a book in her hands. What is she doing?','معها كتاب. ماذا تفعل؟','👓📚',[['','Reading books',1],['','Building blocks',0],['','Drawing',0]]),
+   pick('He is putting little pieces together to make a picture. What is he doing?','يركّب قطعاً صغيرة. ماذا يفعل؟','🧩',[['','Puzzles',1],['','Story writing',0],['','Pretend play',0]]),
+   Q('story',{q:"Story Time: Ahmed's Busy Day. Listen, then answer.",ar:'قصة: يوم أحمد المشغول.',text:'<b>First</b>, Ahmed woke up. <b>Next</b>, he brushed his teeth. <b>After that</b>, he ate breakfast. <b>Then</b>, he went to school. At school, he felt <b>happy</b> when he played with friends and <b>angry</b> when his pencil broke. <b>Later</b>, he ate dinner and slept. "Every day is an adventure!" Ahmed said.',textAr:'أولاً استيقظ أحمد. بعد ذلك فرّش أسنانه. ثم أكل الفطور. ثم ذهب إلى المدرسة. في المدرسة شعر بالسعادة عندما لعب مع أصدقائه، وبالغضب عندما انكسر قلمه. لاحقاً أكل العشاء ونام. "كل يوم مغامرة!" قال أحمد.'}),
+   pick('How did Ahmed feel when he played with friends?','كيف شعر أحمد عندما لعب مع أصدقائه؟','🤝',[['😊','Happy',1],['😠','Angry',0],['😢','Sad',0]]),
+   pick('How did Ahmed feel when his pencil broke?','كيف شعر عندما انكسر قلمه؟','✏️💥',[['😠','Angry',1],['😊','Happy',0],['😴','Sleeping',0]]),
  ]},
  { id:'sounds', title:'Sound Corner', ar:'ركن الأصوات', emoji:'👄', color:'#9b6cff', pages:'Say it: th · sh · ch', rounds:[
-   Q('sound',{ q:'Say it with me: TH – then, that, three.', ar:'قوليها معي: TH – then, that, three.', sound:'th', tip:'Put your tongue between your teeth and blow softly. 😛', tipAr:'ضعي لسانك بين أسنانك وانفخي بهدوء.', words:[['🕐','then'],['👉','that'],['3️⃣','three']] }),
-   Q('pick',{ q:'Listen! Which word starts with the TH sound?', ar:'استمعي! أي كلمة تبدأ بصوت TH؟', scene:'😛', opts:[['👉','that',1],['🏠','home',0],['🛏️','bed',0]], listen:true }),
-   Q('sound',{ q:'Say it with me: SH – she, fish, shoes.', ar:'قوليها معي: SH – she, fish, shoes.', sound:'sh', tip:'Lips round like a kiss and say shhh… like telling a baby to sleep. 🤫', tipAr:'دوّري شفتيك وقولي ششش… كأنك تنوّمين طفلاً.', words:[['👧','she'],['🐟','fish'],['👟','shoes']] }),
-   Q('pick',{ q:'Listen! Which word has the SH sound?', ar:'استمعي! أي كلمة فيها صوت SH؟', scene:'🤫', opts:[['👧','she',1],['🏫','school',0],['🪑','chair',0]], listen:true, fact:'Careful: "school" is spelled s-c-h but it sounds like SK!', factAr:'انتبهي: school تُكتب s-c-h لكنها تُلفظ سكول!' }),
-   Q('sound',{ q:'Say it with me: CH – lunch, chair, teacher.', ar:'قوليها معي: CH – lunch, chair, teacher.', sound:'ch', tip:'Like a little sneeze: ch! ch! ch! 🤧', tipAr:'مثل عطسة صغيرة: تش! تش! تش!', words:[['🍝','lunch'],['🪑','chair'],['👩‍🏫','teacher']] }),
-   Q('pick',{ q:'Listen! Which word has the CH sound?', ar:'استمعي! أي كلمة فيها صوت CH؟', scene:'🤧', opts:[['🍝','lunch',1],['👧','she',0],['3️⃣','three',0]], listen:true }),
+   Q('sound',{q:'Say it with me: TH – then, that, three.',ar:'قوليها معي: TH – then, that, three.',sound:'th',tip:'Put your tongue between your teeth and blow softly. 😛',tipAr:'ضعي لسانك بين أسنانك وانفخي بهدوء.',words:[['🕐','then'],['👉','that'],['3️⃣','three']]}),
+   pick('Listen! Which word starts with the TH sound?','أي كلمة تبدأ بصوت TH؟','😛',[['👉','that',1],['🏠','home',0],['🛏️','bed',0]],{listen:true}),
+   Q('sound',{q:'Say it with me: SH – she, fish, shoes.',ar:'قوليها معي: SH – she, fish, shoes.',sound:'sh',tip:'Lips round like a kiss and say shhh… like telling a baby to sleep. 🤫',tipAr:'دوّري شفتيك وقولي ششش… كأنك تنوّمين طفلاً.',words:[['👧','she'],['🐟','fish'],['👟','shoes']]}),
+   pick('Listen! Which word has the SH sound?','أي كلمة فيها صوت SH؟','🤫',[['👧','she',1],['🏫','school',0],['🪑','chair',0]],{listen:true,fact:'Careful: "school" is spelled s-c-h but it sounds like SK!',factAr:'انتبهي: school تُكتب s-c-h لكنها تُلفظ سكول!'}),
+   Q('sound',{q:'Say it with me: CH – lunch, chair, teacher.',ar:'قوليها معي: CH – lunch, chair, teacher.',sound:'ch',tip:'Like a little sneeze: ch! ch! ch! 🤧',tipAr:'مثل عطسة صغيرة: تش! تش! تش!',words:[['🍝','lunch'],['🪑','chair'],['👩‍🏫','teacher']]}),
+   pick('Listen! Which word has the CH sound?','أي كلمة فيها صوت CH؟','🤧',[['🍝','lunch',1],['👧','she',0],['3️⃣','three',0]],{listen:true}),
  ]},
+]},
+// ===================== UNIT 3 =====================
+{ id:'u3', n:3, title:'My Surroundings', ar:'ما حولي', emoji:'🌳', color:'#4cbb5c', pages:'p.52–73', levels:[
+ { id:'around', title:'What Is Around Me', ar:'ما حولي', emoji:'🏡', color:'#4cbb5c', pages:'p.52–55', rounds:[
+   mat('Match the word to the picture.','صِلي الكلمة بالصورة.',[['','Tree','🌳','Tree'],['','House','🏠','House'],['','Car','🚗','Car'],['','Flower','🌸','Flower'],['','Bird','🐦','Bird']],{lines:{Tree:'Tree.',House:'House.',Car:'Car.',Flower:'Flower.',Bird:'Bird.'},fact:'We see people, buildings, plants and animals around us. They are all part of our surroundings.',factAr:'نرى الناس والمباني والنباتات والحيوانات حولنا. كلها جزء مما يحيط بنا.'}),
+   blank('I can see a red ___ on the street.','أرى سيارة حمراء في الشارع.','🚗',[['','Car',1],['','Tree',0],['','Bird',0]]),
+   blank('In the park, I see a ___.','في الحديقة أرى شجرة.','🌳',[['','Tree',1],['','Car',0],['','House',0]]),
+   blank('My ___ is near the sea.','بيتي قرب البحر.','🏠🌊',[['','House',1],['','Flower',0],['','Bird',0]]),
+   blank('In my garden I have beautiful ___.','في حديقتي زهور جميلة.','🌷🌼🌸',[['','Flowers',1],['','Buildings',0],['','Cars',0]]),
+   blank('I have a pet animal, it is a ___.','عندي حيوان أليف، إنه كلب.','🐕🏠',[['','Dog',1],['','Tree',0],['','Car',0]]),
+   tf('True or false? (Book p.55)','صح أم خطأ؟',[['A house is a building.',1,'البيت مبنى.'],['A tree is part of our surroundings.',1,'الشجرة جزء مما حولنا.'],['Cars can fly in the sky.',0,'السيارات تطير في السماء.'],['Flowers can come in lots of colors.',1,'الزهور بألوان كثيرة.'],['Things around us can be big or small.',1,'الأشياء حولنا كبيرة أو صغيرة.'],['Our surroundings can never change.',0,'ما حولنا لا يتغيّر أبداً.'],['A bird is an animal.',1,'العصفور حيوان.']]),
+ ]},
+ { id:'soundsaround', title:'Sounds Around Me', ar:'الأصوات حولي', emoji:'🔔', color:'#3fb0ff', pages:'p.56–59', rounds:[
+   mat('Match the sound to who makes it.','صِلي الصوت بمن يصدره.',[['🐦','Birds','🎵','Chirping'],['🚗','Car','📢','Honking'],['🔔','Bell','🛎️','Ringing'],['👶','Baby','😭','Crying'],['💦','Water','🌊','Splashing']],{lines:{Birds:'Birds are chirping.',Car:'Cars are honking.',Bell:'The bell is ringing.',Baby:'The baby is crying.',Water:'Water is splashing.'},fact:'Listening to sounds helps us find out more about our surroundings.',factAr:'الاستماع للأصوات يساعدنا على معرفة ما حولنا.'}),
+   uns('Can you hear the baby? Build the answer.','هل تسمعين الرضيع؟','👶😭',['The','baby','is','crying.']),
+   uns('Can you hear the birds? Build the answer.','هل تسمعين العصافير؟','🐦🎵',['The','birds','are','chirping.']),
+   uns('Can you hear the bell? Build the answer.','هل تسمعين الجرس؟','🔔',['The','bell','is','ringing.']),
+   sort('Loud sound or quiet sound? (Book p.58)','صوت عالٍ أم هادئ؟',[{n:'Loud',e:'📢',ar:'عالٍ',v:1},{n:'Quiet',e:'🤫',ar:'هادئ',v:0}],[['🐝','Bee',0],['🐱','Cat',0],['🚌','Bus',1],['🐭','Mouse',0],['📯','Whistle',1],['🦁','Lion',1],['🥁','Drum',1],['🌀','Fan',0],['🐦','Bird',0]]),
+   tf('True or false? (Book p.59)','صح أم خطأ؟',[['A car makes a chirping sound.',0,'السيارة تصدر زقزقة.'],['Sounds are all around us.',1,'الأصوات في كل مكان حولنا.'],['Babies cry to tell us something.',1,'الرضّع يبكون ليخبرونا بشيء.'],['All animals are quiet.',0,'كل الحيوانات هادئة.'],['Music is a sound.',1,'الموسيقى صوت.']]),
+ ]},
+ { id:'colors', title:'Colors Around Me', ar:'الألوان حولي', emoji:'🌈', color:'#ee4b7e', pages:'p.60–63', rounds:[
+   blank('These are ___ apples.','هذه تفاحات حمراء.','🍎🍎',[['🔴','Red',1],['🔵','Blue',0],['🟢','Green',0]]),
+   blank('This is a ___ sky.','هذه سماء زرقاء.','🌤️',[['🔵','Blue',1],['🟤','Brown',0],['⚫','Black',0]]),
+   blank('This is a ___ mouse.','هذا فأر رمادي.','🐭',[['🩶','Gray',1],['🟡','Yellow',0],['🩷','Pink',0]]),
+   blank('These are ___ bananas.','هذا موز أصفر.','🍌🍌',[['🟡','Yellow',1],['🟣','Purple',0],['🔴','Red',0]]),
+   blank('This is a ___ flower.','هذه زهرة بنفسجية.','🪻',[['🟣','Purple',1],['🟢','Green',0],['🟠','Orange',0]]),
+   blank('These are ___ shoes.','هذا حذاء أسود.','👞👞',[['⚫','Black',1],['🩷','Pink',0],['🟡','Yellow',0]]),
+   blank('These are ___ leaves.','هذه أوراق خضراء.','🍃🍃',[['🟢','Green',1],['🔵','Blue',0],['🟤','Brown',0]]),
+   blank('This is an ___ car.','هذه سيارة برتقالية.','🟠🚗',[['🟠','Orange',1],['🩶','Gray',0],['⚫','Black',0]],{fact:'We say "AN orange car" because orange starts with a vowel sound.',factAr:'نقول an orange لأن الكلمة تبدأ بحرف علّة.'}),
+   blank('This is a ___ coat.','هذا معطف بني.','🧥',[['🟤','Brown',1],['🟣','Purple',0],['🔵','Blue',0]]),
+   tf('True or false? (Book p.63)','صح أم خطأ؟',[['The sun is blue.',0,'الشمس زرقاء.'],['Grass is green.',1,'العشب أخضر.'],['Apples can be red.',1,'التفاح قد يكون أحمر.'],['Everything has a color.',1,'كل شيء له لون.'],['Grass and leaves are the same color.',1,'العشب والأوراق بنفس اللون.'],['You can smell colors.',0,'يمكنك شم الألوان.']]),
+ ]},
+ { id:'shapes', title:'Shapes Around Me', ar:'الأشكال حولي', emoji:'🔷', color:'#9b6cff', pages:'p.64–67', rounds:[
+   mat('What shape is each object? (Book p.66)','ما شكل كل شيء؟',[['🍕','Pizza slice','🔺','Triangle'],['🥚','Egg','🥚 ','Oval'],['📺','TV','▬','Rectangle'],['🍩','Donut','⭕','Circle'],['🪟','Window','🟦','Square'],['🪁','Kite','🔶','Diamond']],{lines:{'Pizza slice':'A pizza slice is a triangle.',Egg:'An egg is an oval.',TV:'A TV is a rectangle.',Donut:'A donut is a circle.',Window:'A window is a square.',Kite:'A kite is a diamond.'},fact:'Circles, ovals, diamonds, squares, rectangles and triangles help us build and draw.',factAr:'الدائرة والبيضاوي والمعيّن والمربع والمستطيل والمثلث تساعدنا في البناء والرسم.'}),
+   pick('We can draw a sun with a…','نرسم الشمس بـ…','☀️',[['⭕','Circle',1],['🔺','Triangle',0],['🟦','Square',0]]),
+   pick('We can draw a door with a…','نرسم الباب بـ…','🚪',[['▬','Rectangle',1],['⭕','Circle',0],['🔶','Diamond',0]]),
+   pick('What shape is the top (roof) of the house?','ما شكل سقف البيت؟','🏠',[['🔺','Triangle',1],['⭕','Circle',0],['🥚 ','Oval',0]]),
+   pick('How many corners does a triangle have?','كم زاوية للمثلث؟','🔺',[['','3',1],['','4',0],['','0',0]]),
+   pick('How many corners does a square have?','كم زاوية للمربع؟','🟦',[['','4',1],['','3',0],['','0',0]]),
+   pick('How many corners does a circle have?','كم زاوية للدائرة؟','⭕',[['','0',1],['','3',0],['','4',0]],{fact:'Squares, rectangles and diamonds have 4 corners. Triangles have 3. Ovals and circles have NO corners.',factAr:'المربع والمستطيل والمعيّن لها 4 زوايا. المثلث 3. الدائرة والبيضاوي بلا زوايا.'}),
+   tf('True or false? (Book p.67)','صح أم خطأ؟',[['A triangle has no corners.',0,'المثلث بلا زوايا.'],['A square has four corners.',1,'المربع له أربع زوايا.'],['A circle has three corners.',0,'الدائرة لها ثلاث زوايا.'],['All shapes are the same.',0,'كل الأشكال متشابهة.'],['A watermelon is an oval shape.',1,'البطيخة بيضاوية.'],['A rectangle has four corners.',1,'المستطيل له أربع زوايا.'],['Shapes help us draw.',1,'الأشكال تساعدنا على الرسم.']]),
+ ]},
+ { id:'neighborhood', title:'My Neighborhood', ar:'حيّي', emoji:'🏘️', color:'#ffc93c', pages:'p.68–71', rounds:[
+   blank('We learn at a ___.','نتعلم في المدرسة.','📚',[['🏫','School',1],['🥖','Bakery',0],['🕌','Mosque',0]],{fact:'A neighborhood is where people live and help each other: homes, shops, bakeries, a school, a park and a mosque.',factAr:'الحي حيث يعيش الناس ويساعد بعضهم بعضاً: بيوت ومتاجر ومخابز ومدرسة وحديقة ومسجد.'}),
+   blank('We buy things from a ___.','نشتري الأشياء من المتجر.','🛍️',[['🏪','Shop',1],['🏫','School',0],['🏡','Park',0]]),
+   blank('We play in the ___.','نلعب في الحديقة.','🛝',[['🏞️','Park',1],['🥖','Bakery',0],['🏪','Shop',0]]),
+   blank('We sleep at ___.','ننام في البيت.','😴',[['🏠','Home',1],['🕌','Mosque',0],['🏫','School',0]]),
+   blank('We pray in the ___.','نصلّي في المسجد.','🤲',[['🕌','Mosque',1],['🏪','Shop',0],['🏞️','Park',0]]),
+   blank('We buy bread from the ___.','نشتري الخبز من المخبز.','🍞',[['🥖','Bakery',1],['🏫','School',0],['🏠','Home',0]]),
+   mat('Our neighbors help! Match the person to what they do.','جيراننا يساعدون! صِلي الشخص بعمله.',[['👨‍⚕️','Doctors','🤒','Help us when we are sick'],['👩‍🏫','Teachers','📖','Teach children to read'],['🧑‍💼','Shopkeepers','🛒','Sell us things we need']],{lines:{Doctors:'Doctors help us when we are sick.',Teachers:'Teachers teach children to read.',Shopkeepers:'Shopkeepers sell us things we need.'},fact:'Your neighbors are the people who live near you. Everyone has a role in making the neighborhood a good place.',factAr:'جيرانك هم الناس الذين يعيشون قربك. لكل شخص دور في جعل الحي مكاناً جيداً.'}),
+   tf('True or false? (Book p.71)','صح أم خطأ؟',[['People buy bread from the mosque.',0,'الناس يشترون الخبز من المسجد.'],['Parks are for playing.',1,'الحدائق للّعب.'],['Shops are for sleeping.',0,'المتاجر للنوم.'],['We go to the mosque to pray.',1,'نذهب إلى المسجد للصلاة.']]),
+ ]},
+ { id:'story3', title:'Story: The Shape Hunt', ar:'قصة: البحث عن الأشكال', emoji:'📖', color:'#3fb0ff', pages:'p.72', rounds:[
+   Q('story',{q:'Listen to the story, then answer.',ar:'استمعي للقصة ثم أجيبي.',text:'Omar walked through his neighborhood. He saw a <b>square</b> window, a <b>round</b> tire, and a <b>triangle</b> roof. At the park, he <b>heard</b> birds chirping and <b>touched</b> soft grass. "Look!" he said. "A <b>red</b> flower and a <b>gray</b> rock!" Omar drew the shapes and colors in his notebook. "My world is full of surprises!"',textAr:'مشى عمر في حيّه. رأى نافذة مربعة، وإطاراً دائرياً، وسقفاً مثلثاً. في الحديقة سمع العصافير تزقزق ولمس العشب الناعم. "انظروا! زهرة حمراء وصخرة رمادية!" رسم عمر الأشكال والألوان في دفتره. "عالمي مليء بالمفاجآت!"'}),
+   pick('What shape was the window?','ما شكل النافذة؟','🪟',[['🟦','Square',1],['⭕','Circle',0],['🔺','Triangle',0]]),
+   pick('What shape was the tire?','ما شكل الإطار؟','🛞',[['⭕','Circle',1],['🟦','Square',0],['🔺','Triangle',0]]),
+   pick('What shape was the roof?','ما شكل السقف؟','🏠',[['🔺','Triangle',1],['🥚 ','Oval',0],['▬','Rectangle',0]]),
+   pick('What color was the flower?','ما لون الزهرة؟','🌹',[['🔴','Red',1],['🩶','Gray',0],['🔵','Blue',0]]),
+   pick('What color was the rock?','ما لون الصخرة؟','🪨',[['🩶','Gray',1],['🔴','Red',0],['🟢','Green',0]]),
+   pick('What did Omar hear at the park?','ماذا سمع عمر في الحديقة؟','🏞️',[['🐦','Birds',1],['🔔','Bell',0],['👶','Baby',0]]),
+ ]},
+]},
+// ===================== UNIT 4 =====================
+{ id:'u4', n:4, title:'Exploring Maps', ar:'استكشاف الخرائط', emoji:'🗺️', color:'#3fb0ff', pages:'p.74–87', levels:[
+ { id:'map', title:'What Is a Map?', ar:'ما هي الخريطة؟', emoji:'🗺️', color:'#3fb0ff', pages:'p.74–75', rounds:[
+   pick('A map is a drawing or a picture of a…','الخريطة رسم أو صورة لـ…','🗺️',[['🏘️','Real place',1],['🧸','Toys',0],['👤','People',0]],{fact:'A map is a drawing of a real place. It shows places from above – like looking down from an airplane!',factAr:'الخريطة رسم لمكان حقيقي. تُظهر الأماكن من فوق – كأنك تنظرين من طائرة!'}),
+   pick('Maps show places from…','الخرائط تُظهر الأماكن من…','✈️👀',[['⬇️','Above',1],['⬆️','Below',0]]),
+   pick('Maps help us find…','الخرائط تساعدنا على إيجاد…','🔍',[['📍','Places',1],['👤','People',0],['🧸','Toys',0]]),
+   pick('You are in an airplane looking down at your school. What do you see?','أنت في طائرة تنظرين إلى مدرستك. ماذا ترين؟','✈️🏫',[['🗺️','The school from above',1],['🚪','The school door from the front',0]],{fact:'A picture from above shows the roof and the shapes of the places – that is a map view.',factAr:'الصورة من فوق تُظهر السقف وأشكال الأماكن – هذا منظر الخريطة.'}),
+   tf('True or false? (Book p.75)','صح أم خطأ؟',[['A map is a drawing of a real place.',1,'الخريطة رسم لمكان حقيقي.'],['Maps show places from below.',0,'الخرائط تُظهر الأماكن من تحت.'],['Maps help us find places.',1,'الخرائط تساعدنا على إيجاد الأماكن.'],['We use a map to show us where places are.',1,'نستخدم الخريطة لتُرينا أين الأماكن.']]),
+ ]},
+ { id:'symbols', title:'Map Symbols & Keys', ar:'رموز الخريطة ومفتاحها', emoji:'🔑', color:'#4cbb5c', pages:'p.76–77', rounds:[
+   mat('Match the symbol to its name.','صِلي الرمز باسمه.',[['🚗','Car','','Car'],['🕌','Mosque','','Mosque'],['🌳','Park','','Park'],['✈️','Airport','','Airport'],['🛍️','Shop','','Shop']],{lines:{Car:'Car.',Mosque:'Mosque.',Park:'Park.',Airport:'Airport.',Shop:'Shop.'},fact:'Symbols are small pictures of things on a map. Using symbols makes it easy to read a map.',factAr:'الرموز صور صغيرة للأشياء على الخريطة. تجعل قراءة الخريطة سهلة.'}),
+   mat('Match the symbol to its name.','صِلي الرمز باسمه.',[['🏠','House','','House'],['🏫','School','','School'],['🛒','Mall','','Mall'],['🏥','Hospital','','Hospital'],['🚓','Police station','','Police station']],{lines:{House:'House.',School:'School.',Mall:'Mall.',Hospital:'Hospital.','Police station':'Police station.'}}),
+   pick('What tells us what each symbol on the map means?','ما الذي يخبرنا بمعنى كل رمز على الخريطة؟','🔑',[['📋','Map key',1],['🧭','Compass rose',0],['🚗','Car',0]],{fact:'Remember: 1. Symbols are small pictures of objects. 2. A map key tells us what the pictures are.',factAr:'تذكّري: الرموز صور صغيرة. مفتاح الخريطة يخبرنا ما هي الصور.'}),
+   pick('Symbols are small ___ of things on a map.','الرموز صور صغيرة للأشياء على الخريطة.','🖼️',[['','Pictures',1],['','Countries',0],['','People',0]]),
+   pick('You see 🏥 on a map. What is there?','ترين 🏥 على الخريطة. ماذا يوجد هناك؟','🏥',[['','Hospital',1],['','Bakery',0],['','Airport',0]]),
+   pick('You see ✈️ on a map. What is there?','ترين ✈️ على الخريطة. ماذا يوجد هناك؟','✈️',[['','Airport',1],['','School',0],['','Mosque',0]]),
+ ]},
+ { id:'compass', title:'Compass Rose', ar:'وردة البوصلة', emoji:'🧭', color:'#ffc93c', pages:'p.78–79', rounds:[
+   pick('Maps use a compass rose to show the way. N is for the word…','N هو حرف كلمة…','🧭 N',[['⬆️','North',1],['⬇️','South',0],['➡️','East',0]],{fact:'N = North (top), S = South (bottom), E = East (right), W = West (left).',factAr:'N شمال (فوق)، S جنوب (تحت)، E شرق (يمين)، W غرب (يسار).'}),
+   pick('S is for the word…','S هو حرف كلمة…','🧭 S',[['⬇️','South',1],['⬆️','North',0],['⬅️','West',0]]),
+   pick('E is for the word…','E هو حرف كلمة…','🧭 E',[['➡️','East',1],['⬅️','West',0],['⬇️','South',0]]),
+   pick('W is for the word…','W هو حرف كلمة…','🧭 W',[['⬅️','West',1],['➡️','East',0],['⬆️','North',0]]),
+   pick('Which direction is at the TOP of the compass rose?','أي اتجاه في أعلى وردة البوصلة؟','⬆️🧭',[['','North',1],['','South',0],['','East',0]]),
+   pick('Which direction is on the RIGHT?','أي اتجاه على اليمين؟','🧭➡️',[['','East',1],['','West',0],['','North',0]]),
+   pick('Zoo map! The elephant is at the TOP. Your friend wants to see the elephant. He should go…','خريطة الحديقة! الفيل في الأعلى. يريد صديقك رؤية الفيل. يجب أن يذهب…','🐘⬆️',[['','North',1],['','South',0],['','West',0]]),
+   pick('The giraffe is on the LEFT. He should go…','الزرافة على اليسار. يجب أن يذهب…','⬅️🦒',[['','West',1],['','East',0],['','North',0]]),
+   pick('The zebra is at the BOTTOM. He should go…','الحمار الوحشي في الأسفل. يجب أن يذهب…','🦓⬇️',[['','South',1],['','North',0],['','East',0]]),
+   pick('The bear is on the RIGHT. He should go…','الدب على اليمين. يجب أن يذهب…','🐻➡️',[['','East',1],['','West',0],['','South',0]]),
+   pick('What animal is in the NORTH of the zebra?','أي حيوان في شمال الحمار الوحشي؟','🦓⬆️❓',[['🐘','Elephant',1],['🦒','Giraffe',0],['🐻','Bear',0]]),
+   pick('What animal is in the WEST of the bear?','أي حيوان في غرب الدب؟','❓⬅️🐻',[['🦒','Giraffe',1],['🦓','Zebra',0],['🐘','Elephant',0]]),
+ ]},
+ { id:'parts', title:'Parts of a Map', ar:'أجزاء الخريطة', emoji:'🧩', color:'#9b6cff', pages:'p.80–82', rounds:[
+   pick('A drawing of a real place with roads, houses and a river. What is it?','رسم لمكان حقيقي فيه طرق وبيوت ونهر. ما هو؟','🗺️',[['','Map',1],['','Map key',0],['','Symbol',0]]),
+   pick('A list that shows: 🌊 lake · ⛰️ mountain · 🌲 forest · 🏖️ beach. What is it?','قائمة تُظهر معنى الصور. ما هي؟','📋',[['','Map key',1],['','Compass rose',0],['','Map',0]]),
+   pick('N, S, E, W on a star. What is it?','نجمة عليها N S E W. ما هي؟','🧭',[['','Compass rose',1],['','Symbol',0],['','Map key',0]]),
+   pick('One small picture of a mosque 🕌 on a map. What is it?','صورة صغيرة واحدة لمسجد على الخريطة. ما هي؟','🕌',[['','Symbol',1],['','Map',0],['','Compass rose',0]]),
+   pick('The ___ helps you find directions on a map.','… تساعدك على معرفة الاتجاهات على الخريطة.','🧭❓',[['','Compass rose',1],['','Symbol',0]]),
+   pick('A ___ tells us what the symbols mean.','… يخبرنا بمعنى الرموز.','🔑❓',[['','Map key',1],['','Symbol',0]]),
+   pick('A ___ is a picture of a real place.','… صورة لمكان حقيقي.','🗺️❓',[['','Map',1],['','Compass rose',0]]),
+   pick('A ___ is a drawing of an object on a map.','… رسم لشيء على الخريطة.','🏠❓',[['','Symbol',1],['','Map key',0]],{fact:'To make your own map: draw symbols, make a map key, finish the compass rose, then draw your neighborhood!',factAr:'لتصنعي خريطتك: ارسمي الرموز، اصنعي المفتاح، أكملي وردة البوصلة، ثم ارسمي حيّك!'}),
+ ]},
+ { id:'where', title:'Where Am I?', ar:'أين أنا؟', emoji:'🌍', color:'#ee4b7e', pages:'p.83–85', rounds:[
+   ord('Put the places in order, starting with the SMALLEST.','رتّبي الأماكن من الأصغر.',[['🏠','Home'],['🏘️','Neighborhood'],['🌆','City'],['🇱🇾','Country'],['🌍','Continent']],{fact:'Home → neighborhood → city → country → continent. Each one is bigger than the one before!',factAr:'البيت ← الحي ← المدينة ← الدولة ← القارة. كل واحد أكبر من الذي قبله!'}),
+   pick('A neighborhood is where your home and many other ___ are.','الحي حيث بيتك وبيوت كثيرة أخرى.','🏘️',[['🏠','Homes',1],['🌍','Countries',0],['🌆','Cities',0]]),
+   pick('A city has many…','المدينة فيها كثير من…','🌆',[['🏘️','Neighborhoods',1],['🌍','Countries',0],['🧭','Compass rose',0]]),
+   pick('Tripoli is a…','طرابلس هي…','🌆🇱🇾',[['','City',1],['','Country',0],['','Continent',0]]),
+   pick('Libya is a…','ليبيا هي…','🇱🇾',[['','Country',1],['','City',0],['','Continent',0]],{fact:'A country has many cities. Can you find Tripoli, Benghazi, Misrata and Sabha on the Libya map?',factAr:'الدولة فيها مدن كثيرة. هل تجدين طرابلس وبنغازي ومصراتة وسبها على خريطة ليبيا؟'}),
+   pick('Africa is a…','أفريقيا هي…','🌍',[['','Continent',1],['','Country',0],['','City',0]]),
+   pick('Libya is in…','ليبيا في…','🇱🇾➡️❓',[['🌍','Africa',1],['🌆','Tripoli',0],['🏠','Home',0]]),
+   uns('Finish the sentence (p.85).','أكملي الجملة.','🌆🇱🇾',["I'm in",'Tripoli,','Libya.']),
+   uns('Finish the sentence (p.85).','أكملي الجملة.','🇱🇾🌍',['Libya','is','in','Africa.']),
+ ]},
+ { id:'story4', title:"Story: Omar's Treasure Hunt", ar:'قصة: كنز عمر', emoji:'📖', color:'#3fb0ff', pages:'p.86', rounds:[
+   Q('story',{q:'Listen to the story, then answer.',ar:'استمعي للقصة ثم أجيبي.',text:"Omar found an old <b>map</b> in his grandfather's house. It had <b>symbols</b> like a tree, a mosque, and a school. \"Let's follow it!\" said his sister, Fatima. With the <b>compass rose</b>, they walked <b>north</b> to the park, then <b>east</b> to the bakery. They found a big tree marked with an <b>X</b>, they dug under the tree and found a box of <b>toys</b>! \"Maps are amazing!\" Omar laughed. Now they make their own maps for fun.",textAr:'وجد عمر خريطة قديمة في بيت جده. فيها رموز مثل شجرة ومسجد ومدرسة. "لنتبعها!" قالت أخته فاطمة. بوردة البوصلة مشيا شمالاً إلى الحديقة، ثم شرقاً إلى المخبز. وجدا شجرة كبيرة عليها علامة X، حفرا تحتها ووجدا صندوق ألعاب! "الخرائط مدهشة!" ضحك عمر.'}),
+   pick('Where did Omar find the old map?','أين وجد عمر الخريطة؟','🗺️',[['👴🏠',"Grandfather's house",1],['🏫','School',0],['🏞️','Park',0]]),
+   multi('Which symbols were on the map? Tap them all.','أي رموز كانت على الخريطة؟','🗺️',[['🌳','Tree',1],['🕌','Mosque',1],['🏫','School',1],['✈️','Airport',0],['🚓','Police station',0]]),
+   pick('They walked ___ to the park.','مشيا … إلى الحديقة.','🏞️⬆️',[['','North',1],['','South',0],['','West',0]]),
+   pick('Then they walked ___ to the bakery.','ثم مشيا … إلى المخبز.','🥖➡️',[['','East',1],['','West',0],['','North',0]]),
+   pick('What was the big tree marked with?','بماذا كانت الشجرة معلّمة؟','🌳',[['❌','X',1],['⭕','Circle',0],['🔺','Triangle',0]]),
+   pick('What did they find under the tree?','ماذا وجدا تحت الشجرة؟','📦',[['🧸','Toys',1],['🍞','Bread',0],['🗺️','Map',0]]),
+ ]},
+]},
+// ===================== UNIT 5 =====================
+{ id:'u5', n:5, title:'Travelling', ar:'السفر', emoji:'🚗', color:'#ee4b7e', pages:'p.88–103', levels:[
+ { id:'travel', title:'How We Travel', ar:'كيف نسافر', emoji:'✈️', color:'#3fb0ff', pages:'p.88–91', rounds:[
+   sort('By land, by water or by air? Tap the right box.','بالبر أم بالماء أم بالجو؟',[{n:'Land',e:'🛣️',ar:'البر',v:0},{n:'Water',e:'🌊',ar:'الماء',v:1},{n:'Air',e:'☁️',ar:'الجو',v:2}],[['🚲','Bicycle',0],['✈️','Airplane',2],['⛵','Sailboat',1],['🚗','Car',0],['🚁','Helicopter',2],['🚤','Motorboat',1],['🚌','Bus',0],['🚀','Rocket',2],['🚢','Ship',1],['🚆','Train',0],['🎈','Hot air balloon',2],['🛶','Canoe',1]],{fact:'We can travel by land, air or water. Land: walking, bicycle, car, bus, train. Air: airplane, helicopter, rocket, hot air balloon. Water: sailboat, motorboat, ship, canoe.',factAr:'نسافر بالبر أو الجو أو الماء. البر: المشي، الدراجة، السيارة، الحافلة، القطار. الجو: الطائرة، الهليكوبتر، الصاروخ، المنطاد. الماء: المركب الشراعي، القارب، السفينة، الزورق.'}),
+   pick('How do you go to school? We can travel by a…','كيف تذهبين إلى المدرسة؟','🏫',[['🚗','Car',1],['🚀','Rocket',0],['🚢','Ship',0]],{fact:'We can walk, ride a bicycle, or go by car or bus to school.',factAr:'نذهب إلى المدرسة مشياً أو بالدراجة أو بالسيارة أو الحافلة.'}),
+   pick('Which one travels in the AIR?','أي واحدة تسافر في الجو؟','☁️',[['🎈','Hot air balloon',1],['🚆','Train',0],['🛶','Canoe',0]]),
+   pick('Which one travels on WATER?','أي واحدة تسافر على الماء؟','🌊',[['🚢','Ship',1],['🚁','Helicopter',0],['🚌','Bus',0]]),
+   tf('True or false? (Book p.91)','صح أم خطأ؟',[['We can travel on land by a rocket.',0,'نسافر في البر بالصاروخ.'],['We can travel on water by a ship.',1,'نسافر في الماء بالسفينة.'],['We can travel in the air by an airplane.',1,'نسافر في الجو بالطائرة.'],['We can travel in the air by a bicycle.',0,'نسافر في الجو بالدراجة.'],['We can travel on land by a train.',1,'نسافر في البر بالقطار.'],['We can travel on water by a motorboat.',1,'نسافر في الماء بالقارب.']]),
+ ]},
+ { id:'changed', title:'How Travelling Changed', ar:'كيف تغيّر السفر', emoji:'🐪', color:'#ffc93c', pages:'p.92–93', rounds:[
+   Q('story',{q:'Tap each picture: how travelling changed on land.',ar:'المسي كل صورة: كيف تغيّر السفر في البر.',steps:[['🚶','First','people walked.','أولاً مشى الناس.','People walked'],['🐪','Next','they used animals.','بعد ذلك استخدموا الحيوانات.','Used animals'],['🐴🛒','After that','they used animals with the wheel.','ثم الحيوانات مع العجلة.','Animals with the wheel'],['🚲','Then','they used wheels without animals.','ثم العجلات بدون حيوانات.','Wheels without animals'],['🚗','Finally','people made a motor for motorcycles and cars.','أخيراً صنعوا المحرك للسيارات.','Motor cars']],intro:'The way people travel has changed. Look at how travelling has changed on land.'}),
+   ord('Put the pictures in order: how travelling changed.','رتّبي الصور: كيف تغيّر السفر.',TRAVEL_HIST,{seq:true}),
+   pick('What did people use FIRST to travel?','ماذا استخدم الناس أولاً للسفر؟','1️⃣',[['🚶','Walking',1],['🚗','Car',0],['🚲','Bicycle',0]]),
+   pick('What came LAST?','ماذا جاء أخيراً؟','🏁',[['🚗','Motor cars',1],['🐪','Used animals',0],['🚶','People walked',0]]),
+   tf('True or false? (Book p.93)','صح أم خطأ؟',[['People used cars before bicycles.',0,'استخدم الناس السيارات قبل الدراجات.'],['People first travelled by walking.',1,'سافر الناس أولاً مشياً.'],['Motors came before the wheel.',0,'المحركات جاءت قبل العجلة.'],['Riding donkeys came before a horse and cart.',1,'ركوب الحمير جاء قبل الحصان والعربة.']]),
+ ]},
+ { id:'street', title:'Street Safety', ar:'السلامة في الشارع', emoji:'🚸', color:'#4cbb5c', pages:'p.94–95', rounds:[
+   multi('Tap the SAFE things to do in the street.','المسي الأشياء الآمنة في الشارع.','🚸',[['🚶','Walk on the sidewalk',1],['🤝',"Hold a grown-up's hand",1],['👀','Cross where cars can see you',1],['⚽','Play ball in the street',0],['🏃','Run across the street',0],['🎮','Play near the street',0]],{fact:'1. Always walk on the sidewalk. 2. Never play near a street. 3. Always hold a grown-up\'s hand.',factAr:'1. امشي دائماً على الرصيف. 2. لا تلعبي قرب الشارع أبداً. 3. أمسكي دائماً يد شخص كبير.'}),
+   ord('Before you cross the street: Stop, Look, Listen! Put them in order.','قبل عبور الشارع: قفي، انظري، استمعي!',[['🛑','Stop at the curb'],['👀','Look left and right'],['👂','Listen for cars']],{fact:'When we cross the street we use our senses: stop, look and listen.',factAr:'عند عبور الشارع نستخدم حواسنا: نقف وننظر ونستمع.'}),
+   blank("Always hold a grown-up's ___.",'أمسكي دائماً يد شخص كبير.','🤝',[['','Hand',1],['','Head',0],['','Street',0]]),
+   blank('Never play near a ___.','لا تلعبي قرب الشارع.','🚫⚽',[['','Street',1],['','Park',0],['','Home',0]]),
+   blank('Only ___ a street where cars can see you.','اعبري الشارع فقط حيث تراك السيارات.','👀🚗',[['','Cross',1],['','Stop',0],['','Sleep',0]]),
+   blank('Always walk on the ___.','امشي دائماً على الرصيف.','🚶',[['','Sidewalk',1],['','Street',0],['','Water',0]]),
+   blank('Only cross a street when cars ___.','اعبري الشارع فقط عندما تقف السيارات.','🚗🛑',[['','Stop',1],['','Go',0],['','Honk',0]]),
+ ]},
+ { id:'car', title:'Car Safety', ar:'السلامة في السيارة', emoji:'🚗', color:'#ee4b7e', pages:'p.96–98', rounds:[
+   multi('Tap the RULES for riding safely in a car.','المسي قواعد الركوب الآمن في السيارة.','🚗',[['🔒','Wear a seatbelt',1],['💺','Sit in the back seat',1],['🧘','Stay in your seat',1],['👊','Fight with your brother',0],['🪟','Stick your head out',0],['🧗','Stand on the chair',0]],{fact:'Kids under 12 sit in the back seat. Always wear a seatbelt. Stay in your seat. Keep hands and head inside. No standing or climbing.',factAr:'الأطفال تحت 12 يجلسون في الخلف. البسي حزام الأمان دائماً. ابقي في مقعدك. اليدان والرأس داخل السيارة. لا وقوف ولا تسلّق.'}),
+   blank('We always wear the ___ in the car.','نلبس دائماً حزام الأمان في السيارة.','🔒',[['','Seatbelt',1],['','Hat',0],['','Shoes',0]]),
+   blank('We never stick our ___ and hands out the window.','لا نُخرج رؤوسنا وأيدينا من النافذة.','🪟🚫',[['','Head',1],['','Seatbelt',0],['','Feet',0]]),
+   blank('No ___ or climbing in the chair.','لا وقوف ولا تسلّق على المقعد.','🧗🚫',[['','Standing',1],['','Sitting',0],['','Sleeping',0]]),
+   blank('Children under ___ years old sit in the back seat.','الأطفال تحت 12 سنة يجلسون في الخلف.','💺',[['','12',1],['','3',0],['','100',0]]),
+   pick('Which child is safe?','أي طفل آمن؟','🚗',[['🔒💺','Sitting with a seatbelt',1],['🪟🙌','Hands out of the window',0],['🧗','Standing on the seat',0]]),
+ ]},
+ { id:'signs', title:'Traffic Light & Street Signs', ar:'إشارة المرور ولافتات الشارع', emoji:'🚦', color:'#5b4bc4', pages:'p.99–102', rounds:[
+   pick('The traffic light is RED. What does it mean?','الإشارة حمراء. ماذا تعني؟','🔴',[['🛑','STOP',1],['⏳','WAIT',0],['🏃','GO',0]],{fact:'Red means STOP, yellow means WAIT, green means GO.',factAr:'الأحمر: قف. الأصفر: انتظر. الأخضر: انطلق.'}),
+   pick('The traffic light is YELLOW. What does it mean?','الإشارة صفراء. ماذا تعني؟','🟡',[['⏳','WAIT',1],['🛑','STOP',0],['🏃','GO',0]]),
+   pick('The traffic light is GREEN. What does it mean?','الإشارة خضراء. ماذا تعني؟','🟢',[['🏃','GO',1],['⏳','WAIT',0],['🛑','STOP',0]]),
+   mat('Street signs tell us what to do. Match the sign to its meaning.','لافتات الشارع تخبرنا ماذا نفعل. صِلي اللافتة بمعناها.',[['🛑','STOP sign','👀','Stop and look first'],['⛔','Red circle with a line','🚫',"Don't enter"],['🅿️','Blue P','🚗','You can park'],['🏥','Blue H','🏨','Hospital here']],{lines:{'STOP sign':'This sign means stop and look first.','Red circle with a line':'This sign means don\'t enter this street.','Blue P':'This sign means you can park here.','Blue H':'This sign means there is a hospital here.'}}),
+   pick('A P with a red line through it. What does it mean?','P عليها خط أحمر. ماذا تعني؟','🅿️🚫',[['','No parking',1],['','You can park',0],['','Hospital here',0]]),
+   pick('A yellow sign with R R and an X. What does it mean?','لافتة صفراء عليها R R و X. ماذا تعني؟','🚂⚠️',[['','A train passes here',1],['','Go left soon',0],["","Don't enter",0]]),
+   pick('A blue sign with an arrow turning left. What does it mean?','لافتة زرقاء بسهم يساراً. ماذا تعني؟','↰',[['','Go left soon',1],['','Stop and look first',0],['','No parking',0]]),
+   pick('You see a hospital on the street. Which sign matches it?','ترين مستشفى. أي لافتة تناسبه؟','🏥',[['🅷','Blue H',1],['🛑','STOP sign',0],['🅿️','Blue P',0]]),
+   pick('The street says "No parking". Which sign?','الشارع فيه "ممنوع الوقوف". أي لافتة؟','🚗🚫',[['🚫🅿️','P with a red line',1],['↰','Arrow left',0],['🅷','Blue H',0]]),
+ ]},
+ { id:'story5', title:'Story: Mariam Takes a Plane', ar:'قصة: مريم تركب الطائرة', emoji:'📖', color:'#3fb0ff', pages:'p.103', rounds:[
+   Q('story',{q:'Listen to the story, then answer.',ar:'استمعي للقصة ثم أجيبي.',text:'Mariam was going to visit <b>Grandma\'s</b> house. Her grandma is in another country. "Are we going by car?" she asked. "No," said Mom. "We are <b>flying</b>!" Mariam sat in her seat on the <b>plane</b>. She put on her <b>seatbelt</b>. She looked out the window. "I see <b>clouds</b>!" she said. When they landed, Grandma gave her a big <b>hug</b>. "I love travelling!" Mariam said.',textAr:'كانت مريم ذاهبة لزيارة بيت جدتها. جدتها في دولة أخرى. "هل نذهب بالسيارة؟" سألت. "لا، سنطير!" قالت ماما. جلست مريم في مقعدها في الطائرة ولبست حزام الأمان. نظرت من النافذة: "أرى الغيوم!" عندما هبطوا عانقتها جدتها. "أحب السفر!" قالت مريم.'}),
+   pick('Who was Mariam going to visit?','من كانت مريم ستزور؟','🏠',[['👵','Grandma',1],['👩‍🏫','Teacher',0],['👨‍⚕️','Doctor',0]]),
+   pick('How did they travel?','كيف سافروا؟','☁️',[['✈️','Airplane',1],['🚗','Car',0],['🚢','Ship',0]]),
+   pick('What did Mariam put on in her seat?','ماذا لبست مريم في مقعدها؟','💺',[['🔒','Seatbelt',1],['🧥','Jacket',0],['👟','Shoes',0]]),
+   pick('What did she see out of the window?','ماذا رأت من النافذة؟','🪟',[['☁️','Clouds',1],['🐟','Fish',0],['🚗','Cars',0]]),
+   pick('What did Grandma give her?','ماذا أعطتها الجدة؟','👵',[['🤗','Hug',1],['🧸','Toys',0],['🗺️','Map',0]]),
+ ]},
+]},
 ];
-const BIG_TEST_N = 12;
+const UNIT_TEST_N=12, BOOK_TEST_N=20;
 
-// ============ STATE ============
-const store = {
-  get(k,d){ try{ const v=localStorage.getItem('mira_soc2_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
-  set(k,v){ try{ localStorage.setItem('mira_soc2_'+k,JSON.stringify(v)); }catch(e){} }
-};
-let progress = store.get('progress',{});
-let hard = store.get('hard',{});
-let voiceOn = store.get('voice',true);
-let arOn = store.get('ar',false);
-let history = store.get('history',[]);
+// ===================== STATE =====================
+const store={ get(k,d){ try{ const v=localStorage.getItem('mira_social_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} }, set(k,v){ try{ localStorage.setItem('mira_social_'+k,JSON.stringify(v)); }catch(e){} } };
+let progress=store.get('progress',{}), hard=store.get('hard',{}), voiceOn=store.get('voice',true), arOn=store.get('ar',false), history=store.get('history',[]), curUnit=store.get('unit','u1');
 
-// ============ AUDIO ============
+// ===================== AUDIO & SPEECH =====================
 let actx=null;
 function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
-const sfx={
-  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
-  bad(){ tone(200,.25,'triangle',.08); },
-  tap(){ tone(520,.06,'square',.04); },
-  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
-};
-
-// ============ SPEECH ============
-let voices=[]; let chosenVoice=null;
-function pickVoice(){
-  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
-  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
-  chosenVoice=null;
-  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
-  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
-}
+const sfx={ ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); }, bad(){ tone(200,.25,'triangle',.08); }, tap(){ tone(520,.06,'square',.04); }, win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); } };
+let voices=[],chosenVoice=null;
+function pickVoice(){ voices=(window.speechSynthesis&&speechSynthesis.getVoices())||[]; const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel']; chosenVoice=null; for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} } if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null; }
 if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-function speak(text,{slow=false,force=false,pitch=1.15}={}){
-  if(!window.speechSynthesis) return;
-  if(!voiceOn && !force) return;
-  try{
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’-]/gu,''));
-    if(chosenVoice) u.voice=chosenVoice;
-    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
-    u.rate=slow?0.6:0.9; u.pitch=pitch;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
+function speak(text,{slow=false,force=false,pitch=1.15}={}){ if(!window.speechSynthesis) return; if(!voiceOn&&!force) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’-]/gu,'')); if(chosenVoice) u.voice=chosenVoice; u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB'; u.rate=slow?0.6:0.9; u.pitch=pitch; speechSynthesis.speak(u);}catch(e){} }
 
-// ============ HELPERS ============
+// ===================== HELPERS =====================
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
@@ -328,235 +576,200 @@ function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
 function arWord(w){ return AR[w]||''; }
 function tileHtml(e,w){ return `<span class="e">${e||''}</span><span class="w">${w}</span><span class="wa">${arWord(w)}</span>`; }
 const plain=s=>s.replace(/<[^>]+>/g,'');
-
-// confetti
+const allLevels=()=>UNITS.flatMap(u=>u.levels.map(l=>Object.assign({unit:u},l)));
+const findLevel=id=>allLevels().find(l=>l.id===id);
 const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
-function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
-  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
-  if(!animId) animId=requestAnimationFrame(tick); }
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1']; for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3}); if(!animId) animId=requestAnimationFrame(tick); }
 function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
 
-// ============ HOME ============
+// ===================== HOME =====================
 function home(){
-  speechSynthesis && speechSynthesis.cancel();
+  speechSynthesis&&speechSynthesis.cancel();
   const v=$('#view'); v.innerHTML='';
-  const hero=el('div','hero',`<div><h1>Hello Mira! 🦉 What do you do in the evening and at school?</h1><p>Tap an island, answer the questions and collect ⭐ stars. Finish every island, then try the Big Test!</p><span class="ar">مرحباً ميرا! المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. ثم جرّبي الاختبار الكبير!</span></div><div class="big">🌙🏫</div>`);
-  v.appendChild(hero);
-  v.appendChild(el('div','sectionTitle','Islands · My Daily Life (Social book p.32–37)'));
+  v.appendChild(el('div','hero',`<div><h1>Hello Mira! 🦉 Let's explore The World Around Me!</h1><p>Pick a unit, tap an island, answer the questions and collect ⭐ stars. Finish a unit, then try its Big Test!</p><span class="ar">مرحباً ميرا! اختاري وحدة، المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. ثم جرّبي الاختبار الكبير!</span></div><div class="big">🌍📚</div>`));
+  const tabs=el('div','units'); v.appendChild(tabs);
+  UNITS.forEach(u=>{ const b=el('button','unit'+(u.id===curUnit?' on':''),`<span class="e">${u.emoji}</span><span><div class="t">Unit ${u.n}: ${u.title}</div><div class="u">${u.pages} · ${unitStars(u)} ⭐</div></span>`); b.style.setProperty('--c',u.color); b.onclick=()=>{ curUnit=u.id; store.set('unit',curUnit); sfx.tap(); home(); }; tabs.appendChild(b); });
+  const u=UNITS.find(x=>x.id===curUnit)||UNITS[0];
+  v.appendChild(el('div','sectionTitle',`Unit ${u.n} · ${u.title} (${u.pages})`));
   const map=el('div','map'); v.appendChild(map);
-  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
-  const bt=progress['bigtest']||{};
-  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Order, build sentences, school words – all mixed up!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
-  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  u.levels.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['test_'+u.id]||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Unit ${u.n} Big Test · ${UNIT_TEST_N} questions</div><div class="s">All the islands of this unit, mixed up!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`); test.style.setProperty('--c',u.color); test.onclick=()=>startLevel('test_'+u.id); map.appendChild(test);
+  const bb=progress['test_book']||{};
+  const book=el('button','island test book',`<div class="em">👑</div><div style="flex:1"><div class="t">Whole Book Challenge · ${BOOK_TEST_N} questions</div><div class="s">Units 1 to 5 – for the big test!</div></div><div class="stars">${starsHtml(bb.stars||0)}</div>`); book.style.setProperty('--c','#ff7a59'); book.onclick=()=>startLevel('test_book'); map.appendChild(book);
   const tools=el('div','row'); tools.style.marginTop='18px';
   const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
   const back=el('button','nextbtn ghost','🌟 All games'); back.onclick=()=>location.href='index.html';
   const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
-  tools.append(rep,back,reset); v.appendChild(tools);
-  updateBank();
+  tools.append(rep,back,reset); v.appendChild(tools); updateBank();
 }
-function islandCard(l){
-  const p=progress[l.id]||{};
-  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
-  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
-}
+function unitStars(u){ return u.levels.reduce((s,l)=>s+((progress[l.id]||{}).stars||0),0)+((progress['test_'+u.id]||{}).stars||0); }
+function islandCard(l){ const p=progress[l.id]||{}; const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`); b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b; }
 
-// ============ LEVEL ENGINE ============
+// ===================== LEVEL ENGINE =====================
 let cur=null;
+const testable=r=>r.type!=='story'&&r.type!=='sound'&&!r.any;
 function startLevel(id){
-  speechSynthesis && speechSynthesis.cancel();
-  let level, rounds;
-  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
-  else { level=LEVELS.find(l=>l.id===id); rounds=level.rounds.slice(); }
+  speechSynthesis&&speechSynthesis.cancel();
+  let level,rounds;
+  if(id==='test_book'){ level={id,title:'Whole Book Challenge',ar:'تحدي الكتاب كله',emoji:'👑',color:'#ff7a59'}; let qs=[]; UNITS.forEach(u=>qs=qs.concat(sample(u.levels.flatMap(l=>l.rounds.filter(testable)),4))); rounds=shuffle(qs).slice(0,BOOK_TEST_N); }
+  else if(id.startsWith('test_')){ const u=UNITS.find(x=>'test_'+x.id===id); level={id,title:`Unit ${u.n} Big Test`,ar:'الاختبار الكبير',emoji:'🏆',color:u.color}; let qs=[]; u.levels.forEach(l=>qs=qs.concat(sample(l.rounds.filter(testable),2))); rounds=shuffle(qs).slice(0,UNIT_TEST_N); }
+  else { level=findLevel(id); rounds=level.rounds.slice(); }
   cur={level,rounds,i:0,mistakes:0,total:rounds.length};
-  const v=$('#view'); v.innerHTML='';
-  const panel=el('div','panel'); v.appendChild(panel);
+  const v=$('#view'); v.innerHTML=''; const panel=el('div','panel'); v.appendChild(panel);
   panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
-    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
-    <div id="body"></div>`;
-  $('#backBtn').onclick=home;
-  runRound();
-}
-function buildBigTest(){
-  // 2 random questions from each island (no story/sound rounds), shuffled
-  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(sample(l.rounds.filter(r=>r.type!=='story'&&r.type!=='sound'&&!r.any),2)));
-  return shuffle(qs).slice(0,BIG_TEST_N);
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div><div id="body"></div>`;
+  $('#backBtn').onclick=home; runRound();
 }
 function runRound(){
-  const r=cur.rounds[cur.i];
-  if(!r) return finishLevel();
-  $('#prog').style.width=(cur.i/cur.total*100)+'%';
-  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
-  const body=$('#body'); body.innerHTML='';
-  cur.currentQ=plain(r.q);
+  const r=cur.rounds[cur.i]; if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%'; $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML=''; cur.currentQ=plain(r.q);
   const sayText=r.say||plain(r.q);
-  $('#sayBtn').onclick=()=>speak(sayText,{force:true});
-  $('#slowBtn').onclick=()=>speak(sayText,{force:true,slow:true});
+  $('#sayBtn').onclick=()=>speak(sayText,{force:true}); $('#slowBtn').onclick=()=>speak(sayText,{force:true,slow:true});
   ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
-  if(r.type!=='order'&&r.type!=='match'&&r.type!=='story'&&r.type!=='sound') speak(sayText);
+  if(['pick','multi','unscramble'].includes(r.type)) speak(sayText);
 }
 function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
 function right(){ sfx.ok(); mascot('happy'); }
-function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
-function nextBtn(body,done,r,sayAfter){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); const s=sayAfter||praise(); if(r.fact) speak(`${s} ${r.fact}`); else speak(s); }
-
+function showFact(body,r){ if(!r.fact) return; body.appendChild(el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`)); }
+function nextBtn(body,done,r,sayAfter){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); const s=sayAfter||praise(); speak(r.fact?`${s} ${r.fact}`:s); }
 function finishLevel(){
-  const {level,mistakes,total}=cur;
-  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const {level,mistakes,total}=cur; const stars=mistakes===0?3:mistakes<=2?2:1;
   const prev=progress[level.id]||{stars:0,plays:0};
-  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
-  store.set('progress',progress);
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()}; store.set('progress',progress);
   history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
   updateBank(); sfx.win(); confetti(stars===3?220:120);
   const body=$('#body'); $('#prog').style.width='100%';
-  const msg = stars===3?'Perfect! A wise little owl!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
-  const msgAr = stars===3?'ممتاز! بومة صغيرة حكيمة!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
-  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
-    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
-  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
-  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+  const msg=stars===3?'Perfect! A wise little owl!':stars===2?'Great work! One more go for 3 stars?':'Good try! Let’s play it again together.';
+  const msgAr=stars===3?'ممتاز! بومة صغيرة حكيمة!':stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟':'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p><div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home; speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
 }
 
-// ============ ROUND TYPES ============
+// ===================== ROUND TYPES =====================
 const ROUNDS={};
-function header(body,r){
-  body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||''));
-  if(r.scene) body.appendChild(el('div','scene'+(r.small?' small':''),r.scene));
-}
-const opts=r=>typeof r.opts==='function'?r.opts():r.opts;
+function header(body,r){ body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||'')); if(r.scene) body.appendChild(el('div','scene'+(r.small?' small':''),r.scene)); }
 
-// --- story: tap each step of Ahmed's evening to hear it ---
 ROUNDS.story=function(r,body,done){
   header(body,r);
-  const strip=el('div','story'); body.appendChild(strip);
-  const seen=new Set();
-  ROUTINE.forEach((s,i)=>{ const d=el('button','step',`<div class="e">${s[0]}</div><div class="k">${i+1}. ${s[1]}</div><div class="s">${s[2]}</div><div class="a">${s[3]}</div>`);
-    d.onclick=()=>{ sfx.tap(); strip.querySelectorAll('.step').forEach(x=>x.classList.remove('lit')); d.classList.add('lit'); speak(`${s[1]}, ${s[2]}`,{force:true}); seen.add(i); counter.textContent=seen.size<6?`Listened to ${seen.size} of 6`:'You heard the whole evening! 🌙'; };
-    strip.appendChild(d); });
-  const counter=el('div','counter','Tap a picture to hear it. Listened to 0 of 6'); body.appendChild(counter);
-  const all=el('button','nextbtn ghost','🔊 Read the whole story'); all.onclick=()=>{ let t=''; ROUTINE.forEach(s=>t+=`${s[1]}, ${s[2]} `); speak(t,{force:true}); strip.querySelectorAll('.step').forEach(x=>x.classList.add('lit')); ROUTINE.forEach((s,i)=>seen.add(i)); counter.textContent='You heard the whole evening! 🌙'; };
-  body.appendChild(all);
+  if(r.text){ body.appendChild(el('div','text',`${r.text}<div class="ar">${r.textAr||''}</div>`)); const b1=el('button','nextbtn ghost','🔊 Read the story to me'); b1.onclick=()=>speak(plain(r.text),{force:true}); const b2=el('button','nextbtn ghost','🐢 Read it slowly'); b2.onclick=()=>speak(plain(r.text),{force:true,slow:true}); const row=el('div','row'); row.append(b1,b2); body.appendChild(row); speak('Story time! '+plain(r.text)); }
+  if(r.steps){ const strip=el('div','story'); body.appendChild(strip); const seen=new Set(); const counter=el('div','counter','Tap a picture to hear it. Listened to 0 of '+r.steps.length);
+    r.steps.forEach((s,i)=>{ const d=el('button','step',`<div class="e">${s[0]}</div><div class="k">${i+1}. ${s[1]}</div><div class="s">${s[2]}</div><div class="a">${s[3]}</div>`); d.onclick=()=>{ sfx.tap(); strip.querySelectorAll('.step').forEach(x=>x.classList.remove('lit')); d.classList.add('lit'); speak(`${s[1]}, ${s[2]}`,{force:true}); seen.add(i); counter.textContent=seen.size<r.steps.length?`Listened to ${seen.size} of ${r.steps.length}`:'You heard the whole story! 🌟'; }; strip.appendChild(d); });
+    body.appendChild(counter); const all=el('button','nextbtn ghost','🔊 Read the whole story'); all.onclick=()=>{ speak(r.steps.map(s=>`${s[1]}, ${s[2]}`).join(' '),{force:true}); strip.querySelectorAll('.step').forEach(x=>x.classList.add('lit')); r.steps.forEach((s,i)=>seen.add(i)); counter.textContent='You heard the whole story! 🌟'; }; body.appendChild(all); speak((r.intro||'')+' Tap each picture to listen.'); }
   const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b);
-  speak("Let's read about Ahmed's evening. After school, Ahmed goes back home. Tap each picture to listen. Do you do the same things too?");
 };
-
-// --- pick one correct tile (r.any: every tile is fine – it is a "what do YOU like" question) ---
+const opts=r=>typeof r.opts==='function'?r.opts():r.opts;
 ROUNDS.pick=function(r,body,done){
-  header(body,r);
-  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
-  let locked=false;
+  header(body,r); const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb); let locked=false;
   shuffle(opts(r)).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
     if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); });
-      const full = r.q.includes('blank') ? `${w}, ${plain(r.q).replace(/^___,?\s*/,'')}` : (r.any ? `I’m Mira, I love ${w==='Sports'?'sports':'to '+w.toLowerCase()}!` : w);
+      const full=r.q.includes('class="blank"')?plain(r.q).replace('___',w.trim()):(r.any?`I’m Mira, I love ${w==='Sports'?'sports':'to '+w.toLowerCase()}!`:w);
       nextBtn(body,done,r,`${praise()} ${full}`); }
-    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
-    row.appendChild(b); });
-  if(r.listen){ const lb=el('button','nextbtn ghost','🔊 Hear the words'); lb.onclick=()=>{ const ws=row.querySelectorAll('.tile .w'); let t=''; ws.forEach(x=>t+=x.textContent+'. '); speak(t,{force:true,slow:true,pitch:1}); }; body.appendChild(lb); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } }; row.appendChild(b); });
+  if(r.listen){ const lb=el('button','nextbtn ghost','🔊 Hear the words'); lb.onclick=()=>{ let t=''; row.querySelectorAll('.tile .w').forEach(x=>t+=x.textContent+'. '); speak(t,{force:true,slow:true,pitch:1}); }; body.appendChild(lb); }
 };
-
-// --- multi: tap ALL correct tiles ---
 ROUNDS.multi=function(r,body,done){
-  header(body,r);
-  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
-  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
-  const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
+  header(body,r); const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb); const need=r.opts.filter(o=>o[2]).length; let got=0,locked=false; const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
   shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
-    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
-      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
-    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No, not in school! ${retry()}`); } };
-    row.appendChild(b); });
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad'); if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No. ${retry()}`); } }; row.appendChild(b); });
 };
-
-// --- order: tap pictures in the right order (numbered slots, like "Number the pictures" in the book) ---
+ROUNDS.tf=function(r,body,done){
+  header(body,r); const items=r.items; let i=0; const card=el('div'); body.appendChild(card); const row=el('div','row'); body.appendChild(row); const counter=el('div','counter',''); body.appendChild(counter);
+  const T=el('button','tile tfb t',tileHtml('✅','True')), F=el('button','tile tfb f',tileHtml('❌','False')); row.append(T,F);
+  const show=()=>{ const it=items[i]; if(!it){ row.remove(); nextBtn(body,done,r); return; } card.innerHTML=`<div class="stmt">${it[0]}<div class="ar">${it[2]||''}</div></div><div class="feedback"></div>`; counter.textContent=`${i+1} of ${items.length}`; speak(`${it[0]} True or false?`); };
+  const choose=v=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback'); sfx.tap();
+    if(v===!!it[1]){ right(); fb.textContent=praise(); fb.classList.remove('bad'); speak(`${v?'True':'False'}! ${praise()}`); i++; setTimeout(show,900); }
+    else { wrong(); (v?T:F).classList.add('bad'); setTimeout(()=>(v?T:F).classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Hmm. ${it[0]} Think again!`); } };
+  T.onclick=()=>choose(true); F.onclick=()=>choose(false); show();
+};
+ROUNDS.sort=function(r,body,done){
+  header(body,r); const items=shuffle(r.items); let i=0; const card=el('div'); body.appendChild(card); const bk=el('div','buckets'); bk.style.setProperty('--n',r.buckets.length); body.appendChild(bk); const bEls={};
+  r.buckets.forEach(b=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${b.ar}</div><div class="got"></div>`); d.onclick=()=>choose(b.v); bk.appendChild(d); bEls[b.v]=d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const show=()=>{ const it=items[i]; if(!it){ nextBtn(body,done,r); return; } card.innerHTML=`<div class="scene">${it[0]}</div><div class="q" style="font-size:1.4rem">${it[1]} <span class="ar-hint" style="display:inline;color:var(--grape)">${arWord(it[1])}</span></div><div class="feedback"></div>`; counter.textContent=`${i+1} of ${items.length}`; speak(`${it[1]}. ${r.buckets.map(b=>b.n).join(' or ')}?`); };
+  const choose=v=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback'); const bn=r.buckets.find(b=>b.v===v).n;
+    if(v===it[2]){ right(); bEls[v].querySelector('.got').appendChild(el('span',null,it[0])); fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${it[1]}: ${bn}.`); i++; setTimeout(show,900); }
+    else { wrong(); bEls[v].classList.add('bad'); setTimeout(()=>bEls[v].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${it[1]}, ${bn}? ${retry()}`); } };
+  show();
+};
 ROUNDS.order=function(r,body,done){
-  header(body,r);
-  const slots=el('div','slots'); body.appendChild(slots);
+  header(body,r); const slots=el('div','slots'); body.appendChild(slots);
   r.items.forEach((it,k)=>{ slots.appendChild(el('div','slot',`<span class="n">${k+1}</span>`)); if(k<r.items.length-1) slots.appendChild(el('span','arrow','➜')); });
-  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
-  let k=0;
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb); let k=0;
   shuffle(r.items.map((it,idx)=>[it,idx])).forEach(([it,idx])=>{ const b=el('button','tile',tileHtml(it[0],it[1])); b.onclick=()=>{ sfx.tap();
-    if(idx===k){ right(); b.classList.add('used'); const s=slots.querySelectorAll('.slot')[k]; s.innerHTML=`<span class="n">${k+1}</span>${it[0]}`; s.classList.add('fill'); k++; fb.textContent=praise(); fb.classList.remove('bad');
-      if(k===r.items.length) nextBtn(body,done,r); else speak(`${SEQ[k-1]}, ${it[1].toLowerCase()}. What comes next?`); }
-    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Not yet. What does he do ${k===0?'first':'next'}?`); } };
-    row.appendChild(b); });
+    if(idx===k){ right(); b.classList.add('used'); const s=slots.querySelectorAll('.slot')[k]; s.innerHTML=`<span class="n">${k+1}</span>${it[0]}`; s.classList.add('fill'); k++; fb.textContent=praise(); fb.classList.remove('bad'); if(k===r.items.length) nextBtn(body,done,r); else speak(`${r.seq?SEQ[k-1]+', ':''}${it[1].toLowerCase()}. What comes next?`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Not yet. What comes ${k===0?'first':'next'}?`); } }; row.appendChild(b); });
   speak(plain(r.q)+' Tap what comes first.');
 };
-
-// --- unscramble: tap the words to build the sentence ---
 ROUNDS.unscramble=function(r,body,done){
-  header(body,r);
-  const sent=el('div','sentence'); body.appendChild(sent);
-  r.words.forEach(()=>sent.appendChild(el('span','wslot','')));
-  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
-  const target=r.words.join(' ');
-  let k=0;
+  header(body,r); const sent=el('div','sentence'); body.appendChild(sent); r.words.forEach(()=>sent.appendChild(el('span','wslot',''))); const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb); const target=r.words.join(' '); let k=0;
   shuffle(r.words.map((w,idx)=>[w,idx])).forEach(([w,idx])=>{ const b=el('button','tile word',`<span class="w">${w}</span>`); b.onclick=()=>{ sfx.tap();
-    if(idx===k){ right(); b.classList.add('used'); const s=sent.querySelectorAll('.wslot,.wdone')[k]; s.className='wdone'; s.textContent=w; k++; fb.textContent=praise(); fb.classList.remove('bad');
-      if(k===r.words.length){ nextBtn(body,done,r,`${praise()} ${target}`); } else speak(r.words.slice(0,k).join(' ')+'…'); }
-    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(k===0?'Which word comes first? Look for the capital letter!':`${r.words.slice(0,k).join(' ')}… what comes next?`); } };
-    row.appendChild(b); });
+    if(idx===k){ right(); b.classList.add('used'); const s=sent.querySelectorAll('.wslot,.wdone')[k]; s.className='wdone'; s.textContent=w; k++; fb.textContent=praise(); fb.classList.remove('bad'); if(k===r.words.length) nextBtn(body,done,r,`${praise()} ${target}`); else speak(r.words.slice(0,k).join(' ')+'…'); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(k===0?'Which word comes first? Look for the capital letter!':`${r.words.slice(0,k).join(' ')}… what comes next?`); } }; row.appendChild(b); });
   const hear=el('button','nextbtn ghost','🔊 Hear the sentence'); hear.onclick=()=>speak(target,{force:true,slow:true}); body.appendChild(hear);
 };
-
-// --- match: tap a child, then what they love ---
 ROUNDS.match=function(r,body,done){
-  header(body,r);
-  const cols=el('div','cols'); const L=el('div','col'), R=el('div','col'); cols.append(L,R); body.appendChild(cols);
-  const fb=el('div','feedback',''); body.appendChild(fb);
-  let sel=null, left=r.pairs.length;
-  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[0],p[1])); b.dataset.k=k; b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); L.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel')); b.classList.add('sel'); sel=b; speak(r.lines?r.lines[p[1]]:p[1],{force:true}); }; L.appendChild(b); });
-  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[2],p[3])); b.onclick=()=>{ sfx.tap(); if(!sel){ fb.textContent='Tap a child first!'; fb.classList.add('bad'); speak('Tap a child first!'); return; }
-      const sk=Number(sel.dataset.k);
-      if(sk===k){ right(); sel.classList.remove('sel'); sel.classList.add('ok'); b.classList.add('ok'); sel.style.pointerEvents='none'; b.style.pointerEvents='none'; fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${r.lines[p[1]]}`); sel=null; left--; if(left===0) nextBtn(body,done,r); }
-      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`No. Listen: ${r.lines[r.pairs[sk][1]]} ${retry()}`); } };
-    R.appendChild(b); });
-  speak(plain(r.q)+' Tap a child to hear what they say.');
+  header(body,r); const cols=el('div','cols'); const L=el('div','col'),R=el('div','col'); cols.append(L,R); body.appendChild(cols); const fb=el('div','feedback',''); body.appendChild(fb); let sel=null,left=r.pairs.length; const line=p=>(r.lines&&r.lines[p[1]])||p[1];
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[0],p[1])); b.dataset.k=k; b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); L.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel')); b.classList.add('sel'); sel=b; speak(line(p),{force:true}); }; L.appendChild(b); });
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[2],p[3])); b.onclick=()=>{ sfx.tap(); if(!sel){ fb.textContent='Tap the left side first!'; fb.classList.add('bad'); speak('Tap the left side first!'); return; } const sk=Number(sel.dataset.k);
+      if(sk===k){ right(); sel.classList.remove('sel'); sel.classList.add('ok'); b.classList.add('ok'); sel.style.pointerEvents='none'; b.style.pointerEvents='none'; fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${line(p)} ${p[3]}.`); sel=null; left--; if(left===0) nextBtn(body,done,r); }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`No. ${line(r.pairs[sk])} ${retry()}`); } }; R.appendChild(b); });
+  speak(plain(r.q)+' Tap one on the left, then its match on the right.');
 };
-
-// --- sound: listen-and-repeat corner for th / sh / ch ---
 ROUNDS.sound=function(r,body,done){
-  header(body,r);
-  body.appendChild(el('div','fact',`👄 ${r.tip}<div class="ar">${r.tipAr}</div>`));
-  const row=el('div','row'); body.appendChild(row);
+  header(body,r); body.appendChild(el('div','fact',`👄 ${r.tip}<div class="ar">${r.tipAr}</div>`)); const row=el('div','row'); body.appendChild(row);
   r.words.forEach(([e,w])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ sfx.tap(); b.classList.add('sel'); setTimeout(()=>b.classList.remove('sel'),600); speak(w,{force:true,slow:true,pitch:1}); }; row.appendChild(b); });
   const all=el('button','nextbtn ghost',`🐢 Say them slowly: ${r.sound.toUpperCase()}`); all.onclick=()=>speak(r.words.map(w=>w[1]).join('. '),{force:true,slow:true,pitch:1}); body.appendChild(all);
-  body.appendChild(el('div','counter','Tap a word, listen, then say it out loud 3 times! 🎤'));
-  const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b);
-  speak(plain(r.q)+' '+r.tip,{pitch:1});
+  body.appendChild(el('div','counter','Tap a word, listen, then say it out loud 3 times! 🎤')); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); speak(plain(r.q)+' '+r.tip,{pitch:1});
 };
 
-// ============ REPORT ============
+// ===================== REPORT =====================
+const KEYS={
+ u1:['<b>p.7–9 Body:</b> This is my eye/nose/ear/mouth/hand/foot… One: head, hair, nose, mouth, neck. Two: eyes, ears, hands, legs, feet, knees. Ten fingers. T/F p.9: two mouths F · one eye F · two feet T · two heads F · one hand F · two legs T · one ear F · two fingers F · two knees T · one nose T.',
+     '<b>p.10–13 Senses:</b> ears–hear · eyes–see · tongue–taste · hands–touch · nose–smell. "I can hear birds singing with my ears."',
+     '<b>p.14–16 Family:</b> mother (cares, shoes, cooks) · father (safe, teaches, buys) · brother (friend, plays, laughs) · sister (helpful, kind) · grandparents (hugs, kisses, sweets).',
+     '<b>p.17–21 Home:</b> bedroom–sleep–bed · dining room–eat–table · hall–shoes–shoe rack · living room–TV–sofa · bathroom–wash hands–sink · kitchen–mom cooks–stove.',
+     '<b>p.22–25 Past & Now:</b> baby (bottle, rattle, bib, crawling) → now (rice, bicycle, jacket, jump rope). Timeline: born → crawl → walk → school → first grade.',
+     '<b>p.26 Story "My Amazing Body":</b> hands–blanket · ears–birds · nose–breakfast · eyes–toys · tongue–fruit · arms–hug · legs–walk.'],
+ u2:['<b>p.28–31 Morning:</b> First wake up · Next wash face · After that brush teeth · Then eat breakfast · Later get dressed · Finally go to school.',
+     '<b>p.32–34 Evening:</b> First go home · Next eat lunch · After that homework · Then dinner · Later pyjama · Finally bed. (Ahmed: "he goes" / me: "I go".)',
+     '<b>p.35–38 School:</b> make friends · read & write · count · ask questions · draw & color · sports. Match: Ali–write, Mariam–color, Ahmed–sports, Fatima–draw. "He is asking a question / She is counting / He is making new friends / She is reading."',
+     '<b>p.39–43 Feelings:</b> happy (goal, birthday, favorite food, great work) · sad (bad mark, no one to play, lost pencil, rain) · angry (pushed, took my toy, not picked, can\'t do math). Use words, ask for help, be kind. T/F p.43: T F T T F.',
+     '<b>p.44–48 Playtime:</b> drawing, blocks, origami, story writing, pretend play, reading, puzzles, jump rope / hula hoop. Story "Ahmed\'s Busy Day": happy with friends, angry when pencil broke.'],
+ u3:['<b>p.52–55 Around me:</b> tree, house, car, flower, bird. Red car on the street · tree in the park · house near the sea · flowers in the garden · pet dog. T/F p.55: T T F T T F T.',
+     '<b>p.56–59 Sounds:</b> baby–crying · girl–splashing · birds–chirping · cars–honking · bell–ringing. Quiet: bee, cat, mouse, fan, bird. Loud: bus, whistle, lion, drum. T/F p.59: F T T F T.',
+     '<b>p.60–63 Colors:</b> red apples · blue sky · red dress · gray mouse · yellow bananas · purple flower · black shoes · green leaves · an orange car · brown coat. T/F p.63: F T T T T F.',
+     '<b>p.64–67 Shapes:</b> pizza–triangle · fish/egg–oval · TV–rectangle · clock/window–square · donut/sun–circle · kite–diamond. Corners: triangle 3, square/rectangle/diamond 4, circle/oval 0. T/F p.67: F T F F T T T.',
+     '<b>p.68–71 Neighborhood:</b> learn at school · buy from a shop · play in the park · sleep at home · pray in the mosque · bread from the bakery. Doctors help the sick, teachers teach, shopkeepers sell. T/F p.71: F T F.',
+     '<b>p.72 Story "The Shape Hunt":</b> square window, round tire, triangle roof, red flower, gray rock.'],
+ u4:['<b>p.74–75 Map:</b> a drawing of a real place, shows places from ABOVE, helps us find PLACES. (Pictures from above = map view.)',
+     '<b>p.76–77 Symbols & key:</b> symbols = small pictures (car, mosque, park, airport, shop, house, school, mall, hospital, police station). The map key tells what the symbols mean.',
+     '<b>p.78–79 Compass rose:</b> N North (top) · S South (bottom) · E East (right) · W West (left). Zoo: elephant–north, giraffe–west, zebra–south, bear–east; north of zebra = elephant; west of bear = giraffe.',
+     '<b>p.80 Parts:</b> 1 map · 2 map key · 3 compass rose · 4 symbol. Compass rose finds directions; map key explains symbols; a map is a picture of a real place; a symbol is a drawing of an object.',
+     '<b>p.83–85 Where am I:</b> home → neighborhood → city → country → continent. "I\'m in Tripoli, Libya. Libya is in Africa."',
+     '<b>p.86 Story "Omar\'s Treasure Hunt":</b> old map at grandfather\'s, symbols tree/mosque/school, north to the park, east to the bakery, tree marked X, box of toys.'],
+ u5:['<b>p.88–91 How we travel:</b> Land: walking, bicycle, car, bus, train · Air: airplane, helicopter, rocket, hot air balloon · Water: sailboat, motorboat, ship, canoe. T/F p.91: F T T F T T.',
+     '<b>p.92–93 How travelling changed:</b> walked → animals → animals with the wheel → wheels without animals (bicycle) → motor (cars). T/F p.93: F T F T.',
+     '<b>p.94–95 Street safety:</b> walk on the sidewalk · never play near a street · hold a grown-up\'s Hand · Stop, Look, Listen · Cross where cars can see you · cross when cars Stop.',
+     '<b>p.96–98 Car safety:</b> under 12 in the back seat · Seatbelt · head & hands inside · stay in seat · no Standing or Climbing · don\'t fight.',
+     '<b>p.99–102 Traffic light & signs:</b> red STOP · yellow WAIT · green GO. STOP sign = stop and look · ⛔ don\'t enter · arrows = go left/right soon · P with line = no parking · P = you can park · H = hospital · RR X = train passes here.',
+     '<b>p.103 Story "Mariam Takes a Plane":</b> visiting Grandma in another country, flying, seatbelt, clouds, big hug.'],
+};
 function report(){
-  speechSynthesis && speechSynthesis.cancel();
-  const v=$('#view'); v.innerHTML='';
-  const panel=el('div','panel'); v.appendChild(panel);
-  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
-  const bt=progress['bigtest']||{};
-  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
-  <div class="report">
-    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Book</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
-    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
-    <div class="card"><h3>Answer key · Social book p.32–37</h3><ul>
-      <li><b>p.33 Q1 Unscramble:</b> 1 First, Ahmed goes home. · 2 Next he eats lunch. · 3 After that he does his homework. · 4 Then he eats dinner. · 5 Later he puts on his pyjama. · 6 Finally he goes to bed.</li>
-      <li><b>p.33 Q2 Number the pictures:</b> home 1 · lunch 2 · homework 3 · dinner 4 · pyjama 5 · bed 6.</li>
-      <li><b>p.34 Q3 Draw &amp; write your routine:</b> First I go home. Next I eat my lunch. After that I do my homework. Then I eat dinner. Later I put on my pyjama. Finally I go to bed. (Mira draws the 6 boxes herself.)</li>
-      <li><b>p.35–36 In school you:</b> make new friends · learn to read and write · learn to count · learn to ask questions · learn to draw and color · do sports.</li>
-      <li><b>p.37 Q1 Read and match:</b> Ali → writing ✍️ · Mariam → coloring 🖍️ · Ahmed → football ⚽ · Fatima → painting 🎨.</li>
-      <li><b>p.37 Q2 Unscramble:</b> He is asking a question. · She is counting. · He is making new friends. · She is reading.</li>
-    </ul><p style="margin:6px 0 0;color:var(--muted)">Note: the book calls the boy both "Ali" and "Ahmed" on p.32 – the sentences use Ahmed, so the game does too.</p></div>
-    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
-      <li>Count the 6 sequence words on fingers: <i>First · Next · After that · Then · Later · Finally</i>.</li>
-      <li>“Mira, what do you do first after school?” → <i>First I go home…</i> keep going to <i>Finally I go to bed.</i></li>
-      <li>“What do you do in school?” → <i>I make friends, I read and write, I count, I ask questions, I draw and color, I do sports.</i></li>
-      <li>Point at Dad: “he or she?” Point at Mum: “he or she?” Then: “What is Mum doing?” → <i>She is …ing.</i></li>
-      <li>Sound game: <b>th</b> (tongue between teeth) <i>then, that, three</i> · <b>sh</b> (quiet lips) <i>she, fish, shoes</i> · <b>ch</b> (little sneeze) <i>lunch, chair, teacher</i>.</li>
-    </ul></div>
-  </div>`;
+  speechSynthesis&&speechSynthesis.cancel(); const v=$('#view'); v.innerHTML=''; const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const tables=UNITS.map(u=>{ const rows=u.levels.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join(''); const bt=progress['test_'+u.id]||{}; return `<div class="card"><h3>Unit ${u.n}: ${u.title} (${u.pages})</h3><table><tr><th>Island</th><th>Book</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table><h3 style="margin-top:8px">Answer key</h3><ul>${KEYS[u.id].map(k=>`<li>${k}</li>`).join('')}</ul></div>`; }).join('');
+  const bb=progress['test_book']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div><div class="report">
+    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}<p style="margin:6px 0 0">👑 Whole Book Challenge: ${starsHtml(bb.stars||0)} · ${bb.plays||0} plays</p></div>
+    ${tables}
+    <div class="card"><h3>5-minute chats (say it together)</h3><ul><li>Count on fingers: <i>First · Next · After that · Then · Later · Finally</i> – then tell your morning and evening.</li><li>"What can your body do?" → 5 senses on 5 fingers. "Is a robot… no wait, is the sun blue?"</li><li>"Point north! Where is east?" – play compass in the living room.</li><li>"Red means…? Yellow…? Green…?" and "Before we cross the street we…?" (stop, look, listen).</li><li>"Home, neighborhood, city, country, continent" – say them from smallest to biggest.</li></ul></div></div>`;
   $('#backBtn').onclick=home;
 }
 
-// ============ CHIPS ============
+// ===================== CHIPS =====================
 function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
 $('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Hoot hoot!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
 $('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
