@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mira's Day &amp; School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Evening-sky + school-yellow look. Same engine as the other islands games: one map → one big activity card per round. */
+:root{
+  --bg:#f3f0ff;          /* pale lavender evening */
+  --bg2:#e4ddff;
+  --card:#ffffff;
+  --ink:#2a2338;
+  --muted:#7c7390;
+  --coral:#ff7a59;
+  --sun:#ffc93c;
+  --leaf:#4cbb5c;
+  --sky:#3fb0ff;
+  --grape:#9b6cff;
+  --night:#5b4bc4;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(42,35,56,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#fff6c4 0,transparent 32%),radial-gradient(circle at 92% 92%,#cfeeff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--night)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#e4ddff}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#e4ddff)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--grape),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.q .blank{display:inline-block;min-width:3.2em;border-bottom:4px solid var(--grape);color:var(--grape);padding:0 6px}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.scene{font-size:clamp(2.6rem,9vw,4rem);text-align:center;line-height:1.2;margin:8px 0;letter-spacing:.08em}
+.scene.small{font-size:clamp(2rem,7vw,3rem)}
+.arrow{color:var(--muted);font-size:.6em;vertical-align:middle}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:120px}
+.tile .e{font-size:2.4rem;line-height:1}
+.tile .e:empty{display:none}
+.tile .w{font-size:1.1rem}
+.tile .wa{font-size:.9rem;color:var(--grape);direction:rtl;display:none}
+body.ar .tile .wa{display:block}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+.tile.word{min-width:0;padding:10px 16px;font-size:1.35rem;min-height:54px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.cols .col{display:flex;flex-direction:column;gap:12px}
+.cols .tile{min-width:0}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:14px 0}
+.slot{width:78px;height:78px;border-radius:18px;background:var(--bg2);border-bottom:5px solid #c9bdfb;display:grid;place-items:center;font-size:2.4rem;position:relative}
+.slot.fill{background:#e6f8ea;border-bottom-color:var(--ok);animation:pop .3s}
+.slot .n{position:absolute;top:-10px;left:-6px;background:var(--grape);color:#fff;font-size:.8rem;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--display)}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+/* sentence builder */
+.sentence{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:64px;background:var(--bg2);border-radius:18px;padding:12px;margin:12px 0;font-family:var(--display);font-size:1.5rem}
+.sentence .wslot{min-width:70px;height:46px;border-bottom:4px dashed #c9bdfb;border-radius:6px}
+.sentence .wdone{background:#e6f8ea;color:#1f7a2f;border-radius:12px;padding:4px 12px;animation:pop .3s}
+/* story strip */
+.story{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.step{background:var(--bg2);border-radius:18px;padding:12px 10px;text-align:center;cursor:pointer;transition:transform .1s;border:3px solid transparent}
+.step:active{transform:scale(.97)}
+.step.lit{border-color:var(--sun);background:#fff6c4}
+.step .e{font-size:2.6rem;line-height:1}
+.step .k{font-family:var(--display);color:var(--night);font-size:1.1rem;margin-top:4px}
+.step .s{font-size:.9rem;color:var(--muted)}
+.step .a{font-size:.85rem;color:var(--grape);direction:rtl;display:none}
+body.ar .step .a{display:block}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#e4ddff}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #d6cdf5}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m">🦉</span> Mira's Day &amp; School</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🦉</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Social "The World Around Me" · Unit 2 My Daily Life · Lesson 2 My Evening Routine (p.32–34) + Lesson 3 What I Do in School (p.35–37) ============
+
+const AR = { // Arabic labels (shown only when عربي is on)
+  'First':'أولاً','Next':'بعد ذلك','After that':'بعد ذلك','Then':'ثم','Later':'لاحقاً','Finally':'أخيراً',
+  'Go home':'يذهب إلى البيت','Eat lunch':'يأكل الغداء','Do homework':'يعمل الواجب','Eat dinner':'يأكل العشاء','Put on pyjama':'يلبس البيجاما','Go to bed':'يذهب إلى السرير',
+  'Make new friends':'يكوّن أصدقاء جدداً','Read and write':'يقرأ ويكتب','Count':'يعدّ','Ask questions':'يسأل أسئلة','Draw and color':'يرسم ويلوّن','Do sports':'يمارس الرياضة',
+  'Sleep all day':'ينام طوال اليوم','Drive a car':'يقود سيارة','Cook dinner':'يطبخ العشاء','Watch TV':'يشاهد التلفاز',
+  'Ali':'علي','Mariam':'مريم','Ahmed':'أحمد','Fatima':'فاطمة',
+  'Write':'يكتب','Color':'يلوّن','Sports':'الرياضة','Draw':'يرسم',
+  'Asking a question':'يسأل سؤالاً','Counting':'تعدّ','Making new friends':'يكوّن أصدقاء','Reading':'تقرأ','Sleeping':'ينام','Eating':'يأكل',
+  'lunch':'غداء','bed':'سرير','then':'ثم','home':'بيت','she':'هي','friends':'أصدقاء','that':'ذلك','school':'مدرسة','fish':'سمكة','teacher':'معلّمة','chair':'كرسي','three':'ثلاثة'
+};
+
+const Q = (type, obj) => Object.assign({type}, obj);
+
+// Ahmed's evening routine, exactly in the book's order (p.32)
+const ROUTINE = [
+  ['🏠','First','Ahmed goes home.','أولاً، أحمد يذهب إلى البيت.','Go home'],
+  ['🍝','Next','he eats lunch.','بعد ذلك يأكل الغداء.','Eat lunch'],
+  ['📖','After that','he does his homework.','بعد ذلك يعمل واجبه.','Do homework'],
+  ['🍽️','Then','he eats dinner.','ثم يأكل العشاء.','Eat dinner'],
+  ['👘','Later','he puts on his pyjama.','لاحقاً يلبس البيجاما.','Put on pyjama'],
+  ['🛏️','Finally','he goes to bed.','أخيراً يذهب إلى السرير.','Go to bed'],
+];
+const SEQ = ['First','Next','After that','Then','Later','Finally'];
+const seqOpts = (right)=> shuffle(SEQ.filter(w=>w!==right)).slice(0,2).concat([right]).map(w=>['',w,w===right?1:0]);
+
+const LEVELS = [
+ { id:'story', title:"Ahmed's Evening", ar:'مساء أحمد', emoji:'🌙', color:'#5b4bc4', pages:'Book p.32–33', rounds:[
+   Q('story',{ q:"Tap each picture and listen to Ahmed's evening. Then tap Next.", ar:'المسي كل صورة واستمعي إلى مساء أحمد. ثم المسي التالي.' }),
+   Q('order',{ q:'Number the pictures in order. What does Ahmed do first?', ar:'رتّبي الصور. ماذا يفعل أحمد أولاً؟', items:ROUTINE.map(r=>[r[0],r[4]]), fact:'First home 🏠, next lunch 🍝, after that homework 📖, then dinner 🍽️, later pyjama 👘, finally bed 🛏️.', factAr:'أولاً البيت، بعد ذلك الغداء، ثم الواجب، ثم العشاء، لاحقاً البيجاما، أخيراً السرير.' }),
+   Q('pick',{ q:'<span class="blank">___</span>, Ahmed goes home.', say:'Blank, Ahmed goes home. Which word goes in the blank?', ar:'___، أحمد يذهب إلى البيت.', scene:'🏠', opts:()=>seqOpts('First'), fact:'FIRST is for the thing we do at the very start.', factAr:'"أولاً" للشيء الذي نفعله في البداية.' }),
+   Q('pick',{ q:'<span class="blank">___</span> he eats lunch.', say:'Blank, he eats lunch. Which word goes in the blank?', ar:'___ يأكل الغداء.', scene:'🏠 <span class="arrow">➜</span> 🍝', small:true, opts:()=>[['','Next',1],['','First',0],['','Finally',0]] }),
+   Q('pick',{ q:'<span class="blank">___</span> he does his homework.', say:'Blank, he does his homework. Which word goes in the blank?', ar:'___ يعمل واجبه.', scene:'🍝 <span class="arrow">➜</span> 📖', small:true, opts:()=>[['','After that',1],['','First',0],['','Finally',0]] }),
+   Q('pick',{ q:'<span class="blank">___</span> he eats dinner.', say:'Blank, he eats dinner. Which word goes in the blank?', ar:'___ يأكل العشاء.', scene:'📖 <span class="arrow">➜</span> 🍽️', small:true, opts:()=>[['','Then',1],['','First',0],['','Finally',0]] }),
+   Q('pick',{ q:'<span class="blank">___</span> he puts on his pyjama.', say:'Blank, he puts on his pyjama. Which word goes in the blank?', ar:'___ يلبس البيجاما.', scene:'🍽️ <span class="arrow">➜</span> 👘', small:true, opts:()=>[['','Later',1],['','First',0],['','Next',0]] }),
+   Q('pick',{ q:'<span class="blank">___</span> he goes to bed.', say:'Blank, he goes to bed. Which word goes in the blank?', ar:'___ يذهب إلى السرير.', scene:'👘 <span class="arrow">➜</span> 🛏️', small:true, opts:()=>[['','Finally',1],['','First',0],['','Next',0]], fact:'FINALLY is for the very last thing. Good night, Ahmed! 😴', factAr:'"أخيراً" لآخر شيء. تصبح على خير يا أحمد!' }),
+ ]},
+ { id:'build', title:'Build the Sentence', ar:'ركّبي الجملة', emoji:'🧩', color:'#ff7a59', pages:'Book p.33 · Q1', rounds:[
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🏠', words:['First,','Ahmed','goes','home.'] }),
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🍝', words:['Next','he','eats','lunch.'] }),
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'📖', words:['After that','he','does','his','homework.'] }),
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🍽️', words:['Then','he','eats','dinner.'] }),
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'👘', words:['Later','he','puts on','his','pyjama.'] }),
+   Q('unscramble',{ q:'Tap the words in the right order.', ar:'المسي الكلمات بالترتيب الصحيح.', scene:'🛏️', words:['Finally','he','goes','to','bed.'], fact:'The sentence always starts with a capital letter and ends with a full stop.', factAr:'الجملة تبدأ بحرف كبير وتنتهي بنقطة.' }),
+ ]},
+ { id:'mine', title:'My Routine', ar:'روتيني', emoji:'👧', color:'#ee4b7e', pages:'Book p.34', rounds:[
+   Q('unscramble',{ q:'Now it is YOU, Mira! Build your routine.', ar:'الآن أنتِ يا ميرا! ركّبي روتينك.', scene:'🏠', words:['First','I','go','home.'], fact:'For Ahmed we say "he goes". For me we say "I go" – no s!', factAr:'لأحمد نقول he goes. لنفسي أقول I go – بدون s!' }),
+   Q('unscramble',{ q:'What do you do next?', ar:'ماذا تفعلين بعد ذلك؟', scene:'🍝', words:['Next','I','eat','my','lunch.'] }),
+   Q('unscramble',{ q:'And after that?', ar:'وبعد ذلك؟', scene:'📖', words:['After that','I','do','my','homework.'] }),
+   Q('unscramble',{ q:'Then?', ar:'ثم؟', scene:'🍽️', words:['Then','I','eat','dinner.'] }),
+   Q('unscramble',{ q:'Later…', ar:'لاحقاً…', scene:'👘', words:['Later','I','put on','my','pyjama.'] }),
+   Q('unscramble',{ q:'And finally?', ar:'وأخيراً؟', scene:'🛏️', words:['Finally','I','go','to','bed.'], fact:'In the book you DRAW your routine in 6 boxes and write the 6 sentences. You can say them all now!', factAr:'في الكتاب ترسمين روتينك في 6 مربعات وتكتبين 6 جمل. تستطيعين قولها كلها الآن!' }),
+   Q('order',{ q:'Put YOUR routine in order.', ar:'رتّبي روتينك.', items:ROUTINE.map(r=>[r[0],r[4]]) }),
+ ]},
+ { id:'school', title:'At School', ar:'في المدرسة', emoji:'🏫', color:'#ffc93c', pages:'Book p.35–36', rounds:[
+   Q('multi',{ q:'School is a fun place! Tap ALL the things you do in school.', ar:'المدرسة مكان ممتع! المسي كل الأشياء التي تفعلينها في المدرسة.', opts:[['🤝','Make new friends',1],['📖','Read and write',1],['🧮','Count',1],['🙋','Ask questions',1],['🎨','Draw and color',1],['⚽','Do sports',1],['😴','Sleep all day',0],['🚗','Drive a car',0]], fact:'In school you make new friends, learn to read and write, learn to count, ask questions, draw and color, and do sports.', factAr:'في المدرسة تكوّنين أصدقاء، تتعلمين القراءة والكتابة والعدّ، تسألين، ترسمين وتلوّنين، وتمارسين الرياضة.' }),
+   Q('pick',{ q:'The boy has an abacus with beads. What is he learning?', ar:'الولد معه معداد. ماذا يتعلم؟', scene:'🧮', opts:[['','Count',1],['','Do sports',0],['','Draw and color',0]], fact:'You learn to count: one, two, three…', factAr:'تتعلمين العدّ: واحد، اثنان، ثلاثة…' }),
+   Q('pick',{ q:'The boy has a pencil and an open book. What is he learning?', ar:'الولد معه قلم وكتاب مفتوح. ماذا يتعلم؟', scene:'✏️📖', opts:[['','Read and write',1],['','Count',0],['','Do sports',0]] }),
+   Q('pick',{ q:'Three children are holding hands and smiling. What are they doing?', ar:'ثلاثة أطفال يمسكون الأيدي ويبتسمون. ماذا يفعلون؟', scene:'🧒🤝🧒', opts:[['','Make new friends',1],['','Count',0],['','Ask questions',0]] }),
+   Q('pick',{ q:'He is thinking: "Hmm…?" and his hand is on his chin. What is he doing?', ar:'يفكر: "همم…؟" ويده على ذقنه. ماذا يفعل؟', scene:'🤔❓', opts:[['','Ask questions',1],['','Do sports',0],['','Eat lunch',0]], fact:'Asking questions is how we learn new things!', factAr:'طرح الأسئلة هو طريقة تعلّم الأشياء الجديدة!' }),
+   Q('pick',{ q:'She has a brush, paints and paper. What is she doing?', ar:'معها فرشاة وألوان وورقة. ماذا تفعل؟', scene:'🎨🖌️', opts:[['','Draw and color',1],['','Read and write',0],['','Make new friends',0]] }),
+   Q('pick',{ q:'He is kicking a ball on the grass. What is he doing?', ar:'يركل الكرة على العشب. ماذا يفعل؟', scene:'⚽🏃', opts:[['','Do sports',1],['','Count',0],['','Ask questions',0]] }),
+ ]},
+ { id:'friends', title:'Who Loves What?', ar:'من يحب ماذا؟', emoji:'💛', color:'#4cbb5c', pages:'Book p.37 · Q1', rounds:[
+   Q('match',{ q:'Read and match. Tap the child, then tap what they love.', ar:'اقرئي وصِلي. المسي الطفل ثم المسي ما يحبه.', pairs:[['👦','Ali','✍️','Write'],['👧','Mariam','🖍️','Color'],['🧒','Ahmed','⚽','Sports'],['👧🏽','Fatima','🎨','Draw']], lines:{Ali:'I’m Ali, I love to write.',Mariam:'I’m Mariam, I love to color.',Ahmed:'I’m Ahmed, I love sports.',Fatima:'I’m Fatima, I love to draw.'}, fact:'Ali loves to write ✍️ · Mariam loves to color 🖍️ · Ahmed loves sports ⚽ · Fatima loves to draw 🎨', factAr:'علي يحب الكتابة · مريم تحب التلوين · أحمد يحب الرياضة · فاطمة تحب الرسم' }),
+   Q('pick',{ q:'"I’m Ali, I love to…"', say:'I am Ali, I love to… what?', ar:'"أنا علي، أحب أن…"', scene:'👦✍️', opts:[['','Write',1],['','Color',0],['','Draw',0]] }),
+   Q('pick',{ q:'"I’m Mariam, I love to…"', say:'I am Mariam, I love to… what?', ar:'"أنا مريم، أحب أن…"', scene:'👧🖍️', opts:[['','Color',1],['','Write',0],['','Sports',0]] }),
+   Q('pick',{ q:'"I’m Ahmed, I love…"', say:'I am Ahmed, I love… what?', ar:'"أنا أحمد، أحب…"', scene:'🧒⚽', opts:[['','Sports',1],['','Draw',0],['','Color',0]] }),
+   Q('pick',{ q:'"I’m Fatima, I love to…"', say:'I am Fatima, I love to… what?', ar:'"أنا فاطمة، أحب أن…"', scene:'👧🏽🎨', opts:[['','Draw',1],['','Write',0],['','Sports',0]] }),
+   Q('pick',{ q:'And YOU, Mira? What do you love to do in school?', say:'And you, Mira? What do you love to do in school? Tap your favourite!', ar:'وأنتِ يا ميرا؟ ماذا تحبين أن تفعلي في المدرسة؟', scene:'👧💛', opts:[['✍️','Write',1],['🖍️','Color',1],['⚽','Sports',1],['🎨','Draw',1]], any:true, fact:'Say it: "I’m Mira, I love to …!"', factAr:'قوليها: "أنا ميرا، أحب أن …!"' }),
+ ]},
+ { id:'doing', title:'What Is He Doing?', ar:'ماذا يفعل؟', emoji:'🙋', color:'#3fb0ff', pages:'Book p.37 · Q2', rounds:[
+   Q('unscramble',{ q:'What is he doing? Build the answer.', ar:'ماذا يفعل؟ ركّبي الإجابة.', scene:'🤔❓', words:['He','is','asking','a','question.'] }),
+   Q('unscramble',{ q:'What is she doing? Build the answer.', ar:'ماذا تفعل؟ ركّبي الإجابة.', scene:'👧🧮', words:['She','is','counting.'] }),
+   Q('unscramble',{ q:'What is he doing? Build the answer.', ar:'ماذا يفعل؟ ركّبي الإجابة.', scene:'🧒🤝🧒', words:['He','is','making','new','friends.'] }),
+   Q('unscramble',{ q:'What is she doing? Build the answer.', ar:'ماذا تفعل؟ ركّبي الإجابة.', scene:'👧📖', words:['She','is','reading.'], fact:'"He" is for a boy. "She" is for a girl. Then "is" + the doing word with -ing!', factAr:'He للولد. She للبنت. ثم is + الفعل مع ing!' }),
+   Q('pick',{ q:'He is looking at an open book and reading the words. What is he doing?', ar:'ينظر إلى كتاب مفتوح ويقرأ الكلمات. ماذا يفعل؟', scene:'👦📖', opts:[['','Reading',1],['','Counting',0],['','Sleeping',0]] }),
+   Q('pick',{ q:'She is saying "one, two, three" on her fingers. What is she doing?', ar:'تقول "واحد، اثنان، ثلاثة" على أصابعها. ماذا تفعل؟', scene:'👧✋', opts:[['','Counting',1],['','Reading',0],['','Eating',0]] }),
+   Q('pick',{ q:'Is it HE or SHE? 👧', say:'Look at the girl. Is it he or she?', ar:'هل هي He أم She؟ (بنت)', scene:'👧', opts:[['','She',1],['','He',0]], fact:'A girl is SHE. A boy is HE.', factAr:'البنت She. الولد He.' }),
+   Q('pick',{ q:'Is it HE or SHE? 👦', say:'Look at the boy. Is it he or she?', ar:'هل هو He أم She؟ (ولد)', scene:'👦', opts:[['','He',1],['','She',0]] }),
+ ]},
+ { id:'sounds', title:'Sound Corner', ar:'ركن الأصوات', emoji:'👄', color:'#9b6cff', pages:'Say it: th · sh · ch', rounds:[
+   Q('sound',{ q:'Say it with me: TH – then, that, three.', ar:'قوليها معي: TH – then, that, three.', sound:'th', tip:'Put your tongue between your teeth and blow softly. 😛', tipAr:'ضعي لسانك بين أسنانك وانفخي بهدوء.', words:[['🕐','then'],['👉','that'],['3️⃣','three']] }),
+   Q('pick',{ q:'Listen! Which word starts with the TH sound?', ar:'استمعي! أي كلمة تبدأ بصوت TH؟', scene:'😛', opts:[['👉','that',1],['🏠','home',0],['🛏️','bed',0]], listen:true }),
+   Q('sound',{ q:'Say it with me: SH – she, fish, shoes.', ar:'قوليها معي: SH – she, fish, shoes.', sound:'sh', tip:'Lips round like a kiss and say shhh… like telling a baby to sleep. 🤫', tipAr:'دوّري شفتيك وقولي ششش… كأنك تنوّمين طفلاً.', words:[['👧','she'],['🐟','fish'],['👟','shoes']] }),
+   Q('pick',{ q:'Listen! Which word has the SH sound?', ar:'استمعي! أي كلمة فيها صوت SH؟', scene:'🤫', opts:[['👧','she',1],['🏫','school',0],['🪑','chair',0]], listen:true, fact:'Careful: "school" is spelled s-c-h but it sounds like SK!', factAr:'انتبهي: school تُكتب s-c-h لكنها تُلفظ سكول!' }),
+   Q('sound',{ q:'Say it with me: CH – lunch, chair, teacher.', ar:'قوليها معي: CH – lunch, chair, teacher.', sound:'ch', tip:'Like a little sneeze: ch! ch! ch! 🤧', tipAr:'مثل عطسة صغيرة: تش! تش! تش!', words:[['🍝','lunch'],['🪑','chair'],['👩‍🏫','teacher']] }),
+   Q('pick',{ q:'Listen! Which word has the CH sound?', ar:'استمعي! أي كلمة فيها صوت CH؟', scene:'🤧', opts:[['🍝','lunch',1],['👧','she',0],['3️⃣','three',0]], listen:true }),
+ ]},
+];
+const BIG_TEST_N = 12;
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_soc2_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_soc2_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’-]/gu,''));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a super reader!','Amazing!','Hoot hoot! Great job!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Look again.','Hmm, not that one.','Listen again and try.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🦉'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+function arWord(w){ return AR[w]||''; }
+function tileHtml(e,w){ return `<span class="e">${e||''}</span><span class="w">${w}</span><span class="wa">${arWord(w)}</span>`; }
+const plain=s=>s.replace(/<[^>]+>/g,'');
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🦉 What do you do in the evening and at school?</h1><p>Tap an island, answer the questions and collect ⭐ stars. Finish every island, then try the Big Test!</p><span class="ar">مرحباً ميرا! المسي جزيرة، أجيبي عن الأسئلة واجمعي النجوم ⭐. ثم جرّبي الاختبار الكبير!</span></div><div class="big">🌙🏫</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · My Daily Life (Social book p.32–37)'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Order, build sentences, school words – all mixed up!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const back=el('button','nextbtn ghost','🌟 All games'); back.onclick=()=>location.href='index.html';
+  const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
+  tools.append(rep,back,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  speechSynthesis && speechSynthesis.cancel();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.rounds.slice(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  // 2 random questions from each island (no story/sound rounds), shuffled
+  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(sample(l.rounds.filter(r=>r.type!=='story'&&r.type!=='sound'&&!r.any),2)));
+  return shuffle(qs).slice(0,BIG_TEST_N);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=plain(r.q);
+  const sayText=r.say||plain(r.q);
+  $('#sayBtn').onclick=()=>speak(sayText,{force:true});
+  $('#slowBtn').onclick=()=>speak(sayText,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  if(r.type!=='order'&&r.type!=='match'&&r.type!=='story'&&r.type!=='sound') speak(sayText);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r,sayAfter){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); const s=sayAfter||praise(); if(r.fact) speak(`${s} ${r.fact}`); else speak(s); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg = stars===3?'Perfect! A wise little owl!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = stars===3?'ممتاز! بومة صغيرة حكيمة!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
+    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+}
+
+// ============ ROUND TYPES ============
+const ROUNDS={};
+function header(body,r){
+  body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||''));
+  if(r.scene) body.appendChild(el('div','scene'+(r.small?' small':''),r.scene));
+}
+const opts=r=>typeof r.opts==='function'?r.opts():r.opts;
+
+// --- story: tap each step of Ahmed's evening to hear it ---
+ROUNDS.story=function(r,body,done){
+  header(body,r);
+  const strip=el('div','story'); body.appendChild(strip);
+  const seen=new Set();
+  ROUTINE.forEach((s,i)=>{ const d=el('button','step',`<div class="e">${s[0]}</div><div class="k">${i+1}. ${s[1]}</div><div class="s">${s[2]}</div><div class="a">${s[3]}</div>`);
+    d.onclick=()=>{ sfx.tap(); strip.querySelectorAll('.step').forEach(x=>x.classList.remove('lit')); d.classList.add('lit'); speak(`${s[1]}, ${s[2]}`,{force:true}); seen.add(i); counter.textContent=seen.size<6?`Listened to ${seen.size} of 6`:'You heard the whole evening! 🌙'; };
+    strip.appendChild(d); });
+  const counter=el('div','counter','Tap a picture to hear it. Listened to 0 of 6'); body.appendChild(counter);
+  const all=el('button','nextbtn ghost','🔊 Read the whole story'); all.onclick=()=>{ let t=''; ROUTINE.forEach(s=>t+=`${s[1]}, ${s[2]} `); speak(t,{force:true}); strip.querySelectorAll('.step').forEach(x=>x.classList.add('lit')); ROUTINE.forEach((s,i)=>seen.add(i)); counter.textContent='You heard the whole evening! 🌙'; };
+  body.appendChild(all);
+  const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b);
+  speak("Let's read about Ahmed's evening. After school, Ahmed goes back home. Tap each picture to listen. Do you do the same things too?");
+};
+
+// --- pick one correct tile (r.any: every tile is fine – it is a "what do YOU like" question) ---
+ROUNDS.pick=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  shuffle(opts(r)).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); });
+      const full = r.q.includes('blank') ? `${w}, ${plain(r.q).replace(/^___,?\s*/,'')}` : (r.any ? `I’m Mira, I love ${w==='Sports'?'sports':'to '+w.toLowerCase()}!` : w);
+      nextBtn(body,done,r,`${praise()} ${full}`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
+    row.appendChild(b); });
+  if(r.listen){ const lb=el('button','nextbtn ghost','🔊 Hear the words'); lb.onclick=()=>{ const ws=row.querySelectorAll('.tile .w'); let t=''; ws.forEach(x=>t+=x.textContent+'. '); speak(t,{force:true,slow:true,pitch:1}); }; body.appendChild(lb); }
+};
+
+// --- multi: tap ALL correct tiles ---
+ROUNDS.multi=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
+  const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
+      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No, not in school! ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- order: tap pictures in the right order (numbered slots, like "Number the pictures" in the book) ---
+ROUNDS.order=function(r,body,done){
+  header(body,r);
+  const slots=el('div','slots'); body.appendChild(slots);
+  r.items.forEach((it,k)=>{ slots.appendChild(el('div','slot',`<span class="n">${k+1}</span>`)); if(k<r.items.length-1) slots.appendChild(el('span','arrow','➜')); });
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let k=0;
+  shuffle(r.items.map((it,idx)=>[it,idx])).forEach(([it,idx])=>{ const b=el('button','tile',tileHtml(it[0],it[1])); b.onclick=()=>{ sfx.tap();
+    if(idx===k){ right(); b.classList.add('used'); const s=slots.querySelectorAll('.slot')[k]; s.innerHTML=`<span class="n">${k+1}</span>${it[0]}`; s.classList.add('fill'); k++; fb.textContent=praise(); fb.classList.remove('bad');
+      if(k===r.items.length) nextBtn(body,done,r); else speak(`${SEQ[k-1]}, ${it[1].toLowerCase()}. What comes next?`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`Not yet. What does he do ${k===0?'first':'next'}?`); } };
+    row.appendChild(b); });
+  speak(plain(r.q)+' Tap what comes first.');
+};
+
+// --- unscramble: tap the words to build the sentence ---
+ROUNDS.unscramble=function(r,body,done){
+  header(body,r);
+  const sent=el('div','sentence'); body.appendChild(sent);
+  r.words.forEach(()=>sent.appendChild(el('span','wslot','')));
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const target=r.words.join(' ');
+  let k=0;
+  shuffle(r.words.map((w,idx)=>[w,idx])).forEach(([w,idx])=>{ const b=el('button','tile word',`<span class="w">${w}</span>`); b.onclick=()=>{ sfx.tap();
+    if(idx===k){ right(); b.classList.add('used'); const s=sent.querySelectorAll('.wslot,.wdone')[k]; s.className='wdone'; s.textContent=w; k++; fb.textContent=praise(); fb.classList.remove('bad');
+      if(k===r.words.length){ nextBtn(body,done,r,`${praise()} ${target}`); } else speak(r.words.slice(0,k).join(' ')+'…'); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(k===0?'Which word comes first? Look for the capital letter!':`${r.words.slice(0,k).join(' ')}… what comes next?`); } };
+    row.appendChild(b); });
+  const hear=el('button','nextbtn ghost','🔊 Hear the sentence'); hear.onclick=()=>speak(target,{force:true,slow:true}); body.appendChild(hear);
+};
+
+// --- match: tap a child, then what they love ---
+ROUNDS.match=function(r,body,done){
+  header(body,r);
+  const cols=el('div','cols'); const L=el('div','col'), R=el('div','col'); cols.append(L,R); body.appendChild(cols);
+  const fb=el('div','feedback',''); body.appendChild(fb);
+  let sel=null, left=r.pairs.length;
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[0],p[1])); b.dataset.k=k; b.onclick=()=>{ if(b.classList.contains('ok'))return; sfx.tap(); L.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel')); b.classList.add('sel'); sel=b; speak(r.lines?r.lines[p[1]]:p[1],{force:true}); }; L.appendChild(b); });
+  shuffle(r.pairs.map((p,k)=>[p,k])).forEach(([p,k])=>{ const b=el('button','tile',tileHtml(p[2],p[3])); b.onclick=()=>{ sfx.tap(); if(!sel){ fb.textContent='Tap a child first!'; fb.classList.add('bad'); speak('Tap a child first!'); return; }
+      const sk=Number(sel.dataset.k);
+      if(sk===k){ right(); sel.classList.remove('sel'); sel.classList.add('ok'); b.classList.add('ok'); sel.style.pointerEvents='none'; b.style.pointerEvents='none'; fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${r.lines[p[1]]}`); sel=null; left--; if(left===0) nextBtn(body,done,r); }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`No. Listen: ${r.lines[r.pairs[sk][1]]} ${retry()}`); } };
+    R.appendChild(b); });
+  speak(plain(r.q)+' Tap a child to hear what they say.');
+};
+
+// --- sound: listen-and-repeat corner for th / sh / ch ---
+ROUNDS.sound=function(r,body,done){
+  header(body,r);
+  body.appendChild(el('div','fact',`👄 ${r.tip}<div class="ar">${r.tipAr}</div>`));
+  const row=el('div','row'); body.appendChild(row);
+  r.words.forEach(([e,w])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ sfx.tap(); b.classList.add('sel'); setTimeout(()=>b.classList.remove('sel'),600); speak(w,{force:true,slow:true,pitch:1}); }; row.appendChild(b); });
+  const all=el('button','nextbtn ghost',`🐢 Say them slowly: ${r.sound.toUpperCase()}`); all.onclick=()=>speak(r.words.map(w=>w[1]).join('. '),{force:true,slow:true,pitch:1}); body.appendChild(all);
+  body.appendChild(el('div','counter','Tap a word, listen, then say it out loud 3 times! 🎤'));
+  const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b);
+  speak(plain(r.q)+' '+r.tip,{pitch:1});
+};
+
+// ============ REPORT ============
+function report(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Book</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
+    <div class="card"><h3>Answer key · Social book p.32–37</h3><ul>
+      <li><b>p.33 Q1 Unscramble:</b> 1 First, Ahmed goes home. · 2 Next he eats lunch. · 3 After that he does his homework. · 4 Then he eats dinner. · 5 Later he puts on his pyjama. · 6 Finally he goes to bed.</li>
+      <li><b>p.33 Q2 Number the pictures:</b> home 1 · lunch 2 · homework 3 · dinner 4 · pyjama 5 · bed 6.</li>
+      <li><b>p.34 Q3 Draw &amp; write your routine:</b> First I go home. Next I eat my lunch. After that I do my homework. Then I eat dinner. Later I put on my pyjama. Finally I go to bed. (Mira draws the 6 boxes herself.)</li>
+      <li><b>p.35–36 In school you:</b> make new friends · learn to read and write · learn to count · learn to ask questions · learn to draw and color · do sports.</li>
+      <li><b>p.37 Q1 Read and match:</b> Ali → writing ✍️ · Mariam → coloring 🖍️ · Ahmed → football ⚽ · Fatima → painting 🎨.</li>
+      <li><b>p.37 Q2 Unscramble:</b> He is asking a question. · She is counting. · He is making new friends. · She is reading.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">Note: the book calls the boy both "Ali" and "Ahmed" on p.32 – the sentences use Ahmed, so the game does too.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>Count the 6 sequence words on fingers: <i>First · Next · After that · Then · Later · Finally</i>.</li>
+      <li>“Mira, what do you do first after school?” → <i>First I go home…</i> keep going to <i>Finally I go to bed.</i></li>
+      <li>“What do you do in school?” → <i>I make friends, I read and write, I count, I ask questions, I draw and color, I do sports.</i></li>
+      <li>Point at Dad: “he or she?” Point at Mum: “he or she?” Then: “What is Mum doing?” → <i>She is …ing.</i></li>
+      <li>Sound game: <b>th</b> (tongue between teeth) <i>then, that, three</i> · <b>sh</b> (quiet lips) <i>she, fish, shoes</i> · <b>ch</b> (little sneeze) <i>lunch, chair, teacher</i>.</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Hoot hoot!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Safari, Chrome or Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>
