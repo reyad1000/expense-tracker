@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Number Forest 2">
+<meta name="theme-color" content="#fff7e6">
+<title>Mira's Number Forest 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Number Forest 2 – same squirrel, three new islands for the 4 November maths quiz:
+   missing numbers to 30 · addition to 10 without objects · subtraction to 10 with objects. */
+:root{
+  --bg:#fff7e6; --bg2:#ffe9c2; --card:#ffffff; --ink:#3a2a1a; --muted:#8a705a;
+  --coral:#ff7a59; --sun:#ffc93c; --leaf:#4cbb5c; --sky:#3fb0ff; --grape:#9b6cff; --pink:#ff6fae;
+  --ok:#3fb950; --bad:#e5484d; --shadow:0 6px 0 rgba(58,42,26,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+button,.obj{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#dff5cf 0,transparent 32%),radial-gradient(circle at 92% 92%,#cfeeff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--coral)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#eadfca}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#ffe9c2)}
+.island.test .em{font-size:3rem}
+.island.warm{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#e8f4ff,#dff5cf)}
+.island.warm .em{font-size:2.6rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.arin{display:none;direction:rtl;color:var(--grape)}
+body.ar .arin{display:inline}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.hint{text-align:center;color:var(--muted);font-size:.95rem;margin:-2px 0 6px}
+
+/* number track */
+.track{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0}
+.track .cell{width:60px;height:66px;border-radius:14px;background:#e8f4ff;border-bottom:5px solid #bfe0ff;display:grid;place-items:center;font-family:var(--display);font-size:2rem;font-weight:700}
+.track .cell.gap{background:#fff0f6;border:3px dashed var(--pink);border-bottom-width:5px;color:var(--pink);font-size:2.2rem}
+.track .cell.gap.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+@media (max-width:420px){.track .cell{width:50px;height:58px;font-size:1.6rem}}
+.helper{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:8px 0 2px}
+.helper span{width:34px;height:34px;border-radius:8px;background:var(--bg2);display:grid;place-items:center;font-size:.9rem;font-family:var(--display)}
+.helper span.start{background:var(--sky);color:#fff}
+.helper span.hop{background:var(--sun)}
+
+/* 1–30 number square */
+.grid30{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:600px;margin:10px auto}
+.grid30 .cell{aspect-ratio:1;border-radius:10px;background:#e8f4ff;border-bottom:4px solid #bfe0ff;display:grid;place-items:center;font-family:var(--display);font-size:clamp(.95rem,3.4vw,1.5rem);font-weight:700;padding:0;transition:transform .15s}
+.grid30 .cell.gap{background:#fff0f6;border:2px dashed var(--pink);border-bottom-width:4px;color:var(--pink)}
+.grid30 .cell.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+.grid30 .cell.now{outline:4px solid var(--sky)}
+.grid30 .cell.lit{background:var(--sun);transform:scale(1.15)}
+
+/* object scene (tappable to count / cross out) */
+.objs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;margin:10px 0}
+.objs .grp{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;background:var(--bg2);border-radius:20px;padding:10px 12px;min-width:120px;min-height:70px;max-width:340px}
+.obj{font-size:2.4rem;line-height:1;width:52px;height:52px;display:grid;place-items:center;border-radius:12px;position:relative;transition:transform .1s;user-select:none}
+.obj:hover{transform:scale(1.1)}
+.obj.c{background:#e6f8ea;box-shadow:inset 0 0 0 3px var(--ok)}
+.obj.c::after{content:attr(data-n);position:absolute;right:-4px;top:-6px;background:var(--ok);color:#fff;border-radius:999px;font-size:.75rem;font-family:var(--display);min-width:20px;height:20px;display:grid;place-items:center;padding:0 4px}
+.obj.x{opacity:.45;filter:grayscale(.6)}
+.obj.x::before{content:'✖';position:absolute;inset:0;display:grid;place-items:center;color:var(--bad);font-size:2.6rem;font-weight:900;text-shadow:0 0 6px #fff,0 0 2px #fff;opacity:1}
+.obj:disabled{cursor:default}
+
+.sum{font-family:var(--display);font-size:clamp(2rem,7vw,3rem);text-align:center;margin:8px 0;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap}
+.sum .box{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:14px;background:#fff0f6;border:3px dashed var(--pink);color:var(--pink);font-size:.9em}
+.sum .box.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+.sum .n{min-width:1.1em;text-align:center}
+.sum.huge{font-size:clamp(2.6rem,9vw,4rem)}
+/* vertical (column) sum, as some worksheets show it */
+.vert{display:grid;grid-template-columns:auto auto;gap:2px 14px;font-family:var(--display);font-size:clamp(2.4rem,8vw,3.4rem);justify-items:end;align-items:center;width:max-content;margin:8px auto;padding:6px 18px;background:#fffdf7;border-radius:18px}
+.vert .vs{color:var(--muted)}
+.vert .vline{grid-column:1/-1;width:100%;border-top:5px solid var(--ink);margin:4px 0}
+.vert .box{display:inline-grid;place-items:center;width:1.4em;height:1.4em;border-radius:14px;background:#fff0f6;border:3px dashed var(--pink);color:var(--pink);font-size:.9em}
+.vert .box.fill{background:#e6f8ea;border-color:var(--ok);color:#1f7a2f;animation:pop .3s}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.tile:hover{transform:translateY(-2px)}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+.tile.num{min-width:84px;font-size:2.2rem;padding:10px 18px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.nextbtn.go{background:var(--leaf);box-shadow:0 5px 0 #2f8a3c}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#eadfca}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+.report a{color:var(--sky)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #eadfca}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m" id="mascot-head">🐿️</span> Mira's Number Forest 2</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🐿️</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Maths quiz · Wednesday 4 November ============
+// School note: Missing numbers to 30 (counting by 1) · Simple addition to 10 (WITHOUT counting objects) · Simple subtraction to 10 (WITH counting objects).
+// Every island makes NEW questions each time it is played.
+
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty',
+ 'twenty-one','twenty-two','twenty-three','twenty-four','twenty-five','twenty-six','twenty-seven','twenty-eight','twenty-nine','thirty','thirty-one'];
+const OBJ=[['🍎','apples'],['⭐','stars'],['🍓','strawberries'],['🐟','fish'],['🎈','balloons'],['🌼','flowers'],['🍪','cookies'],['🚗','cars'],['🦋','butterflies'],['🍌','bananas'],['🧁','cupcakes'],['🐞','ladybirds'],['🍭','lollipops'],['⚽','balls'],['🐸','frogs'],['🍬','sweets'],['🐥','chicks']];
+
+// 4 answer tiles around the right answer
+function choices(ans,lo=0,hi=30){ const s=new Set([ans]); const cand=shuffle([ans-1,ans+1,ans-2,ans+2,ans+3,ans-3,ans+10,ans-10]).filter(n=>n>=lo&&n<=hi); for(const c of cand){ if(s.size>=4)break; s.add(c);} return [...s].sort((a,b)=>a-b); }
+
+// ---- generators ----
+function genTrack(){ // one missing number in a track of 5, up to 30
+  const start=rnd(1,26), pos=pick([0,1,2,2,3,4,4]);
+  const nums=Array.from({length:5},(_,i)=>start+i); const ans=nums[pos];
+  const shown=nums.map((n,i)=>i===pos?'_':n);
+  const spoken=nums.map((n,i)=>i===pos?'hmm':WORDS[n]).join(', ');
+  return {type:'track',nums,gaps:[pos],ans,key:'Missing number: '+shown.join(' '),q:'Find the missing number!',ar:'جدي العدد الناقص!',spoken:`Find the missing number. ${spoken}.`,
+    fact:`${cap(WORDS[ans-1])}, ${WORDS[ans]}, ${WORDS[ans+1]}. After ${ans-1} comes ${ans}.`,factAr:`بعد ${ans-1} يأتي ${ans}.`};
+}
+function genTrack2(){ // two gaps in a track of 6, up to 30
+  const start=rnd(1,25), nums=Array.from({length:6},(_,i)=>start+i); let p1=rnd(1,4), p2=p1+pick([1,2]); if(p2>5)p2=5;
+  const gaps=[p1,p2]; const shown=nums.map((n,i)=>gaps.includes(i)?'_':n);
+  return {type:'track',nums,gaps,key:'Missing numbers: '+shown.join(' '),q:'Two numbers are hiding! Fill the first gap, then the second.',ar:'عددان مختبئان! املئي الفراغ الأول ثم الثاني.',spoken:'Two numbers are hiding. '+nums.map((n,i)=>gaps.includes(i)?'hmm':WORDS[n]).join(', ')+'.',
+    fact:`${nums.join(', ')}. Count by one: each number is one more.`,factAr:'نعدّ واحداً واحداً: كل عدد يزيد واحداً.'};
+}
+function genNext(){ // what comes just after / before, up to 30
+  const after=Math.random()<.65; const n=after?rnd(1,29):rnd(2,30); const ans=after?n+1:n-1;
+  return {type:'next',n,after,ans,key:`What comes ${after?'after':'before'} ${n}?`,q:`What number comes just <b>${after?'after':'before'}</b> ${n}?`,ar:`ما العدد الذي يأتي ${after?'بعد':'قبل'} ${n} مباشرة؟`,spoken:`What number comes just ${after?'after':'before'} ${WORDS[n]}?`,
+    fact:after?`${n}, then ${ans}. ${ans} is one more than ${n}.`:`${ans}, then ${n}. ${ans} is one less than ${n}.`,factAr:after?`${ans} يأتي بعد ${n}.`:`${ans} يأتي قبل ${n}.`};
+}
+function genGrid(){ // the 1–30 number square with 3 hidden numbers
+  const gaps=shuffle(Array.from({length:30},(_,i)=>i+1)).slice(0,3).sort((a,b)=>a-b);
+  return {type:'grid',gaps,key:'Number square: '+gaps.join(', ')+' missing',q:'Three numbers are hiding in the number square! Fill them in order.',ar:'ثلاثة أعداد مختبئة في مربع الأعداد! املئيها بالترتيب.',spoken:'Three numbers are hiding in the number square. Find the first one. Which number is missing?',
+    fact:`The missing numbers were ${gaps.join(', ')}. Each row goes up by one; each row down is ten more.`,factAr:`الأعداد الناقصة كانت ${gaps.join('، ')}.`};
+}
+function genAddM(){ // addition WITHOUT objects: a + b = ?  (total ≤ 10)
+  const total=pick([2,3,4,5,5,6,6,7,7,8,8,9,9,10,10]); const a=rnd(0,total), b=total-a; const vert=Math.random()<.3;
+  const big=Math.max(a,b), small=Math.min(a,b);
+  const seq=Array.from({length:small},(_,i)=>big+i+1).join(', ');
+  let fact,factAr;
+  if(small===0){ fact=`${a} + ${b} = ${total}. Adding zero changes nothing!`; factAr=`${a} + ${b} = ${total}. إضافة الصفر لا تغيّر شيئاً!`; }
+  else if(a===b){ fact=`Double ${a} is ${total}. ${a} + ${b} = ${total}.`; factAr=`ضعف ${a} هو ${total}.`; }
+  else { fact=`Put ${big} in your head, count on ${small}: ${seq}. ${a} + ${b} = ${total}.`; factAr=`ضعي ${big} في رأسك وعدّي ${small} للأمام: ${seq}. ${a} + ${b} = ${total}.`; }
+  return {type:'addm',a,b,ans:total,vert,big,small,key:`Add: ${a} + ${b}`,q:'Think, then tap the answer! No pictures this time.',ar:'فكّري ثم المسي الجواب! بدون صور هذه المرة.',spoken:`${WORDS[a]} plus ${WORDS[b]} equals? Think!`,fact,factAr};
+}
+function genSub(shown){ // subtraction WITH objects: a − b = ?
+  const a=rnd(3,10); let b=rnd(1,a-1); if(Math.random()<.12) b=a; const [e,name]=pick(OBJ); const ans=a-b;
+  const base={a,b,e,name,ans,key:`Take away: ${a} − ${b}`,fact:`${a} take away ${b} leaves ${ans}. ${a} − ${b} = ${ans}.`,factAr:`${a} ناقص ${b} يساوي ${ans}.`};
+  if(shown) return Object.assign(base,{type:'subshown',q:`${b} ${name} are crossed out. How many are left?`,ar:`شُطبت ${b}. كم بقي؟`,spoken:`There were ${a} ${name}. ${b} are crossed out. Count the ${name} that are left. ${a} take away ${b} equals?`});
+  return Object.assign(base,{type:'sub',q:`There are ${a} ${name}. Take away ${b}. How many are left?`,ar:`هناك ${a}. خذي ${b} منها. كم بقي؟`,spoken:`There are ${a} ${name}. Take away ${b}. Tap ${b} ${name} to cross them out, then count the ones that are left.`});
+}
+
+const LEVELS=[
+ { id:'train', title:'Number Train to 30', ar:'قطار الأعداد إلى 30', emoji:'🚂', color:'#3fb0ff', pages:'Missing numbers to 30 · counting by 1', gen(){ return [genTrack(),genNext(),genGrid(),genTrack(),genTrack2(),genNext(),genGrid()]; } },
+ { id:'addm', title:'Quick Adding', ar:'الجمع السريع', emoji:'⚡', color:'#4cbb5c', pages:'Addition to 10 · no counting objects', gen(){ return [genAddM(),genAddM(),genAddM(),genAddM(),genAddM(),genAddM(),genAddM()]; } },
+ { id:'sub', title:'Take Away Shop', ar:'دكان الطرح', emoji:'✂️', color:'#ff7a59', pages:'Subtraction to 10 · cross out and count', gen(){ return [genSub(false),genSub(true),genSub(false),genSub(false),genSub(true),genSub(false),genSub(false)]; } },
+];
+const BIG_TEST_N=12;
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_math2_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_math2_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});          // question -> mistakes
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  count(n){ tone(440+n*40,.09,'sine',.08); },
+  snip(){ tone(300,.08,'square',.06); tone(220,.12,'square',.05,.08); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function clean(text){ return text.replace(/<[^>]+>/g,'').replace(/−/g,' take away ').replace(/[^\p{L}\p{N}\s.,!?+='’-]/gu,''); }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(clean(text));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+// speak, then call cb when finished (used by "Count to 30")
+function speakThen(text,cb){
+  let done=false; const fin=()=>{ if(done)return; done=true; cb&&cb(); };
+  if(!window.speechSynthesis){ setTimeout(fin,700); return; }
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(clean(text)); if(chosenVoice) u.voice=chosenVoice; u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB'; u.rate=.9; u.pitch=1.15;
+    u.onend=()=>setTimeout(fin,250); u.onerror=()=>setTimeout(fin,250);
+    speechSynthesis.speak(u); setTimeout(fin,2500);
+  }catch(e){ setTimeout(fin,700); }
+}
+
+// ============ HELPERS ============
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a maths champion!','Amazing!','Nutty good, says the squirrel!','Quick thinking!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Think again.','Hmm, not that one.','Slowly… try again.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🐿️'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+let countRun=0; // cancels a running "Count to 30"
+function home(){
+  countRun++;
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🐿️ The squirrel is back!</h1><p>Maths quiz on <b>Wednesday</b>: numbers to 30, quick adding and taking away. Tap an island, answer the questions and collect ⭐ stars. New questions every time!</p><span class="ar">مرحباً ميرا! اختبار الرياضيات يوم الأربعاء: الأعداد إلى 30، الجمع السريع، والطرح. المسي جزيرة واجمعي النجوم ⭐.</span></div><div class="big">🌳🔢</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · Maths quiz · Wed 4 November'));
+  const map=el('div','map'); v.appendChild(map);
+  const warm=el('button','island warm',`<div class="em">🎵</div><div style="flex:1"><div class="t">Count to 30 with the squirrel</div><div class="s">Warm-up: listen, point and say every number 1 → 30</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">إحماء: نعدّ من 1 إلى 30 معاً</div></div>`);
+  warm.style.setProperty('--c','#3fb0ff'); warm.onclick=countAlong; map.appendChild(warm);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  const bt=progress['bigtest']||{};
+  const test=el('button','island test',`<div class="em">🏆</div><div style="flex:1"><div class="t">Big Test · 12 questions from all islands</div><div class="s">Just like Wednesday's quiz – 4 questions from each island!</div></div><div class="stars">${starsHtml(bt.stars||0)}</div>`);
+  test.style.setProperty('--c','#ffc93c'); test.onclick=()=>startLevel('bigtest'); map.appendChild(test);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 Start again'); reset.onclick=()=>{ if(confirm('Reset all stars and progress?')){ progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); } };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ COUNT TO 30 (warm-up) ============
+function grid30(onTap){ const g=el('div','grid30'); const cells=[]; for(let i=1;i<=30;i++){ const c=el('button','cell',String(i)); c.dataset.n=i; if(onTap) c.onclick=()=>onTap(i,c); g.appendChild(c); cells.push(c);} return {g,cells}; }
+function countAlong(){
+  const run=++countRun;
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>🎵 Count to 30</h2></div>
+    <div class="hint">Press ▶ and say each number with the squirrel. Or tap any number to hear it. <span class="arin">اضغطي ▶ وقولي كل عدد مع السنجاب، أو المسي أي عدد لتسمعيه.</span></div>`;
+  const {g,cells}=grid30((n,c)=>{ cells.forEach(x=>x.classList.remove('lit')); c.classList.add('lit'); sfx.count(n%10); speak(WORDS[n],{force:true}); });
+  panel.appendChild(g);
+  const row=el('div','row'); row.style.marginTop='12px';
+  const play=el('button','nextbtn go','▶ Play 1 → 30'); const play20=el('button','nextbtn ghost','▶ From 20');
+  let playing=false;
+  const go=(from)=>{ if(playing) return; playing=true; const my=++countRun; let i=from;
+    const step=()=>{ if(my!==countRun){ playing=false; return; } if(i>30){ playing=false; cells.forEach(x=>x.classList.remove('lit')); speak('Thirty! Well done, Mira!',{force:true}); mascot('happy'); confetti(80); return; }
+      cells.forEach(x=>x.classList.remove('lit')); cells[i-1].classList.add('lit'); speakThen(WORDS[i],()=>{ i++; step(); }); };
+    step(); };
+  play.onclick=()=>go(1); play20.onclick=()=>go(20);
+  row.append(play,play20); panel.appendChild(row);
+  $('#backBtn').onclick=home;
+  speak('Let us count to thirty together! Press play.',{});
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  countRun++;
+  speechSynthesis && speechSynthesis.cancel();
+  let level, rounds;
+  if(id==='bigtest'){ level={id:'bigtest',title:'Big Test',ar:'الاختبار الكبير',emoji:'🏆',color:'#ffc93c'}; rounds=buildBigTest(); }
+  else { level=LEVELS.find(l=>l.id===id); rounds=level.gen(); }
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function buildBigTest(){
+  // 4 fresh questions from each island, shuffled
+  let qs=[]; LEVELS.forEach(l=>qs=qs.concat(shuffle(l.gen()).slice(0,4)));
+  return shuffle(qs).slice(0,BIG_TEST_N);
+}
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=r.key;
+  $('#sayBtn').onclick=()=>speak(r.spoken||r.q,{force:true});
+  $('#slowBtn').onclick=()=>speak(r.spoken||r.q,{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(r.spoken||r.q);
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); b.scrollIntoView({block:'nearest',behavior:'smooth'}); if(r.fact) speak(`${praise()} ${r.fact}`); else speak(praise()); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const msg = stars===3?'Perfect! A maths champion!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = stars===3?'ممتاز! بطلة الرياضيات!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div><p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>
+    <div class="row"><button class="nextbtn" id="again">Play again 🔁</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(`${msg} You got ${stars} star${stars===1?'':'s'}!`);
+}
+
+// ============ SHARED PIECES ============
+const ROUNDS={};
+function header(body,r){ body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||'')); }
+function helperSquare(body){ // 1–30 number square to look at (like the classroom wall)
+  const {g}=grid30(null); g.classList.add('hidden'); g.style.maxWidth='460px';
+  const b=el('button','nextbtn ghost','🧮 Show number square'); b.style.margin='6px auto 0'; b.onclick=()=>{ g.classList.toggle('hidden'); b.textContent=g.classList.contains('hidden')?'🧮 Show number square':'🧮 Hide number square'; };
+  body.append(b,g);
+}
+// number tiles → calls onRight(tileEl)
+function numberTiles(body,r,ans,onRight,{lo=0,hi=30,wrongSay}={}){
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  choices(ans,lo,hi).forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(n===ans){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b)t.classList.add('used'); }); onRight(b); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(wrongSay?wrongSay(n):`${n}? ${retry()}`); } };
+    row.appendChild(b); });
+  return {row,fb};
+}
+
+// ============ ROUND TYPES ============
+// --- track: number track with a gap (or two) ---
+ROUNDS.track=function(r,body,done){
+  header(body,r);
+  const gaps=r.gaps; let gi=0;
+  const t=el('div','track'); body.appendChild(t);
+  const cells=r.nums.map((n,i)=>{ const c=el('div','cell'+(gaps.includes(i)?' gap':''),gaps.includes(i)?'?':String(n)); t.appendChild(c); return c; });
+  const fb=el('div','feedback',''); const row=el('div','row'); body.append(row,fb);
+  const ask=()=>{ const idx=gaps[gi]; const ans=r.nums[idx]; row.innerHTML=''; cells.forEach((c,i)=>c.style.outline=i===idx?'4px solid var(--sky)':'');
+    let locked=false;
+    choices(ans,1,30).forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+      if(n===ans){ locked=true; right(); b.classList.add('ok'); cells[idx].textContent=String(ans); cells[idx].classList.add('fill'); cells[idx].style.outline=''; fb.textContent=praise(); fb.classList.remove('bad'); gi++;
+        if(gi<gaps.length){ speak(`${ans}! Now the next gap.`); setTimeout(ask,700); } else { row.querySelectorAll('.tile').forEach(x=>{ if(x!==b)x.classList.add('used'); }); nextBtn(body,done,r); } }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${n}? ${r.nums[idx-1]!=null?'After '+r.nums[idx-1]+' comes?':'Before '+r.nums[idx+1]+' comes?'} ${retry()}`); } };
+      row.appendChild(b); }); };
+  ask();
+  helperSquare(body);
+};
+
+// --- next: what comes just after / before ---
+ROUNDS.next=function(r,body,done){
+  header(body,r);
+  const t=el('div','track'); body.appendChild(t);
+  const cells=r.after?[[r.n,false],[null,true]]:[[null,true],[r.n,false]];
+  const gapCell={};
+  cells.forEach(([n,isGap])=>{ const c=el('div','cell'+(isGap?' gap':''),isGap?'?':String(n)); t.appendChild(c); if(isGap)gapCell.el=c; });
+  numberTiles(body,r,r.ans,()=>{ gapCell.el.textContent=String(r.ans); gapCell.el.classList.add('fill'); nextBtn(body,done,r); },{lo:0,hi:30,wrongSay:n=>`${n}? Count ${r.after?'on from':'back from'} ${r.n}. ${retry()}`});
+  helperSquare(body);
+};
+
+// --- grid: 1–30 number square with 3 gaps, filled in order ---
+ROUNDS.grid=function(r,body,done){
+  header(body,r);
+  const {g,cells}=grid30(null); body.appendChild(g);
+  r.gaps.forEach(n=>{ const c=cells[n-1]; c.classList.add('gap'); c.textContent='?'; });
+  const fb=el('div','feedback',''); const row=el('div','row'); body.append(row,fb);
+  let gi=0;
+  const ask=()=>{ const ans=r.gaps[gi]; const c=cells[ans-1]; cells.forEach(x=>x.classList.remove('now')); c.classList.add('now'); row.innerHTML='';
+    let locked=false;
+    choices(ans,1,30).forEach(n=>{ const b=el('button','tile num',String(n)); b.onclick=()=>{ if(locked)return; sfx.tap();
+      if(n===ans){ locked=true; right(); b.classList.add('ok'); c.textContent=String(ans); c.classList.remove('gap','now'); c.classList.add('fill'); fb.textContent=praise(); fb.classList.remove('bad'); gi++;
+        if(gi<r.gaps.length){ speak(`${ans}! Now the next one.`); setTimeout(ask,700); } else { row.querySelectorAll('.tile').forEach(x=>{ if(x!==b)x.classList.add('used'); }); nextBtn(body,done,r); } }
+      else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); const before=ans-1; speak(`${n}? Look at the number just before the gap: ${before>0?before:'the start'}. ${retry()}`); } };
+      row.appendChild(b); }); };
+  ask();
+};
+
+// --- addm: a + b = ?  with NO objects (count on in your head / fingers) ---
+ROUNDS.addm=function(r,body,done){
+  header(body,r);
+  let box;
+  if(r.vert){
+    const v=el('div','vert',`<span class="vs">&nbsp;</span><span>${r.a}</span><span class="vs">+</span><span>${r.b}</span><span class="vline"></span><span class="vs">&nbsp;</span><span class="box">?</span>`);
+    body.appendChild(v); box=v.querySelector('.box');
+  } else {
+    const s=el('div','sum huge',`<span class="n">${r.a}</span><span>+</span><span class="n">${r.b}</span><span>=</span><span class="box">?</span>`);
+    body.appendChild(s); box=s.querySelector('.box');
+  }
+  numberTiles(body,r,r.ans,()=>{ box.textContent=r.ans; box.classList.add('fill'); nextBtn(body,done,r); },{lo:0,hi:10,wrongSay:n=>`${n}? Put ${r.big} in your head and count on ${r.small}. ${retry()}`});
+  // help: a 0–10 track showing "start at the big number, hop on"
+  const h=el('div','helper'); h.classList.add('hidden');
+  for(let i=0;i<=10;i++){ const s=el('span',null,String(i)); if(i===r.big) s.classList.add('start'); else if(i>r.big && i<=r.big+r.small) s.classList.add('hop'); h.appendChild(s); }
+  const hb=el('button','nextbtn ghost','💡 Help me count on'); hb.style.margin='6px auto 0';
+  hb.onclick=()=>{ h.classList.remove('hidden'); hb.classList.add('hidden'); speak(r.small===0?`${r.big} plus zero. Adding nothing!`:`Put ${r.big} in your head. Now hop on ${r.small} more with your fingers: ${Array.from({length:r.small},(_,i)=>r.big+i+1).join(', ')}.`,{force:true}); };
+  body.append(hb,h);
+};
+
+// --- sub: a objects, tap b to cross them out, count the rest ---
+ROUNDS.sub=function(r,body,done){
+  header(body,r);
+  const hint=el('div','hint',`Tap ${r.b} ${r.name} to cross them out ✖ <span class="arin">المسي ${r.b} لتشطبيها ✖</span>`); body.appendChild(hint);
+  const objs=el('div','objs'); const g=el('div','grp'); objs.appendChild(g); body.appendChild(objs);
+  const sum=el('div','sum',`<span class="n">${r.a}</span><span>−</span><span class="n">${r.b}</span><span>=</span><span class="box">?</span>`); body.appendChild(sum);
+  const status=el('div','feedback',''); body.appendChild(status);
+  let crossed=0, counted=0, phase=1; const items=[];
+  for(let i=0;i<r.a;i++){ const o=el('button','obj',r.e); items.push(o);
+    o.onclick=()=>{
+      if(phase===1){
+        if(o.classList.contains('x')){ o.classList.remove('x'); crossed--; status.textContent=crossed?`✖ ${crossed} of ${r.b}`:''; return; }
+        if(crossed>=r.b){ toast(`Only ${r.b} ✖`); speak(`Only ${r.b}! You have crossed out ${r.b} already. Now count the ones that are left.`); return; }
+        o.classList.add('x'); crossed++; sfx.snip(); speak(`Take away ${crossed}`); status.textContent=`✖ ${crossed} of ${r.b}`; status.classList.remove('bad');
+        if(crossed===r.b){ phase=2; items.forEach(x=>{ if(x.classList.contains('x')) x.disabled=true; }); hint.innerHTML=`Good! Now tap the ${r.name} that are LEFT to count them 👆 <span class="arin">الآن المسي الباقية لتعدّيها</span>`; speak(`Good. ${r.b} crossed out. Now count the ${r.name} that are left.`); }
+      } else {
+        if(o.classList.contains('x')) return;
+        if(o.classList.contains('c')){ o.classList.remove('c'); counted--; return; }
+        counted++; o.classList.add('c'); o.dataset.n=counted; sfx.count(counted); speak(String(counted));
+      }
+    };
+    g.appendChild(o); }
+  numberTiles(body,r,r.ans,()=>{ const bx=sum.querySelector('.box'); bx.textContent=r.ans; bx.classList.add('fill'); items.forEach(x=>x.disabled=true); nextBtn(body,done,r); },{lo:0,hi:10,wrongSay:n=>`${n}? Cross out ${r.b}, then count only the ones that are left. ${retry()}`});
+};
+
+// --- subshown: b objects already crossed out, count the rest (worksheet style) ---
+ROUNDS.subshown=function(r,body,done){
+  header(body,r);
+  body.appendChild(el('div','hint',`Tap the ${r.name} that are NOT crossed out to count them 👆 <span class="arin">المسي غير المشطوبة لتعدّيها</span>`));
+  const objs=el('div','objs'); const g=el('div','grp'); objs.appendChild(g); body.appendChild(objs);
+  const xs=new Set(shuffle(Array.from({length:r.a},(_,i)=>i)).slice(0,r.b));
+  let counted=0; const items=[];
+  for(let i=0;i<r.a;i++){ const o=el('button','obj',r.e); items.push(o);
+    if(xs.has(i)){ o.classList.add('x'); o.disabled=true; }
+    else o.onclick=()=>{ if(o.classList.contains('c')){ o.classList.remove('c'); counted--; return; } counted++; o.classList.add('c'); o.dataset.n=counted; sfx.count(counted); speak(String(counted)); };
+    g.appendChild(o); }
+  const sum=el('div','sum',`<span class="n">${r.a}</span><span>−</span><span class="n">${r.b}</span><span>=</span><span class="box">?</span>`); body.appendChild(sum);
+  numberTiles(body,r,r.ans,()=>{ const bx=sum.querySelector('.box'); bx.textContent=r.ans; bx.classList.add('fill'); items.forEach(x=>x.disabled=true); nextBtn(body,done,r); },{lo:0,hi:10,wrongSay:n=>`${n}? Do not count the crossed-out ones. Count only the ${r.name} that are left. ${retry()}`});
+};
+
+// ============ REPORT ============
+function report(){
+  countRun++;
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const rows=LEVELS.map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  const bt=progress['bigtest']||{};
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Quiz topic</th><th>Best</th><th>Plays</th></tr>${rows}<tr><td>🏆 Big Test</td><td>all</td><td>${starsHtml(bt.stars||0)}</td><td>${bt.plays||0}</td></tr></table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these on paper)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet – play some islands first.</p>'}</div>
+    <div class="card"><h3>What the quiz covers (school note · Wednesday 4 November)</h3><ul>
+      <li><b>Missing numbers to 30 (counting by 1)</b> – a number track or a 1–30 square with gaps: 23 24 __ 26 __. She <b>writes</b> the number. Watch the twenties: twenty-one is 21 (not 12), and after 29 comes 30 – not “twenty-ten”.</li>
+      <li><b>Simple addition to 10 – WITHOUT counting objects</b> – just numbers: 3 + 4 = __. No pictures to count, so she needs a strategy: put the <b>bigger</b> number in her head and count on with fingers (5… 6, 7). Doubles (2+2, 3+3, 4+4, 5+5) and “+ 0” are worth knowing by heart.</li>
+      <li><b>Simple subtraction to 10 – WITH counting objects</b> – pictures: 7 balloons, cross out 3, count what is left, write 4. The “−” sign is read “take away”. Watch: cross out <b>exactly</b> the number asked, then count <b>only</b> the ones not crossed out.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">The teacher also says: revise all the worksheets in the maths notebook – those show the exact layout she will see. In the real quiz Mira <b>writes</b> the numbers, so do the printed mock quiz once on paper and check she writes 6/9, 12/21, 13/31 the right way round.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>Count 1 → 30 together. Then “I say 24, you say the next one!” (25). Try 19→20, 29→30, 16→17. And backwards: “what comes before 20?” (19), “before 30?” (29).</li>
+      <li>Fingers, no pictures: “4 and 3?” – 4 in your head, count on 5, 6, 7. Try 6+2, 5+5, 7+1, 2+8, 3+3, 9+0.</li>
+      <li>Take away with real things: “7 grapes on the plate, eat 2 – how many are left?” Say it as a sum: “7 take away 2 is 5”.</li>
+      <li>Quick doubles: 1+1, 2+2, 3+3, 4+4, 5+5 = 2, 4, 6, 8, 10.</li>
+    </ul></div>
+    <div class="card"><h3>Paper practice</h3><p style="margin:0">Print <a href="math-quiz-mock.pdf">Mira's Maths Quiz Mock (PDF)</a> – 2 pages in the quiz's three question types + answer key.</p></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Welcome back to the Number Forest!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome, Edge or Safari.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>
