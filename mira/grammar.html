@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Grammar Garden">
+<meta name="theme-color" content="#eafbe7">
+<title>Mira's Grammar Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Grammar Garden — one playful garden map → one big activity card per question. Big tiles for a 6-year-old on an iPad. */
+:root{
+  --bg:#eafbe7;          /* fresh grass */
+  --card:#ffffff;
+  --ink:#2e3a2a;         /* leaf ink */
+  --muted:#7b8a76;
+  --leaf:#4cbb5c;
+  --sun:#ffc93c;
+  --coral:#ff6b6b;
+  --sky:#4fb3ff;
+  --grape:#a66cff;
+  --pink:#ff7bac;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(46,58,42,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 10% 10%,#fff7c4 0,transparent 35%),radial-gradient(circle at 90% 90%,#cfeeff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--leaf);text-decoration:none}
+.brand span.bee{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--leaf))}
+.island:hover{transform:translateY(-3px)}
+.island:active{transform:translateY(2px);box-shadow:none}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#e3e8df}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff3c4,#e2f7d9)}
+.island.test .em{font-size:3rem}
+.island.learn{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#e8f1ff,#f3e8ff)}
+.island.learn .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:#f0f4ee;border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:16px;background:#eef3ec;border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .35s}
+.qcount{font-family:var(--display);color:var(--muted);font-size:1rem;white-space:nowrap}
+
+.prompt{text-align:center;padding:10px 6px 18px}
+.prompt .ask{font-size:1.05rem;color:var(--muted);margin-bottom:8px}
+.prompt .word{font-family:var(--display);font-size:clamp(2rem,7vw,3.4rem);font-weight:700;line-height:1.15;word-break:keep-all}
+.prompt .word .blank{display:inline-block;min-width:3.2ch;border-bottom:5px solid var(--coral);line-height:.9;margin:0 .15em;color:var(--coral);vertical-align:baseline}
+.prompt .word .pm{display:inline-block;min-width:1.2ch;border-bottom:5px solid var(--coral);color:var(--coral);margin-left:.1em}
+.prompt .say{margin-top:10px;background:#e8f1ff;border-radius:999px;padding:10px 18px;font-size:1rem;color:#1d5fa8}
+.choices{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.choices.two{grid-template-columns:repeat(2,1fr)}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:420px){.choices.three{grid-template-columns:repeat(3,1fr)}}
+.tile{background:#f7faf5;border:4px solid #e3ebdf;border-radius:22px;padding:18px 10px;min-height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:1.25rem;transition:transform .1s,background .2s,border-color .2s}
+.tile .bigL{font-family:var(--display);font-size:2.4rem;line-height:1}
+.tile .sub{font-size:.9rem;color:var(--muted);font-weight:700}
+.tile:hover{transform:translateY(-2px);border-color:#cfe0c8}
+.tile:active{transform:scale(.97)}
+.tile.ok{background:#e4f8e7;border-color:var(--ok);color:#1d6b2b}
+.tile.bad{background:#ffe6e6;border-color:var(--bad);color:#9b1c1c;animation:shake .4s}
+.tile.dim{opacity:.45}
+.tile[disabled]{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.feedback{margin-top:14px;min-height:64px;border-radius:18px;padding:12px 16px;display:none;align-items:center;gap:12px;font-size:1.05rem}
+.feedback.show{display:flex}
+.feedback.ok{background:#e4f8e7;color:#1d6b2b}
+.feedback.bad{background:#fff1e6;color:#8a4a12}
+.feedback .fx{font-size:1.8rem}
+.feedback .nxt{margin-left:auto;background:var(--leaf);color:#fff;border-radius:999px;padding:12px 20px;font-size:1.05rem;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.feedback.bad .nxt{background:var(--coral)}
+
+/* vowel mushroom */
+.mush{position:relative;max-width:440px;margin:0 auto}
+.cap{background:radial-gradient(circle at 30% 30%,#ff9fb0,#ff6b8a 70%);border-radius:50% 50% 45% 45%/60% 60% 40% 40%;padding:30px 40px 34px;box-shadow:inset 0 -14px 0 rgba(0,0,0,.08)}
+.stem{width:60%;margin:-8px auto 0;background:linear-gradient(#dff5cf,#b8e4a6);border-radius:0 0 40px 40px;padding:16px 10px 24px}
+.lg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;justify-items:center}
+.stem .lg{grid-template-columns:repeat(3,1fr)}
+.lt{aspect-ratio:1;width:min(100%,66px);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:clamp(1.5rem,5vw,2.2rem);font-weight:700;box-shadow:0 4px 0 rgba(0,0,0,.1);transition:transform .1s}
+.lt:active{transform:scale(.94)}
+.lt.ok{background:var(--ok);color:#fff;box-shadow:0 0 0 5px #bdf0c5}
+.lt.bad{background:#ffe6e6;color:var(--bad);animation:shake .4s}
+.lt.dot{position:relative}
+.vrow{display:flex;gap:8px;justify-content:center;margin:8px 0 16px;flex-wrap:wrap}
+.vrow span{background:#fff;border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:1.3rem;box-shadow:var(--shadow);color:#c9c9c9}
+.vrow span.got{color:var(--ok);background:#e4f8e7}
+
+/* results */
+.result{text-align:center;padding:10px}
+.result .trophy{font-size:4.5rem;line-height:1;animation:pop .6s}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.result .bigstars{font-size:3rem;letter-spacing:6px;color:var(--sun);margin:8px 0}
+.result .bigstars .off{color:#e3e8df}
+.result p{color:var(--muted)}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--leaf);color:#fff;border-radius:999px;padding:14px 22px;font-size:1.1rem;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.btn.alt{background:#eef3ec;color:var(--ink)}
+.btn.sun{background:var(--sun);color:var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+
+/* learn cards */
+.rules{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.rule{background:#f7faf5;border-radius:22px;padding:16px;border-left:10px solid var(--c)}
+.rule h3{font-size:1.25rem;display:flex;align-items:center;gap:8px}
+.rule p{margin:8px 0 0;font-size:1rem;line-height:1.45}
+.rule .ex{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.rule .ex b{background:#fff;border-radius:999px;padding:6px 12px;box-shadow:var(--shadow);font-family:var(--display);font-weight:600}
+.rule .ex b.cap{color:var(--coral)}
+.rule .spk{margin-top:10px;background:#e8f1ff;border-radius:999px;padding:8px 14px;font-size:.95rem;color:#1d5fa8}
+
+/* parents */
+table{width:100%;border-collapse:collapse;font-size:1rem}
+td,th{padding:10px 8px;border-bottom:2px solid #eef3ec;text-align:left}
+th{color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-size:1rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <a class="brand" href="index.html" aria-label="Back to Mira's Games"><span class="bee">🐝</span>Grammar Garden</a>
+    <div class="tools">
+      <button class="chip on" id="voiceBtn" aria-pressed="true">🔊 Voice</button>
+      <span class="starbank" id="starbank" aria-live="polite">⭐ 0</span>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={
+  get(k,d){ try{ const v=localStorage.getItem('mira_gg_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_gg_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* ---------- sound ---------- */
+let actx;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.12,'sine',.12); tone(880,.16,'sine',.12,.1); },
+  bad(){ tone(220,.25,'square',.06); },
+  tap(){ tone(520,.06,'triangle',.08); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.18,'sine',.14,i*.12)); }
+};
+
+/* ---------- voice ---------- */
+let voiceOn=store.get('voice',true), voices=[], chosenVoice=null;
+function pickVoice(){
+  voices=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
+  const en=voices.filter(v=>/^en/i.test(v.lang));
+  const prefer=['Samantha','Karen','Moira','Daniel','Google UK English Female','Google US English','Microsoft Zira','Microsoft Aria','Microsoft Libby','Microsoft Sonia'];
+  chosenVoice=en.find(v=>prefer.some(p=>v.name.includes(p)))||en.find(v=>/female|woman/i.test(v.name))||en[0]||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.1}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn&&!force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- confetti ---------- */
+function confetti(){
+  const c=$('#confetti'),ctx=c.getContext('2d'); c.width=innerWidth;c.height=innerHeight;
+  const cols=['#ff6b6b','#ffc93c','#4cbb5c','#4fb3ff','#a66cff','#ff7bac'];
+  const ps=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,r:6+Math.random()*7,c:cols[Math.random()*cols.length|0],v:2+Math.random()*3,a:Math.random()*6.28,s:Math.random()*.2-.1}));
+  let t=0; const id=setInterval(()=>{ ctx.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.y+=p.v;p.a+=p.s;p.x+=Math.sin(p.a)*1.2; ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);ctx.restore();}); if(++t>160){clearInterval(id);ctx.clearRect(0,0,c.width,c.height);} },16);
+}
+
+/* ---------- content (matches the school revision sheet) ---------- */
+const COMMON=['city','girl','country','school','river','boy','teacher','dog','cat','book','day','month','car','friend','baby','park','street','shop','flower','doctor','bird','town'];
+const PROPER=['Manila','Maria','Philippines','Sunshine School','Amazon River','James','Tripoli','Libya','Mira','Monday','January','Mr. Ali','London','Egypt','Nile River','Sara','Omar','Rainbow School','Max','Paris','Friday','Africa'];
+
+const TF=[
+  ['An adjective is a word that describes a noun.',true,'Yes! Adjectives describe nouns: a BIG dog, a RED ball, a HAPPY girl.'],
+  ['A capital letter is used at the start of a sentence or a name.',true,'Yes! Every sentence and every name starts with a capital letter.'],
+  ['A full stop goes at the beginning of a sentence.',false,'No! A full stop goes at the END of a sentence.'],
+  ['Punctuation marks help to make our writing clear.',true,'Yes! Full stops and question marks make our writing clear.'],
+  ['A verb is a word that describes an action.',true,'Yes! Verbs are doing words: run, jump, eat, read.'],
+  ['A noun is the name of a person, place or thing.',true,'Yes! Girl, school and ball are all nouns.'],
+  ['A proper noun starts with a capital letter.',true,'Yes! Mira, Tripoli and Monday all start with a capital letter.'],
+  ['A sentence starts with a small letter.',false,'No! A sentence starts with a CAPITAL letter.'],
+  ['A verb describes a noun.',false,'No! An ADJECTIVE describes a noun. A verb is an action word.'],
+  ['We put a question mark at the end of a question.',true,'Yes! A question ends with a question mark.'],
+  ['The word "happy" is a verb.',false,'No! Happy is an adjective. It describes how someone feels.'],
+  ['The word "jump" is a verb.',true,'Yes! Jump is an action, so it is a verb.'],
+  ['The word "Manila" is a common noun.',false,'No! Manila is a proper noun. It is the special name of a city.'],
+  ['The word "girl" is a common noun.',true,'Yes! Girl is a common noun. It can be any girl.'],
+  ['A question ends with a full stop.',false,'No! A question ends with a QUESTION MARK.'],
+  ['The word "big" is an adjective.',true,'Yes! Big describes a noun, so it is an adjective.'],
+];
+
+const QUESTIONS=['What is your name','Can you play with me','Do you have a dog','Will you read this book','Where is my bag','How old are you','Is this your pen','Can you jump','What time is it','Do you like apples','Who is that boy','Are you happy','Where do you live','Is it raining','What is your favourite colour','Can I have some water'];
+const STATEMENTS=['I am outside','Look at the cat','I like the color red','I love school','I have a red ball','The sun is hot','We go to school','My cat is black','I like ice cream','She has a blue dress','The dog is big','We play in the park','My name is Mira','I am six years old','The sky is blue','I can jump high'];
+
+const TOBE=[
+  ['I','a student.','am'],['He','hungry.','is'],['She','happy.','is'],['We','late.','are'],['They','from England.','are'],['It','very cold today.','is'],
+  ['She','in the living room.','is'],['We','playing computer games.','are'],['He','watching TV.','is'],['I','feeling well.','am'],
+  ['I','six years old.','am'],['She','my friend.','is'],['They','at school.','are'],['He','a doctor.','is'],['We','happy.','are'],['It','a big cat.','is'],
+  ['You','my sister.','are'],['I','reading a book.','am'],['The boys','playing football.','are'],['Mira','a good girl.','is'],
+  ['I','a girl.','am'],['He','tall.','is'],['We','in the car.','are'],['It','sunny today.','is'],['They','my friends.','are'],['She','eating an apple.','is'],
+  ['I','very tired.','am'],['You','late.','are'],['The dog','sleeping.','is'],['We','going home.','are'],['My mum','in the kitchen.','is'],['The children','singing.','are'],
+];
+const TOBE_WHY={am:'With "I" we always say "am": I am.',is:'With he, she, it, or ONE person or thing we say "is".',are:'With we, you, they, or MORE than one we say "are".'};
+const VOWELS=['a','e','i','o','u'];
+const CONSONANTS='bcdfghjklmnpqrstvwxyz'.split('');
+
+/* ---------- question builders (each returns {ask, html, speak, choices:[{label,sub}], answer, why}) ---------- */
+function qNoun(){
+  const isProper=Math.random()<.5;
+  const w=isProper?pick(PROPER,1)[0]:pick(COMMON,1)[0];
+  return {type:'noun',ask:'Common noun or proper noun?',html:`<div class="word">${esc(w)}</div>`,speak:`${w}. Is it a common noun or a proper noun?`,
+    choices:[{label:'C',sub:'common noun'},{label:'P',sub:'proper noun'}],cls:'two',answer:isProper?1:0,
+    why:isProper?`"${w}" is a PROPER noun. It is a special name, so it starts with a capital letter.`:`"${w}" is a COMMON noun. It can be any ${w}, not a special name.`};
+}
+function qTF(){
+  const [s,a,why]=pick(TF,1)[0];
+  return {type:'tf',ask:'True or False?',html:`<div class="word" style="font-size:clamp(1.3rem,4.5vw,2rem)">${esc(s)}</div>`,speak:`True or false? ${s}`,
+    choices:[{label:'✅',sub:'True'},{label:'❌',sub:'False'}],cls:'two',answer:a?0:1,why};
+}
+function qPunct(){
+  const isQ=Math.random()<.5;
+  const s=isQ?pick(QUESTIONS,1)[0]:pick(STATEMENTS,1)[0];
+  return {type:'punct',ask:'Question mark or full stop?',html:`<div class="word" style="font-size:clamp(1.5rem,5vw,2.4rem)">${esc(s)}<span class="pm">&nbsp;</span></div>`,speak:`${s}. Question mark, or full stop?`,
+    choices:[{label:'?',sub:'question mark'},{label:'.',sub:'full stop'}],cls:'two',answer:isQ?0:1,
+    why:isQ?`"${s}?" is ASKING something, so it needs a question mark.`:`"${s}." is TELLING something, so it needs a full stop.`};
+}
+function qToBe(){
+  const [sub,rest,ans]=pick(TOBE,1)[0];
+  const opts=['am','is','are'];
+  return {type:'tobe',ask:'Fill in: am, is or are?',html:`<div class="word">${esc(sub)} <span class="blank">&nbsp;</span> ${esc(rest)}</div>`,speak:`${sub}, blank, ${rest.replace(/\.$/,'')}. Am, is, or are?`,
+    choices:opts.map(o=>({label:o})),cls:'three',answer:opts.indexOf(ans),why:`${sub} ${ans} ${rest} — ${TOBE_WHY[ans]}`,fill:true};
+}
+function qVowelMC(){
+  const v=pick(VOWELS,1)[0]; const cs=pick(CONSONANTS,3);
+  const opts=shuffle([v,...cs]);
+  return {type:'vowel',ask:'Which letter is a vowel?',html:`<div class="word" style="font-size:1.6rem;color:var(--muted)">The vowels are <b style="color:var(--coral)">a e i o u</b></div>`,speak:'Which letter is a vowel?',
+    choices:opts.map(o=>({label:o})),cls:'four',answer:opts.indexOf(v),why:`"${v}" is a vowel. The five vowels are a, e, i, o, u.`};
+}
+
+/* ---------- levels ---------- */
+const LEVELS=[
+  {id:'noun',em:'🏰',title:'Noun Castle',sub:'C or P? common & proper nouns',c:'#ff6b6b',n:10,make:qNoun,intro:'Common nouns are any person, place or thing: girl, city, river. Proper nouns are special names and start with a CAPITAL letter: Maria, Manila, Amazon River.'},
+  {id:'tf',em:'🤖',title:'Robot Rules',sub:'True or False? grammar rules',c:'#4fb3ff',n:8,make:qTF,intro:'Robot will say a rule. Is it true or false? Remember: a sentence starts with a capital letter and ends with a full stop!'},
+  {id:'punct',em:'🎈',title:'Balloon Pop',sub:'? or . at the end',c:'#a66cff',n:10,make:qPunct,intro:'If the sentence is ASKING something, pop the question mark. If it is TELLING something, pop the full stop.'},
+  {id:'tobe',em:'🐸',title:'Frog Pond',sub:'am · is · are',c:'#4cbb5c',n:10,make:qToBe,intro:'I am. He is, she is, it is. We are, you are, they are. Help the frog jump to the right lily pad!'},
+  {id:'vowel',em:'🍄',title:'Vowel Mushroom',sub:'find a e i o u',c:'#ff7bac',n:3,special:'vowel',intro:'The five vowels are a, e, i, o, u. Tap all the vowels hiding on the mushroom!'},
+];
+const BIG={id:'big',em:'🏆',title:'Big Garden Test',sub:'15 mixed questions — just like the real test!',c:'#ffc93c',n:15,
+  make(i){ const order=[qNoun,qTF,qPunct,qToBe,qVowelMC,qNoun,qPunct,qToBe,qTF,qNoun,qToBe,qPunct,qVowelMC,qToBe,qTF]; return order[i%order.length](); },intro:'Everything together! Take your time, read each one carefully.'};
+
+const byId=id=>id==='big'?BIG:LEVELS.find(l=>l.id===id);
+function starsFor(id){ return store.get('stars_'+id,0); }
+function totalStars(){ return LEVELS.concat([BIG]).reduce((s,l)=>s+starsFor(l.id),0); }
+function starHTML(n,max=3){ let h=''; for(let i=0;i<max;i++) h+=`<span class="${i<n?'':'off'}">★</span>`; return h; }
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').setAttribute('aria-pressed',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#starbank').textContent='⭐ '+totalStars(); }
+
+/* ---------- views ---------- */
+const view=$('#view');
+function home(){
+  speechSynthesis&&speechSynthesis.cancel();
+  view.innerHTML=`
+  <section class="hero">
+    <div><h1>Hello Mira! 🌻 Welcome to Grammar Garden</h1>
+      <p>Revision for the <b>Term 1 final English exam</b>. Visit every corner of the garden, collect ⭐ stars, then do the Big Garden Test.</p>
+      <span class="ar">مرحباً ميرا! العبي واجمعي النجوم استعداداً لامتحان نهاية الفصل الأول في الإنجليزي 🌟</span></div>
+    <div class="big">🐝</div>
+  </section>
+  <div class="sectionTitle">Learn</div>
+  <div class="map">
+    <button class="island learn" data-go="learn"><span class="em">📖</span><span><span class="t">The 5 Rules</span><div class="s">Listen to the rules first — nouns, verbs, adjectives, capital letters, full stops & question marks</div></span></button>
+  </div>
+  <div class="sectionTitle">Play</div>
+  <div class="map">
+    ${LEVELS.map(l=>`<button class="island" style="--c:${l.c}" data-go="${l.id}"><span class="em">${l.em}</span><span class="t">${l.title}</span><span class="s">${l.sub}</span><span class="stars">${starHTML(starsFor(l.id))}</span></button>`).join('')}
+    <button class="island test" style="--c:${BIG.c}" data-go="big"><span class="em">${BIG.em}</span><span><span class="t">${BIG.title}</span><div class="s">${BIG.sub}</div><div class="stars">${starHTML(starsFor('big'))}</div></span></button>
+  </div>
+  <div class="sectionTitle">For Mum &amp; Dad</div>
+  <div class="map"><button class="island" style="--c:#7b8a76" data-go="parents"><span class="em">📋</span><span class="t">Progress</span><span class="s">scores &amp; reset</span></button></div>`;
+  view.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ sfx.tap(); const g=b.dataset.go; if(g==='learn') learn(); else if(g==='parents') parents(); else start(g); });
+  syncChips();
+}
+
+function learn(){
+  const R=[
+    {c:'#ff6b6b',em:'🏷️',t:'Nouns',p:'A <b>noun</b> is the name of a person, place or thing. A <b>common noun</b> is any one: girl, city, river. A <b>proper noun</b> is a special name and starts with a <b>CAPITAL</b> letter.',ex:['girl','<i class="cap">Maria</i>','city','<i class="cap">Manila</i>','river','<i class="cap">Amazon River</i>'],say:'A noun is the name of a person, place or thing. A common noun is any one, like girl, city, river. A proper noun is a special name and starts with a capital letter, like Maria, Manila, Amazon River.'},
+    {c:'#4cbb5c',em:'🏃',t:'Verbs',p:'A <b>verb</b> is an action word — something you do.',ex:['run','jump','eat','read','sing'],say:'A verb is an action word, something you do: run, jump, eat, read, sing.'},
+    {c:'#ffc93c',em:'🎨',t:'Adjectives',p:'An <b>adjective</b> describes a noun. It tells us what something is like.',ex:['big','red','happy','cold','small'],say:'An adjective describes a noun. It tells us what something is like: a big dog, a red ball, a happy girl.'},
+    {c:'#4fb3ff',em:'🔠',t:'Capital letters',p:'Use a <b>capital letter</b> at the <b>start of a sentence</b> and for <b>names</b> of people, places and days.',ex:['<i class="cap">T</i>he cat is black.','<i class="cap">M</i>ira','<i class="cap">T</i>ripoli','<i class="cap">M</i>onday'],say:'Use a capital letter at the start of a sentence, and for names of people, places and days.'},
+    {c:'#a66cff',em:'❓',t:'Full stop or question mark',p:'A <b>full stop (.)</b> goes at the <b>END</b> of a telling sentence. A <b>question mark (?)</b> goes at the end of an asking sentence. Punctuation makes our writing clear!',ex:['I love school<i class="cap">.</i>','What is your name<i class="cap">?</i>'],say:'A full stop goes at the end of a telling sentence: I love school. A question mark goes at the end of an asking sentence: What is your name? Punctuation makes our writing clear.'},
+    {c:'#ff7bac',em:'🍄',t:'Vowels',p:'The five <b>vowels</b> are <b>a, e, i, o, u</b>. All the other letters are consonants.',ex:['<i class="cap">a</i>','<i class="cap">e</i>','<i class="cap">i</i>','<i class="cap">o</i>','<i class="cap">u</i>'],say:'The five vowels are a, e, i, o, u. All the other letters are consonants.'},
+    {c:'#7b8a76',em:'👤',t:'am · is · are',p:'<b>I am</b>. <b>He is, she is, it is</b> (one person or thing). <b>We are, you are, they are</b> (more than one).',ex:['I <i class="cap">am</i>','She <i class="cap">is</i>','They <i class="cap">are</i>'],say:'I am. He is, she is, it is. We are, you are, they are.'},
+  ];
+  view.innerHTML=`<section class="panel"><div class="topbar"><button class="back" id="back">← Garden</button><h2>📖 The rules</h2><span></span></div>
+  <div class="rules">${R.map((r,i)=>`<div class="rule" style="--c:${r.c}"><h3>${r.em} ${r.t}</h3><p>${r.p}</p><div class="ex">${r.ex.map(e=>`<b>${e.replace(/<i class="cap">/g,'<span class="cap">').replace(/<\/i>/g,'</span>')}</b>`).join('')}</div><button class="spk" data-i="${i}">🔊 Listen</button></div>`).join('')}</div></section>`;
+  $('#back').onclick=()=>{sfx.tap();home();};
+  view.querySelectorAll('.spk').forEach(b=>b.onclick=()=>speak(R[b.dataset.i].say,{force:true}));
+}
+
+/* ---------- game loop ---------- */
+let cur=null;
+function start(id){
+  const level=byId(id);
+  cur={level,i:0,firstTry:0,mistakes:0,log:[]};
+  view.innerHTML=`<section class="panel"><div class="topbar"><button class="back" id="back">← Garden</button><h2>${level.em} ${level.title}</h2><span></span></div>
+    <div class="prompt"><div class="word" style="font-size:1.35rem;line-height:1.45;font-family:var(--body);font-weight:700">${esc(level.intro)}</div>
+    <button class="say" id="sayIntro">🔊 Listen</button></div>
+    <div class="row"><button class="btn" id="go">Let's play! 🎉</button></div></section>`;
+  $('#back').onclick=()=>{sfx.tap();home();};
+  $('#sayIntro').onclick=()=>speak(level.intro,{force:true});
+  $('#go').onclick=()=>{ sfx.tap(); speechSynthesis&&speechSynthesis.cancel(); next(); };
+  speak(level.title+'. '+level.intro);
+}
+function next(){
+  const L=cur.level;
+  if(cur.i>=L.n) return finish();
+  if(L.special==='vowel') return vowelRound();
+  const q=L.make(cur.i);
+  cur.q=q; cur.tries=0;
+  view.innerHTML=`<section class="panel">
+    <div class="topbar"><button class="back" id="back">← Garden</button><div class="progress"><i style="width:${(cur.i/L.n)*100}%"></i></div><span class="qcount">${cur.i+1} / ${L.n}</span></div>
+    <div class="prompt"><div class="ask">${esc(q.ask)}</div>${q.html}<button class="say" id="say">🔊 Read it to me</button></div>
+    <div class="choices ${q.cls||''}">${q.choices.map((c,i)=>`<button class="tile" data-i="${i}"><span class="bigL">${esc(c.label)}</span>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div></section>`;
+  $('#back').onclick=()=>{sfx.tap();home();};
+  $('#say').onclick=()=>speak(q.speak,{force:true});
+  view.querySelectorAll('.tile').forEach(t=>t.onclick=()=>answer(+t.dataset.i,t));
+  speak(q.speak);
+}
+function answer(i,tile){
+  const q=cur.q, L=cur.level, fb=$('#fb'); cur.tries++;
+  const tiles=[...view.querySelectorAll('.tile')];
+  if(i===q.answer){
+    sfx.ok(); tile.classList.add('ok'); tiles.forEach(t=>{t.disabled=true; if(t!==tile)t.classList.add('dim');});
+    if(cur.tries===1) cur.firstTry++;
+    // fill the blank / punctuation mark in the sentence
+    const blank=$('.blank')||$('.pm'); if(blank){ blank.textContent=q.choices[i].label; blank.style.color='var(--ok)'; blank.style.borderColor='var(--ok)'; }
+    const cheer=pick(['Yes! 🎉','Super! ⭐','Well done! 🌟','Brilliant! 🐝','You got it! 🌻'],1)[0];
+    fb.className='feedback ok show'; fb.innerHTML=`<span class="fx">🎉</span><span><b>${cheer}</b> ${esc(q.why)}</span><button class="nxt" id="nxt">Next ➜</button>`;
+    speak(cheer.replace(/[^\w! ]/g,'')+'. '+q.why);
+    cur.log.push({q:q.speak,ok:cur.tries===1});
+    $('#nxt').onclick=()=>{ sfx.tap(); speechSynthesis&&speechSynthesis.cancel(); cur.i++; next(); };
+  }else{
+    sfx.bad(); tile.classList.add('bad'); tile.disabled=true; cur.mistakes++;
+    const hint=q.type==='noun'?'Does it start with a capital letter? Then it is a proper noun.':q.type==='punct'?'Is it asking something, or telling something?':q.type==='tobe'?'I → am. One person or thing → is. More than one → are.':q.type==='vowel'?'The vowels are a, e, i, o, u.':'Think about the rule again.';
+    fb.className='feedback bad show'; fb.innerHTML=`<span class="fx">🤔</span><span><b>Try again!</b> ${esc(hint)}</span>`;
+    speak('Try again. '+hint);
+  }
+}
+
+/* vowel mushroom round */
+function vowelRound(){
+  const L=cur.level;
+  const letters=shuffle([...VOWELS,...pick(CONSONANTS,10)]);
+  const capL=letters.slice(0,12), stemL=letters.slice(12);
+  let found=0, wrongHere=0;
+  view.innerHTML=`<section class="panel">
+    <div class="topbar"><button class="back" id="back">← Garden</button><div class="progress"><i style="width:${(cur.i/L.n)*100}%"></i></div><span class="qcount">Round ${cur.i+1} / ${L.n}</span></div>
+    <div class="prompt"><div class="ask">Tap all the vowels on the mushroom! 🍄</div><div class="vrow">${VOWELS.map(v=>`<span id="v_${v}">${v}</span>`).join('')}</div><button class="say" id="say">🔊 Read it to me</button></div>
+    <div class="mush"><div class="cap"><div class="lg">${capL.map(l=>`<button class="lt" data-l="${l}">${l}</button>`).join('')}</div></div>
+    <div class="stem"><div class="lg">${stemL.map(l=>`<button class="lt" data-l="${l}">${l}</button>`).join('')}</div></div></div>
+    <div class="feedback" id="fb"></div></section>`;
+  $('#back').onclick=()=>{sfx.tap();home();};
+  $('#say').onclick=()=>speak('Tap all the vowels on the mushroom. The vowels are a, e, i, o, u.',{force:true});
+  speak('Tap all the vowels on the mushroom. The vowels are a, e, i, o, u.');
+  view.querySelectorAll('.lt').forEach(b=>b.onclick=()=>{
+    const l=b.dataset.l; if(b.disabled) return;
+    if(VOWELS.includes(l)){ sfx.ok(); b.classList.add('ok'); b.disabled=true; $('#v_'+l).classList.add('got'); found++; speak(l,{pitch:1.3});
+      if(found===5){ if(wrongHere===0) cur.firstTry++; else cur.mistakes+=wrongHere; cur.log.push({q:'Vowel mushroom round '+(cur.i+1),ok:wrongHere===0});
+        const fb=$('#fb'); fb.className='feedback ok show'; fb.innerHTML=`<span class="fx">🎉</span><span><b>All five vowels!</b> a, e, i, o, u.</span><button class="nxt" id="nxt">Next ➜</button>`;
+        setTimeout(()=>speak('All five vowels! a, e, i, o, u. Well done!'),400);
+        $('#nxt').onclick=()=>{sfx.tap(); speechSynthesis&&speechSynthesis.cancel(); cur.i++; next();}; }
+    }else{ sfx.bad(); wrongHere++; b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),500); const fb=$('#fb'); fb.className='feedback bad show'; fb.innerHTML=`<span class="fx">🤔</span><span><b>"${l}" is not a vowel.</b> Look for a, e, i, o, u.</span>`; speak(`${l} is not a vowel. Look for a, e, i, o, u.`); }
+  });
+}
+
+function finish(){
+  const L=cur.level, n=L.n, score=cur.firstTry, pct=score/n;
+  const stars=pct>=.9?3:pct>=.7?2:pct>=.4?1:0;
+  const best=Math.max(stars,starsFor(L.id)); store.set('stars_'+L.id,best); store.set('last_'+L.id,{score,n,when:Date.now()});
+  const msg=stars===3?'Amazing, Mira! You are a grammar star! 🌟':stars===2?'Great job! One more try for 3 stars!':stars===1?'Good start! Let\'s listen to the rule and try again.':'Let\'s learn the rule together and play again!';
+  view.innerHTML=`<section class="panel result"><div class="trophy">${stars===3?'🏆':stars>=1?'🌻':'🌱'}</div><h2>${L.title} finished!</h2>
+    <div class="bigstars">${starHTML(stars)}</div><p>${score} out of ${n} right first time. ${esc(msg)}</p>
+    <div class="row"><button class="btn" id="again">Play again 🔁</button><button class="btn alt" id="home">Back to the garden 🌻</button>${L.id!=='big'?'<button class="btn sun" id="big">Big Garden Test 🏆</button>':''}</div></section>`;
+  if(stars>=2){ confetti(); sfx.win(); }
+  speak(msg);
+  $('#again').onclick=()=>{sfx.tap();start(L.id);}; $('#home').onclick=()=>{sfx.tap();home();}; const b=$('#big'); if(b) b.onclick=()=>{sfx.tap();start('big');};
+  syncChips();
+}
+
+function parents(){
+  const rows=LEVELS.concat([BIG]).map(l=>{ const last=store.get('last_'+l.id,null); return `<tr><td>${l.em} ${l.title}</td><td style="color:var(--sun)">${starHTML(starsFor(l.id))}</td><td>${last?`${last.score}/${last.n}`:'—'}</td><td style="color:var(--muted);font-size:.9rem">${last?new Date(last.when).toLocaleDateString():''}</td></tr>`; }).join('');
+  view.innerHTML=`<section class="panel"><div class="topbar"><button class="back" id="back">← Garden</button><h2>📋 Progress for Mum &amp; Dad</h2><span></span></div>
+    <table><thead><tr><th>Game</th><th>Best</th><th>Last score</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>
+    <p style="color:var(--muted);font-size:.95rem;margin-top:14px">Covers the revision sheet: common/proper nouns, true/false grammar rules, question mark vs full stop, am/is/are, and vowels. Scores count answers right on the first try. Questions are shuffled every game, so it can be played again and again. Printable practice tests: <a href="english-practice-test-1.pdf">Test 1</a> · <a href="english-practice-test-2.pdf">Test 2</a>.</p>
+    <div class="row"><button class="btn alt" id="reset">Reset all stars</button></div></section>`;
+  $('#back').onclick=()=>{sfx.tap();home();};
+  $('#reset').onclick=()=>{ if(confirm('Reset all of Mira\'s stars and scores?')){ LEVELS.concat([BIG]).forEach(l=>{store.set('stars_'+l.id,0);store.set('last_'+l.id,null);}); toast('Progress reset'); home(); } };
+}
+
+/* ---------- boot ---------- */
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+addEventListener('resize',()=>{const c=$('#confetti');c.width=innerWidth;c.height=innerHeight;});
+home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Safari, Chrome or Edge.');
+</script>
+</body>
+</html>
