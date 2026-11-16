@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Computer Lab 2">
+<meta name="theme-color" content="#eef4ff">
+<title>Mira's Computer Lab 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Computer-lab look: one island map → one big activity card per round, big tappable tiles for a 6-year-old. */
+:root{
+  --bg:#eef4ff;          /* pale sky-blue */
+  --bg2:#dbe7ff;         /* light blue */
+  --card:#ffffff;
+  --ink:#1e2a4a;         /* navy ink */
+  --muted:#6b7a9c;
+  --coral:#ff7a59;       /* main accent */
+  --sun:#ffc93c;
+  --leaf:#4cbb5c;
+  --sky:#3fb0ff;
+  --grape:#9b6cff;
+  --pink:#ff6fae;
+  --ok:#3fb950;
+  --bad:#e5484d;
+  --shadow:0 6px 0 rgba(30,42,74,.12);
+  --display:'Fredoka','Baloo 2','Comic Sans MS','Segoe UI Rounded',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+button,.dom,.bucket,.obj{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;
+  background-image:radial-gradient(circle at 8% 8%,#fff6c4 0,transparent 32%),radial-gradient(circle at 92% 92%,#e6dcff 0,transparent 40%);}
+button{font-family:inherit;font-weight:800;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:10px 40px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--grape)}
+.brand span.m{font-size:2rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);font-size:.95rem;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--sun)}
+.starbank{background:var(--sun);border-radius:999px;padding:8px 14px;font-family:var(--display);font-size:1.1rem;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:28px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);color:var(--ink)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:1rem}
+.hero .big{font-size:3.4rem;line-height:1}
+.hero .ar{display:block;font-size:.95rem;color:var(--grape);margin-top:4px;direction:rtl;text-align:right}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero .big{display:none}}
+
+.sectionTitle{font-size:1.1rem;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.island{background:var(--card);border-radius:22px;padding:14px 12px 12px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .12s;border-top:8px solid var(--c,var(--coral))}
+.island:hover{transform:translateY(-3px)}
+.island .em{font-size:2.3rem;line-height:1}
+.island .t{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.island .s{font-size:.82rem;color:var(--muted)}
+.island .stars{font-size:1rem;letter-spacing:1px;color:var(--sun)}
+.island .stars .off{color:#dde4f3}
+.island.test{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:linear-gradient(90deg,#fff6c4,#dbe7ff)}
+.island.test .em{font-size:3rem}
+
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.back{background:var(--bg2);border-radius:999px;padding:10px 16px;font-size:1rem}
+.progress{flex:1;min-width:120px;height:14px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));width:0;transition:width .4s}
+.instr{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.instr .txt{flex:1;min-width:0}
+.instr h2{font-size:1.25rem}
+.instr .ar{direction:rtl;text-align:right;color:var(--grape);font-size:1rem;margin-top:4px;display:none}
+body.ar .instr .ar{display:block}
+.ar-hint{display:none;direction:rtl}
+body.ar .ar-hint{display:block}
+.arin{display:none;direction:rtl;color:var(--grape)}
+body.ar .arin{display:inline}
+.speak{background:var(--sky);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.3rem;flex:none;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.speak:active{transform:translateY(2px);box-shadow:none}
+.speak.turtle{background:var(--leaf)}
+
+.q{font-family:var(--display);font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;margin:6px 0 4px;line-height:1.35}
+.qar{direction:rtl;text-align:center;color:var(--grape);font-size:1.1rem;margin-bottom:8px;display:none}
+body.ar .qar{display:block}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:-2px 0 6px}
+.scene{font-size:clamp(2.6rem,9vw,4rem);text-align:center;line-height:1.2;margin:8px 0}
+.scene svg{width:1.3em;height:1.3em;vertical-align:middle}
+
+.tile{background:var(--card);border:3px solid var(--bg2);border-radius:18px;padding:12px 16px;font-size:1.25rem;font-family:var(--display);font-weight:600;box-shadow:var(--shadow);transition:transform .1s;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.tile .e{font-size:2.4rem;line-height:1;height:2.4rem;display:grid;place-items:center}
+.tile .e svg{width:2.4rem;height:2.4rem}
+.tile .w{font-size:1.1rem}
+.tile .wa{font-size:.9rem;color:var(--grape);direction:rtl;display:none}
+body.ar .tile .wa{display:block}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--sky);background:#e8f4ff}
+.tile.ok{border-color:var(--ok);background:#e6f8ea;color:#1f7a2f}
+.tile.bad{animation:shake .4s;border-color:var(--bad);background:#ffecec}
+.tile.used{opacity:.35;pointer-events:none;transform:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.feedback{text-align:center;font-family:var(--display);font-size:1.4rem;min-height:2.2rem;margin:10px 0;color:var(--leaf)}
+.feedback.bad{color:var(--bad)}
+.nextbtn{display:block;margin:12px auto 0;background:var(--coral);color:#fff;border-radius:999px;padding:14px 30px;font-family:var(--display);font-size:1.3rem;box-shadow:0 5px 0 #c9553a}
+.nextbtn:active{transform:translateY(3px);box-shadow:none}
+.nextbtn.ghost{background:var(--bg2);color:var(--ink);box-shadow:var(--shadow);font-size:1rem;padding:10px 18px}
+.buckets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.buckets.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:460px){.buckets.three{grid-template-columns:1fr 1fr}.buckets.three .bucket:last-child{grid-column:1/-1}}
+.bucket{background:var(--bg2);border-radius:20px;padding:12px 8px;text-align:center;min-height:120px;border:3px dashed transparent;border-top:8px solid var(--c,var(--sky))}
+.bucket:hover{border-color:var(--sky)}
+.bucket .h{font-family:var(--display);font-size:1.15rem}
+.bucket .e{font-size:2rem}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.bucket .got span{background:var(--card);border-radius:999px;padding:2px 8px;font-size:1rem;display:inline-grid;place-items:center}
+.bucket .got span svg{width:1.2em;height:1.2em}
+.bucket.bad{animation:shake .4s;border-color:var(--bad)}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.fact{background:#fff6c4;border-radius:16px;padding:10px 14px;margin-top:10px;font-size:1rem;text-align:center}
+.fact .ar{direction:rtl;color:var(--grape);display:none;margin-top:4px}
+body.ar .fact .ar{display:block}
+
+/* build-a-computer canvas */
+.build{display:flex;justify-content:center;margin:6px 0 4px}
+.build svg{width:min(100%,420px);height:auto}
+.build .part{opacity:0;transition:opacity .35s,transform .35s;transform:translateY(8px)}
+.build .part.on{opacity:1;transform:none}
+.build .part.glow{filter:drop-shadow(0 0 6px var(--sun))}
+
+.result{text-align:center;padding:10px}
+.result .bigstars{font-size:3.6rem;letter-spacing:6px;margin:10px 0}
+.result .bigstars .off{color:#dde4f3}
+.result h2{font-size:1.8rem}
+.result p{color:var(--muted)}
+.report{display:grid;gap:10px}
+.report .card{background:var(--bg2);border-radius:18px;padding:12px 14px}
+.report .card h3{font-size:1.05rem;margin-bottom:6px}
+.report ul{margin:4px 0 0;padding-left:18px;font-size:.95rem}
+.report li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #c9d6f2}
+th{color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+
+#mascot{position:fixed;right:14px;bottom:14px;font-size:3rem;line-height:1;transition:transform .2s;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.15))}
+#mascot.happy{animation:jump .6s}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-26px) rotate(-10deg)}60%{transform:translateY(-10px) rotate(8deg)}}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:.95rem;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#confetti{position:fixed;inset:0;pointer-events:none}
+.hidden{display:none !important}
+
+/* lesson cards, word writing, rocket game, stickers */
+.learn{text-align:center}
+.scene.big{font-size:clamp(3.6rem,13vw,5.5rem)}
+.ltext{font-size:clamp(1.15rem,3.4vw,1.4rem);line-height:1.5;max-width:34ch;margin:8px auto 4px}
+.ltext b{color:var(--coral)}
+.wline{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:10px 0 16px}
+.slot{min-width:92px;min-height:54px;border-bottom:4px solid var(--ink);font-family:var(--display);font-size:1.6rem;display:grid;place-items:center;padding:0 8px;color:var(--muted)}
+.slot.full{color:var(--ink);animation:pop .3s}
+.wtile{min-width:96px}
+.wtile .w{font-size:1.5rem}
+.track{position:relative;height:56px;border-radius:999px;margin:0 0 6px;background:linear-gradient(90deg,#dbe7ff,#2f3a5c)}
+.track .moon{position:absolute;right:10px;top:8px;font-size:2rem}
+.track .rk{position:absolute;top:8px;font-size:2rem;transition:left .7s cubic-bezier(.3,1.4,.5,1);transform:rotate(45deg)}
+.track .rk.wob{animation:shake .4s}
+.tile.big2{min-width:150px;padding:16px 18px}
+.shelf{display:flex;flex-wrap:wrap;gap:10px;background:var(--card);border-radius:22px;padding:12px 14px;box-shadow:var(--shadow)}
+.stk{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;background:var(--bg2);filter:grayscale(1);opacity:.55}
+.stk.got{background:#fff6c4;filter:none;opacity:1;font-size:2rem}
+.newstk{font-family:var(--display);font-size:1.2rem;color:var(--grape);margin:8px 0}
+.newstk span{display:block;font-size:3.4rem;animation:pop .6s}
+@media (max-width:520px){#body .row .tile{min-width:0;flex:1 1 42%;padding:10px 8px}#body .row .tile .w{font-size:1rem}.slot{min-width:70px}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="m" id="mascot-head">🤖</span> Mira's Computer Lab 2</div>
+    <div class="tools">
+      <button class="chip" id="voiceBtn">🔊 Voice</button>
+      <button class="chip" id="arBtn">عربي</button>
+      <div class="starbank" id="starbank">⭐ 0</div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="mascot">🤖</div>
+<div id="toast"></div>
+
+<script>
+// ============ CONTENT: Computer test Tue 17 Nov 2026 · Inspire Computing Year 1 Workbook, Unit 2 ============
+// School note: workbook p.31 (single-role / multi-role table) · p.40 (circle the online activities) · p.46 (positive / negative ways to use apps).
+// Answers follow Pearson's Inspire Computing Y1 workbook answer key (Unit 2, Lessons 1, 5 and 8).
+
+// --- small drawings for things that have no good emoji ---
+const SVG={
+  washer:`<svg viewBox="0 0 64 64"><rect x="8" y="6" width="48" height="52" rx="5" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/><circle cx="32" cy="36" r="14" fill="#9fd4ff" stroke="#1e2a4a" stroke-width="3"/><circle cx="32" cy="36" r="8" fill="#3fb0ff"/><circle cx="16" cy="14" r="2.5" fill="#ff7a59"/><rect x="24" y="12" width="20" height="4" rx="2" fill="#8a9bc4"/></svg>`,
+  microwave:`<svg viewBox="0 0 64 64"><rect x="4" y="14" width="56" height="36" rx="4" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="3"/><rect x="10" y="20" width="32" height="24" rx="2" fill="#2f3a5c"/><path d="M20 38h12a6 6 0 0 1-12 0z" fill="#ffc93c"/><path d="M23 32c-2-3 2-4 0-7M29 32c-2-3 2-4 0-7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="51" cy="26" r="3" fill="#ff7a59"/><rect x="48" y="34" width="6" height="8" rx="2" fill="#8a9bc4"/></svg>`,
+  computer:`<svg viewBox="0 0 64 64"><rect x="4" y="12" width="12" height="34" rx="2" fill="#8a9bc4" stroke="#1e2a4a" stroke-width="2.5"/><circle cx="10" cy="20" r="2" fill="#4cbb5c"/><rect x="20" y="10" width="40" height="28" rx="3" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="2.5"/><rect x="24" y="14" width="32" height="20" rx="1.5" fill="#9fd4ff"/><rect x="36" y="38" width="8" height="5" fill="#8a9bc4"/><rect x="30" y="43" width="20" height="3" rx="1.5" fill="#1e2a4a"/><rect x="18" y="50" width="34" height="9" rx="2" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="2.5"/><path d="M22 54.5h26" stroke="#8a9bc4" stroke-width="2.5" stroke-dasharray="3 2"/><ellipse cx="58" cy="55" rx="3.5" ry="4.5" fill="#f4f7ff" stroke="#1e2a4a" stroke-width="2"/></svg>`,
+  tablet:`<svg viewBox="0 0 64 64"><rect x="12" y="4" width="40" height="56" rx="6" fill="#2f3a5c" stroke="#1e2a4a" stroke-width="3"/><rect x="16" y="9" width="32" height="44" rx="2" fill="#eaf4ff"/><g><rect x="19" y="12" width="7" height="7" rx="2" fill="#ff7a59"/><rect x="28.5" y="12" width="7" height="7" rx="2" fill="#ffc93c"/><rect x="38" y="12" width="7" height="7" rx="2" fill="#4cbb5c"/><rect x="19" y="22" width="7" height="7" rx="2" fill="#3fb0ff"/><rect x="28.5" y="22" width="7" height="7" rx="2" fill="#9b6cff"/><rect x="38" y="22" width="7" height="7" rx="2" fill="#ff6fae"/><rect x="19" y="32" width="7" height="7" rx="2" fill="#4cbb5c"/><rect x="28.5" y="32" width="7" height="7" rx="2" fill="#ff7a59"/><rect x="38" y="32" width="7" height="7" rx="2" fill="#3fb0ff"/></g><rect x="19" y="44" width="26" height="6" rx="3" fill="#c9d6f2"/><circle cx="32" cy="56.5" r="1.8" fill="#8a9bc4"/></svg>`,
+  headphones:`<svg viewBox="0 0 64 64"><path d="M12 40V30a20 20 0 0 1 40 0v10" fill="none" stroke="#1e2a4a" stroke-width="5" stroke-linecap="round"/><rect x="6" y="34" width="14" height="22" rx="6" fill="#ff7a59" stroke="#1e2a4a" stroke-width="3"/><rect x="44" y="34" width="14" height="22" rx="6" fill="#ff7a59" stroke="#1e2a4a" stroke-width="3"/></svg>`,
+  seesaw:`<svg viewBox="0 0 64 64"><path d="M6 44L58 24" stroke="#ff7a59" stroke-width="5" stroke-linecap="round"/><path d="M32 34l-9 20h18z" fill="#ffc93c" stroke="#1e2a4a" stroke-width="3" stroke-linejoin="round"/><circle cx="12" cy="31" r="5" fill="#9b6cff" stroke="#1e2a4a" stroke-width="2"/><path d="M12 36v6" stroke="#1e2a4a" stroke-width="3" stroke-linecap="round"/><circle cx="52" cy="13" r="5" fill="#4cbb5c" stroke="#1e2a4a" stroke-width="2"/><path d="M52 18v7" stroke="#1e2a4a" stroke-width="3" stroke-linecap="round"/><path d="M4 56h56" stroke="#8a9bc4" stroke-width="3" stroke-linecap="round"/></svg>`,
+  toaster:`<svg viewBox="0 0 64 64"><rect x="20" y="8" width="10" height="16" rx="3" fill="#f2c27a" stroke="#1e2a4a" stroke-width="2.5"/><rect x="34" y="8" width="10" height="16" rx="3" fill="#f2c27a" stroke="#1e2a4a" stroke-width="2.5"/><rect x="8" y="22" width="48" height="30" rx="8" fill="#dbe7ff" stroke="#1e2a4a" stroke-width="3"/><rect x="48" y="30" width="5" height="12" rx="2" fill="#ff7a59"/><path d="M14 54v4M50 54v4" stroke="#1e2a4a" stroke-width="3" stroke-linecap="round"/></svg>`,
+};
+const AR={ // Arabic labels (shown only when عربي is on)
+ 'Microwave':'ميكروويف','Washing machine':'غسالة','Computer':'حاسوب','Tablet':'جهاز لوحي','Headphones':'سماعات رأس','Phone':'هاتف',
+ 'Single-role':'وظيفة واحدة','Multi-role':'وظائف متعددة','One job':'عمل واحد','Many jobs':'أعمال كثيرة',
+ 'Cook food':'يطبخ الطعام','Wash clothes':'تغسل الملابس','Listen to music':'نسمع الموسيقى','Play games':'نلعب الألعاب','Take photos':'نلتقط الصور','Watch films':'نشاهد الأفلام','Draw pictures':'نرسم الصور','Write a story':'نكتب قصة','Watch videos':'نشاهد الفيديو',
+ 'Online':'متصل بالإنترنت','Offline':'غير متصل',
+ 'Using a phone':'استخدام الهاتف','Playing football':'لعب كرة القدم','Picking fruit':'قطف الفاكهة','Using a laptop':'استخدام الحاسوب المحمول','Watching a tablet':'مشاهدة الجهاز اللوحي','Writing on paper':'الكتابة على الورق','Playing on a seesaw':'اللعب على الأرجوحة','Reading a book':'قراءة كتاب','Making toast':'تحميص الخبز',
+ 'Video call':'مكالمة فيديو','Sending a message':'إرسال رسالة','Playing an online game':'لعبة على الإنترنت','Drawing with crayons':'الرسم بالألوان','Riding a bike':'ركوب الدراجة','Eating with family':'الأكل مع العائلة',
+ 'Positive':'إيجابي','Negative':'سلبي',
+ 'Sending a picture of a person without asking':'إرسال صورة شخص دون استئذان','Inviting a friend for lunch':'دعوة صديق للغداء','Sending a scary video':'إرسال فيديو مخيف','Sending a picture of a flower':'إرسال صورة زهرة',
+ 'Saying thank you':'قول شكراً','Sending a mean message':'إرسال رسالة مؤذية','Sending a happy birthday message':'إرسال تهنئة عيد ميلاد','Laughing at someone’s photo':'السخرية من صورة شخص',
+ 'Ask first':'أستأذن أولاً','Just send it':'أرسلها فوراً','Tell a grown-up':'أخبر شخصاً كبيراً','Send it to my friends':'أرسله لأصدقائي',
+ 'It does ONE job':'يقوم بعمل واحد','It does MANY jobs':'يقوم بأعمال كثيرة','Connected to the internet':'متصل بالإنترنت','Not connected':'غير متصل',
+ 'Kind and good':'لطيف وجيد','Not kind':'غير لطيف'
+};
+const Q=(type,obj)=>Object.assign({type},obj);
+const ICON=(e)=>SVG[e]||e;
+
+// ---------- Lesson: Learn with Robo (teaching cards, no questions) ----------
+function genLearn(){ return [
+  Q('learn',{ pic:'💻📱', q:'Digital devices', text:'A <b>digital device</b> uses electricity and keeps information inside. A computer, a tablet and a microwave are all digital devices.', ar:'الجهاز الرقمي يعمل بالكهرباء ويحفظ المعلومات. الحاسوب والجهاز اللوحي والميكروويف أجهزة رقمية.' }),
+  Q('learn',{ pic:'☝️', q:'Single-role = ONE job', text:'A <b>single-role device</b> can do only <b>one</b> job. Hold up one finger!', ar:'الجهاز ذو الوظيفة الواحدة يقوم بعمل واحد فقط. ارفعي إصبعاً واحداً!' }),
+  Q('learn',{ pic:'microwave', q:'Microwave', text:'A microwave helps you <b>cook food</b>. That is its one job. It is a <b>single-role</b> device.', ar:'الميكروويف يساعدك على طبخ الطعام. هذا عمله الوحيد. إنه جهاز بوظيفة واحدة.' }),
+  Q('learn',{ pic:'washer', q:'Washing machine', text:'A washing machine helps you <b>wash clothes</b>. One job, so it is a <b>single-role</b> device.', ar:'الغسالة تساعدك على غسل الملابس. عمل واحد، إذن هي جهاز بوظيفة واحدة.' }),
+  Q('learn',{ pic:'headphones', q:'Headphones', text:'Headphones help you <b>listen to music</b>. One job, so they are a <b>single-role</b> device.', ar:'سماعات الرأس تساعدك على سماع الموسيقى. عمل واحد، إذن هي جهاز بوظيفة واحدة.' }),
+  Q('learn',{ pic:'🖐️', q:'Multi-role = MANY jobs', text:'A <b>multi-role device</b> can do <b>more than one</b> job. Hold up all your fingers!', ar:'الجهاز متعدد الوظائف يقوم بأكثر من عمل. ارفعي كل أصابعك!' }),
+  Q('learn',{ pic:'computer', q:'Computer', text:'A computer helps you <b>play games</b>, write, draw and watch films. Many jobs, so it is a <b>multi-role</b> device.', ar:'الحاسوب يساعدك على اللعب والكتابة والرسم ومشاهدة الأفلام. أعمال كثيرة، إذن هو متعدد الوظائف.' }),
+  Q('learn',{ pic:'tablet', q:'Tablet', text:'A tablet helps you <b>take photos</b>, play games and watch videos. Many jobs, so it is a <b>multi-role</b> device.', ar:'الجهاز اللوحي يساعدك على التقاط الصور واللعب ومشاهدة الفيديو. أعمال كثيرة، إذن هو متعدد الوظائف.' }),
+  Q('learn',{ pic:'🌐', q:'Online', text:'<b>Online</b> means you are connected to the internet. Using a phone, a laptop or a tablet is an online activity.', ar:'«أونلاين» يعني أنك متصلة بالإنترنت. استخدام الهاتف أو الحاسوب المحمول أو الجهاز اللوحي نشاط على الإنترنت.' }),
+  Q('learn',{ pic:'⚽📖', q:'Offline', text:'<b>Offline</b> is the world you can see around you. Playing football, reading a book, writing on paper and playing on a seesaw are offline. No screen!', ar:'«أوفلاين» هو العالم الذي ترينه حولك. لعب الكرة، قراءة كتاب، الكتابة على الورق واللعب على الأرجوحة. بدون شاشة!' }),
+  Q('learn',{ pic:'😊👍', q:'Positive ways', text:'<b>Positive</b> means kind and good. Inviting a friend for lunch is positive. Sending a picture of a flower is positive.', ar:'«إيجابي» يعني لطيف وجيد. دعوة صديق للغداء إيجابي. إرسال صورة زهرة إيجابي.' }),
+  Q('learn',{ pic:'😟👎', q:'Negative ways', text:'<b>Negative</b> means not kind. Sending a picture of a person <b>without asking</b> is negative. Sending a scary video is negative.', ar:'«سلبي» يعني غير لطيف. إرسال صورة شخص دون استئذان سلبي. إرسال فيديو مخيف سلبي.' }),
+  Q('learn',{ pic:'🤖💛', q:'Robo’s golden rule', text:'Always <b>ask first</b> before you send a picture of someone. Be kind online, just like you are kind at school.', ar:'استأذني دائماً قبل أن ترسلي صورة أي شخص. كوني لطيفة على الإنترنت كما أنتِ لطيفة في المدرسة.' }),
+];}
+
+// ---------- Island 1: One Job or Many Jobs (p.31) ----------
+const SM_BUCKETS=[{n:'Single-role',e:'☝️',ar:'وظيفة واحدة',v:'s',c:'#3fb0ff'},{n:'Multi-role',e:'🖐️',ar:'وظائف متعددة',v:'m',c:'#ff7a59'}];
+function genRole(){ return [
+  Q('sort',{ q:'Single-role or multi-role? Sort the devices from page 31.', ar:'وظيفة واحدة أم وظائف متعددة؟ صنّفي أجهزة الصفحة 31.', buckets:SM_BUCKETS, items:[['microwave','Microwave','s'],['washer','Washing machine','s'],['computer','Computer','m'],['tablet','Tablet','m'],['headphones','Headphones','s']], fact:'Page 31: microwave, washing machine and headphones are single-role. Computer and tablet are multi-role.', factAr:'الميكروويف والغسالة وسماعات الرأس: وظيفة واحدة. الحاسوب والجهاز اللوحي: وظائف متعددة.' }),
+  Q('pick',{ q:'What does a <b>washing machine</b> help you do?', ar:'بماذا تساعدك الغسالة؟', scene:'washer', opts:[['👕','Wash clothes',1],['🍲','Cook food',0],['🎵','Listen to music',0]], fact:'A washing machine helps you wash clothes.', factAr:'الغسالة تساعدك على غسل الملابس.' }),
+  Q('words',{ q:'Write it! What does a <b>washing machine</b> help you do?', ar:'اكتبيها! بماذا تساعدك الغسالة؟', scene:'washer', words:['wash','clothes'], extra:['food','music'], fact:'wash clothes. Now write it on paper too!', factAr:'تغسل الملابس. اكتبيها الآن على الورق أيضاً!' }),
+  Q('pick',{ q:'What do <b>headphones</b> help you do?', ar:'بماذا تساعدك سماعات الرأس؟', scene:'headphones', opts:[['🎵','Listen to music',1],['👕','Wash clothes',0],['📸','Take photos',0]], fact:'Headphones help you listen to music.', factAr:'سماعات الرأس تساعدك على سماع الموسيقى.' }),
+  Q('words',{ q:'Write it! What do <b>headphones</b> help you do?', ar:'اكتبيها! بماذا تساعدك سماعات الرأس؟', scene:'headphones', words:['listen','to','music'], extra:['wash','food'], fact:'listen to music. Three little words!', factAr:'نسمع الموسيقى. ثلاث كلمات صغيرة!' }),
+  Q('multi',{ q:'Tap ALL the things a <b>computer</b> can help you do.', ar:'المسي كل ما يساعدك الحاسوب على فعله.', opts:[['🎮','Play games',1],['✍️','Write a story',1],['🎬','Watch films',1],['🎨','Draw pictures',1],['👕','Wash clothes',0],['🍲','Cook food',0]], fact:'A computer does many jobs, so it is a multi-role device. In the test, write one job: play games.', factAr:'الحاسوب يقوم بأعمال كثيرة، إذن هو متعدد الوظائف. في الاختبار اكتبي عملاً واحداً: play games.' }),
+  Q('words',{ q:'Write it! One thing a <b>computer</b> helps you do.', ar:'اكتبيها! شيء واحد يساعدك الحاسوب على فعله.', scene:'computer', words:['play','games'], extra:['clothes','cook'], fact:'play games. A computer is multi-role.', factAr:'نلعب الألعاب. الحاسوب متعدد الوظائف.' }),
+  Q('words',{ q:'Write it! One thing a <b>tablet</b> helps you do.', ar:'اكتبيها! شيء واحد يساعدك الجهاز اللوحي على فعله.', scene:'tablet', words:['take','photos'], extra:['wash','food'], fact:'take photos. A tablet is multi-role.', factAr:'نلتقط الصور. الجهاز اللوحي متعدد الوظائف.' }),
+  Q('pick',{ q:'What does <b>single-role</b> mean?', ar:'ماذا تعني «وظيفة واحدة»؟', opts:[['☝️','It does ONE job',1],['🖐️','It does MANY jobs',0]], fact:'Single means one. A single-role device does one job.', factAr:'«Single» تعني واحد. الجهاز يقوم بعمل واحد.' }),
+  Q('pick',{ q:'Which one is a <b>multi-role</b> device?', ar:'أي واحد جهاز متعدد الوظائف؟', opts:[['tablet','Tablet',1],['microwave','Microwave',0],['headphones','Headphones',0]], fact:'A tablet takes photos, plays games and shows videos. Many jobs!', factAr:'الجهاز اللوحي يلتقط الصور ويشغّل الألعاب والفيديو. أعمال كثيرة!' }),
+];}
+
+// ---------- Island 2: Online or Offline (p.40) ----------
+const OO_BUCKETS=[{n:'Online',e:'🌐',ar:'متصل بالإنترنت',v:1,c:'#9b6cff'},{n:'Offline',e:'🌳',ar:'غير متصل',v:0,c:'#4cbb5c'}];
+const P40=[['📱','Using a phone',1],['⚽','Playing football',0],['🍎','Picking fruit',0],['💻','Using a laptop',1],['tablet','Watching a tablet',1],['✏️','Writing on paper',0],['seesaw','Playing on a seesaw',0],['📖','Reading a book',0],['toaster','Making toast',0]];
+function genOnline(){ return [
+  Q('pick',{ q:'What does <b>online</b> mean?', ar:'ماذا تعني «أونلاين»؟', scene:'🌐', opts:[['🌐','Connected to the internet',1],['🌳','Not connected',0]], fact:'Online means you are connected to the internet.', factAr:'«أونلاين» يعني أنك متصلة بالإنترنت.' }),
+  Q('multi',{ q:'Page 40! Tap ALL the <b>online</b> activities.', ar:'الصفحة 40! المسي كل الأنشطة التي على الإنترنت.', opts:P40, fact:'Three online pictures: the phone, the laptop and the tablet. Look for a screen!', factAr:'ثلاث صور على الإنترنت: الهاتف، الحاسوب المحمول، الجهاز اللوحي. ابحثي عن الشاشة!' }),
+  Q('sort',{ q:'Online or offline?', ar:'على الإنترنت أم لا؟', buckets:OO_BUCKETS, items:[['📱','Using a phone',1],['⚽','Playing football',0],['💻','Using a laptop',1],['📖','Reading a book',0],['tablet','Watching a tablet',1],['seesaw','Playing on a seesaw',0]], fact:'Phone, laptop, tablet: online. Football, book, seesaw: offline.', factAr:'الهاتف والحاسوب المحمول والجهاز اللوحي: أونلاين. الكرة والكتاب والأرجوحة: أوفلاين.' }),
+  Q('pick',{ q:'Which one is an <b>offline</b> activity?', ar:'أي نشاط ليس على الإنترنت؟', opts:[['✏️','Writing on paper',1],['💻','Using a laptop',0],['📱','Using a phone',0]], fact:'Writing on paper is offline. No internet needed.', factAr:'الكتابة على الورق أوفلاين. لا تحتاج الإنترنت.' }),
+  Q('multi',{ q:'Now tap ALL the <b>offline</b> activities.', ar:'الآن المسي كل الأنشطة التي ليست على الإنترنت.', opts:P40.map(([e,w,ok])=>[e,w,ok?0:1]), fact:'Six offline pictures: football, picking fruit, writing, seesaw, reading a book and making toast.', factAr:'ست صور أوفلاين: الكرة، قطف الفاكهة، الكتابة، الأرجوحة، قراءة كتاب، تحميص الخبز.' }),
+  Q('sort',{ q:'New ones! Online or offline?', ar:'أنشطة جديدة! على الإنترنت أم لا؟', buckets:OO_BUCKETS, items:[['🤳','Video call',1],['🖍️','Drawing with crayons',0],['💬','Sending a message',1],['🚲','Riding a bike',0],['🎮','Playing an online game',1],['🍽️','Eating with family',0]], fact:'Video call, message and online game need the internet. Crayons, bike and family dinner do not.', factAr:'مكالمة الفيديو والرسالة واللعبة تحتاج الإنترنت. الألوان والدراجة والعشاء لا تحتاجه.' }),
+  Q('pick',{ q:'A boy is <b>making toast</b>. Online or offline?', ar:'ولد يحمّص الخبز. أونلاين أم أوفلاين؟', scene:'toaster', opts:[['🌳','Offline',1],['🌐','Online',0]], fact:'Making toast is offline. A toaster is not on the internet!', factAr:'تحميص الخبز أوفلاين. المحمصة ليست على الإنترنت!' }),
+  Q('pick',{ q:'Children are <b>watching a tablet</b> together. Online or offline?', ar:'أطفال يشاهدون الجهاز اللوحي معاً. أونلاين أم أوفلاين؟', scene:'tablet', opts:[['🌐','Online',1],['🌳','Offline',0]], fact:'Watching a tablet is an online activity.', factAr:'مشاهدة الجهاز اللوحي نشاط على الإنترنت.' }),
+];}
+
+// ---------- Island 3: Positive or Negative (p.46) ----------
+const PN_BUCKETS=[{n:'Positive',e:'👍😊',ar:'إيجابي',v:1,c:'#4cbb5c'},{n:'Negative',e:'👎😟',ar:'سلبي',v:0,c:'#e5484d'}];
+const P46=[['🧍📸','Sending a picture of a person without asking',0],['🍽️','Inviting a friend for lunch',1],['👻','Sending a scary video',0],['🌸','Sending a picture of a flower',1]];
+function genKind(){ return [
+  Q('pick',{ q:'What does <b>positive</b> mean?', ar:'ماذا تعني «إيجابي»؟', opts:[['😊','Kind and good',1],['😟','Not kind',0]], fact:'Positive means kind and good. Negative means not kind.', factAr:'«إيجابي» يعني لطيف وجيد. «سلبي» يعني غير لطيف.' }),
+  Q('sort',{ q:'Page 46! Positive or negative way to use apps?', ar:'الصفحة 46! طريقة إيجابية أم سلبية لاستخدام التطبيقات؟', buckets:PN_BUCKETS, items:P46, fact:'Positive: inviting a friend for lunch, sending a picture of a flower. Negative: a picture of a person without asking, a scary video.', factAr:'إيجابي: دعوة صديق للغداء، صورة زهرة. سلبي: صورة شخص دون استئذان، فيديو مخيف.' }),
+  Q('pick',{ q:'<b>Inviting a friend for lunch.</b> Positive or negative?', ar:'دعوة صديق للغداء. إيجابي أم سلبي؟', scene:'🍽️', opts:[['👍','Positive',1],['👎','Negative',0]], fact:'Inviting a friend is kind. Positive!', factAr:'دعوة صديق تصرّف لطيف. إيجابي!' }),
+  Q('pick',{ q:'<b>Sending a scary video.</b> Positive or negative?', ar:'إرسال فيديو مخيف. إيجابي أم سلبي؟', scene:'👻', opts:[['👎','Negative',1],['👍','Positive',0]], fact:'A scary video can upset someone. Negative!', factAr:'الفيديو المخيف قد يزعج الآخرين. سلبي!' }),
+  Q('pick',{ q:'<b>Sending a picture of a flower.</b> Positive or negative?', ar:'إرسال صورة زهرة. إيجابي أم سلبي؟', scene:'🌸', opts:[['👍','Positive',1],['👎','Negative',0]], fact:'A flower picture makes people smile. Positive!', factAr:'صورة الزهرة تُفرح الناس. إيجابي!' }),
+  Q('pick',{ q:'<b>Sending a picture of a person without asking.</b> Positive or negative?', ar:'إرسال صورة شخص دون استئذان. إيجابي أم سلبي؟', scene:'🧍📸', opts:[['👎','Negative',1],['👍','Positive',0]], fact:'You did not ask, so it is negative. Always ask first!', factAr:'لم تستأذني، إذن هو سلبي. استأذني دائماً!' }),
+  Q('pick',{ q:'You want to send a photo of your friend. What do you do first?', ar:'تريدين إرسال صورة صديقتك. ماذا تفعلين أولاً؟', scene:'🤔', opts:[['🙋','Ask first',1],['📤','Just send it',0]], fact:'Ask first. If your friend says yes, then you can send it.', factAr:'استأذني أولاً. إذا وافقت صديقتك يمكنك الإرسال.' }),
+  Q('sort',{ q:'New ones! Positive or negative?', ar:'جديدة! إيجابي أم سلبي؟', buckets:PN_BUCKETS, items:[['💌','Saying thank you',1],['😡','Sending a mean message',0],['🎂','Sending a happy birthday message',1],['😂📷','Laughing at someone’s photo',0]], fact:'Thank you and happy birthday are kind. Mean messages and laughing at photos are not kind.', factAr:'الشكر والتهنئة تصرفات لطيفة. الرسائل المؤذية والسخرية من الصور غير لطيفة.' }),
+];}
+
+// ---------- Rocket game: quick-fire cards, two big buttons, no Next button ----------
+const B_SM=[['☝️','Single-role'],['🖐️','Multi-role']], B_OO=[['🌐','Online'],['🌳','Offline']], B_PN=[['👍','Positive'],['👎','Negative']];
+const QUICK_SM=[['microwave','Microwave',0],['washer','Washing machine',0],['headphones','Headphones',0],['computer','Computer',1],['tablet','Tablet',1]];
+const QUICK_OO=[['📱','Using a phone',0],['💻','Using a laptop',0],['tablet','Watching a tablet',0],['⚽','Playing football',1],['🍎','Picking fruit',1],['✏️','Writing on paper',1],['seesaw','Playing on a seesaw',1],['📖','Reading a book',1],['toaster','Making toast',1]];
+const QUICK_PN=[['🍽️','Inviting a friend for lunch',0],['🌸','Sending a picture of a flower',0],['🧍📸','Sending a picture of a person without asking',1],['👻','Sending a scary video',1]];
+const quick=(it,btns)=>Q('quick',{ q:it[1], scene:it[0], label:it[1], opts:btns.map((b,i)=>[b[0],b[1],i===it[2]?1:0]) });
+function genRocket(){
+  return shuffle([].concat(sample(QUICK_SM,4).map(x=>quick(x,B_SM)), sample(QUICK_OO,5).map(x=>quick(x,B_OO)), QUICK_PN.map(x=>quick(x,B_PN))));
+}
+
+// ---------- Practice tests (fixed, in the same three question types as the workbook pages) ----------
+function genTest1(){ const r=genRole(), o=genOnline(), k=genKind();
+  return [ r[0], r[2], r[4], r[6], r[7], o[1], o[3], k[1], k[6] ];
+}
+function genTest2(){ const r=genRole(), o=genOnline(), k=genKind();
+  return [
+    Q('sort',{ q:'Test 2. Single-role or multi-role?', ar:'الاختبار 2. وظيفة واحدة أم وظائف متعددة؟', buckets:SM_BUCKETS.slice().reverse(), items:[['headphones','Headphones','s'],['tablet','Tablet','m'],['washer','Washing machine','s'],['computer','Computer','m'],['microwave','Microwave','s']] }),
+    r[1], r[3],
+    Q('words',{ q:'Write it! What does a <b>microwave</b> help you do?', ar:'اكتبيها! بماذا يساعدك الميكروويف؟', scene:'microwave', words:['cook','food'], extra:['wash','music'] }),
+    r[7], r[6],
+    Q('sort',{ q:'Online or offline? All 9 pictures from page 40.', ar:'أونلاين أم أوفلاين؟ كل صور الصفحة 40.', buckets:OO_BUCKETS.slice().reverse(), items:P40 }),
+    k[2], k[3], k[4], k[5], k[7],
+  ];
+}
+
+const LEVELS=[
+ { id:'learn', title:'Learn with Robo', ar:'تعلّمي مع روبو', emoji:'📖', color:'#ffc93c', pages:'Start here · 13 story cards', gen:genLearn },
+ { id:'role', title:'One Job or Many?', ar:'عمل واحد أم كثير؟', emoji:'☝️', color:'#3fb0ff', pages:'Workbook p.31', gen:genRole },
+ { id:'online', title:'Online or Offline?', ar:'أونلاين أم أوفلاين؟', emoji:'🌐', color:'#9b6cff', pages:'Workbook p.40', gen:genOnline },
+ { id:'kind', title:'Positive or Negative?', ar:'إيجابي أم سلبي؟', emoji:'👍', color:'#4cbb5c', pages:'Workbook p.46', gen:genKind },
+ { id:'rocket', title:'Rocket to the Moon', ar:'صاروخ إلى القمر', emoji:'🚀', color:'#ff6fae', pages:'Fast game · all 3 pages', gen:genRocket },
+];
+const TESTS=[
+ { id:'test1', title:'Practice Test 1', ar:'الاختبار التجريبي 1', emoji:'📝', color:'#ffc93c', pages:'9 questions · all 3 pages', gen:genTest1 },
+ { id:'test2', title:'Practice Test 2', ar:'الاختبار التجريبي 2', emoji:'🏆', color:'#ff7a59', pages:'12 questions · new order', gen:genTest2 },
+];
+const STICKERS={learn:'📚',role:'🧺',online:'🌍',kind:'💖',rocket:'🌙',test1:'🥇',test2:'👑'};
+
+// ============ STATE ============
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mira_comp2_'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('mira_comp2_'+k,JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get('progress',{});
+let hard = store.get('hard',{});
+let voiceOn = store.get('voice',true);
+let arOn = store.get('ar',false);
+let history = store.get('history',[]);
+
+// ============ AUDIO ============
+let actx=null;
+function tone(f,d,type='sine',vol=.15,when=0){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=f; g.gain.setValueAtTime(0,actx.currentTime+when); g.gain.linearRampToValueAtTime(vol,actx.currentTime+when+.02); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+when+d); o.connect(g);g.connect(actx.destination); o.start(actx.currentTime+when);o.stop(actx.currentTime+when+d+.05);}catch(e){} }
+const sfx={
+  ok(){ tone(660,.15);tone(880,.2,'sine',.15,.12); },
+  bad(){ tone(200,.25,'triangle',.08); },
+  tap(){ tone(520,.06,'square',.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.15,i*.13)); tone(1319,.5,'sine',.12,.55); }
+};
+
+// ============ SPEECH ============
+let voices=[]; let chosenVoice=null;
+function pickVoice(){
+  voices = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  const prefs=['Google UK English Female','Microsoft Hazel','Microsoft Libby','Microsoft Sonia','Microsoft Zira','Microsoft Aria','Samantha','Karen','Moira','Google US English','Daniel'];
+  chosenVoice=null;
+  for(const p of prefs){ const v=voices.find(v=>v.name.includes(p)); if(v){chosenVoice=v;break;} }
+  if(!chosenVoice) chosenVoice=voices.find(v=>/^en(-|_)GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,{slow=false,force=false,pitch=1.15}={}){
+  if(!window.speechSynthesis) return;
+  if(!voiceOn && !force) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[^\p{L}\p{N}\s.,!?'’\/-]/gu,''));
+    if(chosenVoice) u.voice=chosenVoice;
+    u.lang=(chosenVoice&&chosenVoice.lang)||'en-GB';
+    u.rate=slow?0.6:0.9; u.pitch=pitch;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ============ HELPERS ============
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const PRAISE=['Brilliant!','Super star!','Yes! Well done!','Fantastic, Mira!','You are a computer expert!','Amazing!','Beep boop – correct!'];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+const RETRY=['Try again!','Almost! Look again.','Hmm, not that one.','Listen again and try.'];
+const retry=()=>RETRY[Math.floor(Math.random()*RETRY.length)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function mascot(mood){ const m=$('#mascot'); m.textContent=mood==='think'?'🙈':'🤖'; m.classList.remove('happy'); void m.offsetWidth; if(mood==='happy')m.classList.add('happy'); }
+function totalStars(){ return Object.values(progress).reduce((s,p)=>s+(p.stars||0),0); }
+function updateBank(){ $('#starbank').textContent='⭐ '+totalStars(); }
+function starsHtml(n){ let s=''; for(let i=0;i<3;i++) s+=`<span class="${i<n?'':'off'}">★</span>`; return s; }
+function noteHard(key){ hard[key]=(hard[key]||0)+1; store.set('hard',hard); }
+function arWord(w){ return AR[w]||''; }
+function tileHtml(e,w){ return `<span class="e">${ICON(e)}</span><span class="w">${w}</span><span class="wa">${arWord(w)}</span>`; }
+
+// confetti
+const cv=$('#confetti'),cx=cv.getContext('2d'); let parts=[],animId=null;
+function confetti(n=140){ cv.width=innerWidth;cv.height=innerHeight; const cols=['#ff7a59','#ffc93c','#4cbb5c','#3fb0ff','#9b6cff','#ff8fb1'];
+  for(let i=0;i<n;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.3});
+  if(!animId) animId=requestAnimationFrame(tick); }
+function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);cx.restore();}); parts=parts.filter(p=>p.y<cv.height+20); if(parts.length) animId=requestAnimationFrame(tick); else {animId=null;cx.clearRect(0,0,cv.width,cv.height);} }
+
+// ============ HOME ============
+function home(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const hero=el('div','hero',`<div><h1>Hello Mira! 🤖 Robo has a new mission!</h1><p>Learn with Robo first. Then play the islands, fly the rocket and try the two practice tests. Collect ⭐ stars and stickers!</p><span class="ar">مرحباً ميرا! تعلّمي مع روبو أولاً، ثم العبي الجزر، وطيري بالصاروخ، وجرّبي الاختبارين. اجمعي النجوم ⭐ والملصقات!</span></div><div class="big">🚀✨</div>`);
+  v.appendChild(hero);
+  v.appendChild(el('div','sectionTitle','Islands · Computer test · Workbook pages 31, 40 and 46'));
+  const map=el('div','map'); v.appendChild(map);
+  LEVELS.forEach(l=>map.appendChild(islandCard(l)));
+  v.appendChild(el('div','sectionTitle','Practice tests'));
+  const tmap=el('div','map'); v.appendChild(tmap);
+  TESTS.forEach(l=>tmap.appendChild(islandCard(l)));
+  v.appendChild(el('div','sectionTitle','My stickers'));
+  const all=LEVELS.concat(TESTS);
+  const shelf=el('div','shelf',all.map(l=>{ const got=((progress[l.id]||{}).stars||0)>=2; return `<span class="stk${got?' got':''}" title="${l.title}">${got?STICKERS[l.id]:'❔'}</span>`; }).join(''));
+  v.appendChild(shelf);
+  const tools=el('div','row'); tools.style.marginTop='18px';
+  const rep=el('button','nextbtn ghost','👨‍👩‍👧 For Mum & Dad'); rep.onclick=report;
+  const reset=el('button','nextbtn ghost','🔄 Start again'); let armed=false;
+  reset.onclick=()=>{ if(!armed){ armed=true; reset.textContent='Tap again to clear all stars'; setTimeout(()=>{armed=false; reset.textContent='🔄 Start again';},3500); return; }
+    progress={};hard={};history=[]; store.set('progress',progress);store.set('hard',hard);store.set('history',history); home(); };
+  tools.append(rep,reset); v.appendChild(tools);
+  updateBank();
+}
+function islandCard(l){
+  const p=progress[l.id]||{};
+  const b=el('button','island',`<div class="em">${l.emoji}</div><div class="t">${l.title}</div><div class="s">${l.pages}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${l.ar}</div><div class="stars">${starsHtml(p.stars||0)}</div>`);
+  b.style.setProperty('--c',l.color); b.onclick=()=>startLevel(l.id); return b;
+}
+
+// ============ LEVEL ENGINE ============
+let cur=null;
+function startLevel(id){
+  speechSynthesis && speechSynthesis.cancel();
+  const level=LEVELS.concat(TESTS).find(l=>l.id===id); const rounds=level.gen();
+  cur={level,rounds,i:0,mistakes:0,total:rounds.length};
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><div class="progress"><i id="prog"></i></div><div class="chip" id="roundNo"></div></div>
+    <div class="instr"><button class="speak" id="sayBtn" title="Read it to me">🔊</button><button class="speak turtle" id="slowBtn" title="Slowly">🐢</button><div class="txt"><h2>${level.emoji} ${level.title}</h2><div class="ar">${level.ar}</div></div></div>
+    <div id="body"></div>`;
+  $('#backBtn').onclick=home;
+  runRound();
+}
+function sayText(r){ return r.type==='learn' ? `${r.q}. ${r.text}` : r.type==='quick' ? `${r.label}. ${r.opts[0][1]}, or ${r.opts[1][1]}?` : r.q; }
+function runRound(){
+  const r=cur.rounds[cur.i];
+  if(!r) return finishLevel();
+  $('#prog').style.width=(cur.i/cur.total*100)+'%';
+  $('#roundNo').textContent=`${cur.i+1} / ${cur.total}`;
+  const body=$('#body'); body.innerHTML='';
+  cur.currentQ=r.q.replace(/<[^>]+>/g,'');
+  $('#sayBtn').onclick=()=>speak(sayText(r),{force:true});
+  $('#slowBtn').onclick=()=>speak(sayText(r),{force:true,slow:true});
+  ROUNDS[r.type](r,body,()=>{ cur.i++; runRound(); });
+  speak(sayText(r));
+}
+function wrong(){ cur.mistakes++; sfx.bad(); mascot('think'); noteHard(cur.currentQ); }
+function right(){ sfx.ok(); mascot('happy'); }
+function showFact(body,r){ if(!r.fact) return; const f=el('div','fact',`💡 ${r.fact}<div class="ar">${r.factAr||''}</div>`); body.appendChild(f); }
+function nextBtn(body,done,r){ showFact(body,r); const b=el('button','nextbtn','Next ➜'); b.onclick=done; body.appendChild(b); b.scrollIntoView({block:'nearest',behavior:'smooth'}); if(r.fact) speak(`${praise()} ${r.fact}`); else speak(praise()); }
+
+function finishLevel(){
+  const {level,mistakes,total}=cur;
+  const stars = mistakes===0?3 : mistakes<=2?2 : 1;
+  const prev=progress[level.id]||{stars:0,plays:0};
+  const newSticker = stars>=2 && (prev.stars||0)<2;
+  progress[level.id]={stars:Math.max(prev.stars,stars),best:Math.min(prev.best??99,mistakes),plays:(prev.plays||0)+1,last:new Date().toISOString()};
+  store.set('progress',progress);
+  history.push({date:new Date().toISOString(),level:level.title,stars,mistakes}); store.set('history',history);
+  updateBank(); sfx.win(); confetti(stars===3?220:120);
+  const body=$('#body'); $('#prog').style.width='100%';
+  const isLearn=level.id==='learn';
+  const msg = isLearn?'Lesson finished! Now you are ready to play.' : stars===3?'Perfect! A real computer expert!' : stars===2?'Great work! One more go for 3 stars?' : 'Good try! Let’s play it again together.';
+  const msgAr = isLearn?'انتهى الدرس! الآن أنتِ جاهزة للعب.' : stars===3?'ممتاز! خبيرة حاسوب حقيقية!' : stars===2?'عمل رائع! مرة أخرى لثلاث نجوم؟' : 'محاولة جيدة! لنلعبها مرة أخرى معاً.';
+  body.innerHTML=`<div class="result"><div class="bigstars">${starsHtml(stars)}</div><h2>${msg}</h2><div class="ar-hint" style="color:var(--grape);font-size:1.1rem">${msgAr}</div>
+    ${isLearn?'':`<p>${total} questions · ${mistakes} slip${mistakes===1?'':'s'}</p>`}
+    ${newSticker?`<div class="newstk"><span>${STICKERS[level.id]}</span>New sticker!</div>`:''}
+    <div class="row"><button class="nextbtn" id="again">${isLearn?'Read again 🔁':'Play again 🔁'}</button><button class="nextbtn ghost" id="toHome">Back to islands 🗺️</button></div></div>`;
+  $('#again').onclick=()=>startLevel(level.id); $('#toHome').onclick=home;
+  speak(isLearn?msg:`${msg} You got ${stars} star${stars===1?'':'s'}!${newSticker?' And a new sticker!':''}`);
+}
+// ============ ROUND TYPES ============
+const ROUNDS={};
+function header(body,r){
+  body.appendChild(el('div','q',r.q)); body.appendChild(el('div','qar',r.ar||''));
+  if(r.scene) body.appendChild(el('div','scene',ICON(r.scene)));
+}
+
+// --- pick one correct tile ---
+ROUNDS.pick=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); row.querySelectorAll('.tile').forEach(t=>{ if(t!==b) t.classList.add('used'); }); nextBtn(body,done,r); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- multi: tap ALL correct tiles ---
+ROUNDS.multi=function(r,body,done){
+  header(body,r);
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  const need=r.opts.filter(o=>o[2]).length; let got=0, locked=false;
+  const counter=el('div','counter',`Found 0 of ${need}`); body.appendChild(counter);
+  shuffle(r.opts).forEach(([e,w,ok])=>{ const b=el('button','tile',tileHtml(e,w)); b.onclick=()=>{ if(locked||b.classList.contains('ok'))return; sfx.tap();
+    if(ok){ right(); b.classList.add('ok'); got++; counter.textContent=`Found ${got} of ${need}`; fb.textContent=praise(); fb.classList.remove('bad');
+      if(got===need){ locked=true; row.querySelectorAll('.tile:not(.ok)').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(`${w}! Yes. Find more.`); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>{b.classList.remove('bad'); b.classList.add('used');},450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? No. ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- sort: one item at a time into 2 or 3 buckets ---
+ROUNDS.sort=function(r,body,done){
+  header(body,r);
+  const items=shuffle(r.items); let i=0;
+  const card=el('div'); body.appendChild(card);
+  const bk=el('div','buckets'+(r.buckets.length===3?' three':'')); body.appendChild(bk);
+  const bEls={};
+  r.buckets.forEach(b=>{ const d=el('button','bucket',`<div class="e">${b.e}</div><div class="h">${b.n}</div><div class="ar-hint" style="color:var(--grape);font-size:.9rem">${b.ar}</div><div class="got"></div>`); d.style.setProperty('--c',b.c||'var(--sky)'); d.onclick=()=>choose(b.v); bk.appendChild(d); bEls[b.v]=d; });
+  const counter=el('div','counter',''); body.appendChild(counter);
+  const name=v=>r.buckets.find(b=>b.v===v).n;
+  const show=()=>{ const it=items[i]; if(!it){ nextBtn(body,done,r); return; }
+    card.innerHTML=`<div class="scene">${ICON(it[0])}</div><div class="q" style="font-size:1.4rem">${it[1]} <span class="arin">${arWord(it[1])}</span></div><div class="feedback"></div>`;
+    counter.textContent=`${i+1} of ${items.length}`; speak(`${it[1]}. ${r.buckets.map(b=>b.n).join(', or ')}?`); };
+  const choose=(v)=>{ const it=items[i]; if(!it)return; const fb=card.querySelector('.feedback');
+    if(v===it[2]){ right(); bEls[v].querySelector('.got').appendChild(el('span',null,ICON(it[0]))); fb.textContent=praise(); fb.classList.remove('bad'); speak(`Yes! ${it[1]}: ${name(v)}.`); i++; setTimeout(show,900); }
+    else { wrong(); bEls[v].classList.add('bad'); setTimeout(()=>bEls[v].classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${it[1]}, ${name(v)}? ${retry()}`); } };
+  show();
+};
+
+// --- learn: a teaching card, nothing to get wrong ---
+ROUNDS.learn=function(r,body,done){
+  const c=el('div','learn',`<div class="scene big">${ICON(r.pic)}</div><div class="q">${r.q}</div><p class="ltext">${r.text}</p><div class="qar">${r.ar||''}</div>`);
+  body.appendChild(c);
+  const b=el('button','nextbtn', cur.i===cur.total-1?'Finish ⭐':'Got it ➜'); b.onclick=()=>{ sfx.tap(); done(); }; body.appendChild(b);
+};
+
+// --- words: tap the words in order to write the answer (then she writes it on paper) ---
+ROUNDS.words=function(r,body,done){
+  header(body,r);
+  const line=el('div','wline'); body.appendChild(line);
+  r.words.forEach(()=>line.appendChild(el('span','slot','')));
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let k=0;
+  shuffle(r.words.map((w,i)=>[w,i]).concat(r.extra.map(w=>[w,-1]))).forEach(([w,idx])=>{ const b=el('button','tile wtile',`<span class="w">${w}</span>`); b.onclick=()=>{ sfx.tap();
+    if(idx===k){ right(); b.classList.add('used'); const s=line.children[k]; s.textContent=w; s.classList.add('full'); k++; fb.textContent=praise(); fb.classList.remove('bad');
+      if(k===r.words.length){ row.querySelectorAll('.tile').forEach(t=>t.classList.add('used')); nextBtn(body,done,r); } else speak(w); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); speak(`${w}? ${retry()}`); } };
+    row.appendChild(b); });
+};
+
+// --- quick: rocket game card, two big buttons, flies on by itself ---
+ROUNDS.quick=function(r,body,done){
+  const pct=n=>(4+n/cur.total*84)+'%';
+  const track=el('div','track',`<span class="moon">🌙</span><span class="rk" style="left:${pct(cur.i)}">🚀</span>`); body.appendChild(track);
+  body.appendChild(el('div','scene',ICON(r.scene)));
+  body.appendChild(el('div','q',`${r.label} <span class="arin">${arWord(r.label)}</span>`));
+  const row=el('div','row'); const fb=el('div','feedback',''); body.append(row,fb);
+  let locked=false;
+  r.opts.forEach(([e,w,ok])=>{ const b=el('button','tile big2',tileHtml(e,w)); b.onclick=()=>{ if(locked)return; sfx.tap();
+    if(ok){ locked=true; right(); b.classList.add('ok'); fb.textContent=praise(); fb.classList.remove('bad'); track.querySelector('.rk').style.left=pct(cur.i+1); speak(`${w}!`); setTimeout(done,1100); }
+    else { wrong(); b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),450); fb.textContent=retry(); fb.classList.add('bad'); track.querySelector('.rk').classList.add('wob'); setTimeout(()=>track.querySelector('.rk').classList.remove('wob'),500); speak(retry()); } };
+    row.appendChild(b); });
+};
+// ============ REPORT ============
+function report(){
+  speechSynthesis && speechSynthesis.cancel();
+  const v=$('#view'); v.innerHTML='';
+  const panel=el('div','panel'); v.appendChild(panel);
+  const hardList=Object.entries(hard).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const rows=LEVELS.concat(TESTS).map(l=>{ const p=progress[l.id]||{}; return `<tr><td>${l.emoji} ${l.title}</td><td>${l.pages}</td><td>${starsHtml(p.stars||0)}</td><td>${p.plays||0}</td></tr>`; }).join('');
+  panel.innerHTML=`<div class="topbar"><button class="back" id="backBtn">⬅ Islands</button><h2>For Mum & Dad 👨‍👩‍👧</h2></div>
+  <div class="report">
+    <div class="card"><h3>Progress</h3><table><tr><th>Island</th><th>Covers</th><th>Best</th><th>Plays</th></tr>${rows}</table></div>
+    <div class="card"><h3>Questions Mira slipped on (practise these)</h3>${hardList.length?'<ul>'+hardList.map(([q,n])=>`<li>${q} <b>×${n}</b></li>`).join('')+'</ul>':'<p>No slips yet. Play some islands first.</p>'}</div>
+    <div class="card"><h3>What the test covers (Inspire Computing Year 1 Workbook, Unit 2)</h3><ul>
+      <li><b>p.31 (Lesson 1, Q3) – table:</b> write one thing the device helps you do, then tick single-role or multi-role. Microwave: cook food, single-role (done in the book) · washing machine: <b>wash clothes</b>, single-role · computer: <b>play games</b> (or write, watch films), <b>multi-role</b> · tablet: <b>take photos</b> (or play games), <b>multi-role</b> · headphones: <b>listen to music</b>, single-role.</li>
+      <li><b>p.40 (Lesson 5, Q3) – circle the online activities:</b> the 3 pictures with a screen: the girl with a <b>phone</b>, the girl with a <b>laptop</b>, the children around a <b>tablet</b>. Not circled: football, picking fruit, writing, seesaw, reading a book, making toast.</li>
+      <li><b>p.46 (Lesson 8, Q1) – match:</b> <b>positive</b> = inviting a friend for lunch, sending a picture of a flower · <b>negative</b> = sending a picture of a person without asking, sending a scary video.</li>
+    </ul><p style="margin:6px 0 0;color:var(--muted)">On page 31 Mira has to <b>write</b>. Let her copy these four on paper tonight: wash clothes · play games · take photos · listen to music. The printable practice tests (Mira Computer Practice Tests 17 Nov.pdf) have the same three questions.</p></div>
+    <div class="card"><h3>5-minute bedtime chat (say it together)</h3><ul>
+      <li>One finger or five? Microwave ☝️ · washing machine ☝️ · headphones ☝️ · computer 🖐️ · tablet 🖐️. <i>Single = one job, multi = many jobs.</i></li>
+      <li>“Is there a screen and the internet?” Phone, laptop, tablet: online. Football, book, seesaw, toast: offline.</li>
+      <li>Thumbs up or thumbs down? Lunch invitation 👍 · flower picture 👍 · photo of a person without asking 👎 · scary video 👎.</li>
+    </ul></div>
+  </div>`;
+  $('#backBtn').onclick=home;
+}
+// ============ CHIPS ============
+function syncChips(){ $('#voiceBtn').classList.toggle('on',voiceOn); $('#voiceBtn').textContent=voiceOn?'🔊 Voice':'🔇 Voice'; $('#arBtn').classList.toggle('on',arOn); document.body.classList.toggle('ar',arOn); }
+$('#voiceBtn').onclick=()=>{ voiceOn=!voiceOn; store.set('voice',voiceOn); syncChips(); if(voiceOn) speak('Voice is on. Hello Mira! Welcome back to the Computer Lab!',{force:true}); else speechSynthesis&&speechSynthesis.cancel(); };
+$('#arBtn').onclick=()=>{ arOn=!arOn; store.set('ar',arOn); syncChips(); };
+syncChips(); home();
+if(!window.speechSynthesis) toast('This browser has no voice. Please open the game in Chrome or Edge.');
+window.addEventListener('resize',()=>{ if(animId){cv.width=innerWidth;cv.height=innerHeight;} });
+</script>
+</body>
+</html>
